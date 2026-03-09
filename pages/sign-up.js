@@ -77,96 +77,111 @@ export default function SignUpPage() {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             </Head>
 
-            <div className="min-h-screen flex items-center justify-center px-5 py-10"
-                style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(224,36,36,0.08) 0%, transparent 60%), #09090b' }}>
-                <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm">
+            {/* Animated Cinematic Background for ENTIRE PAGE */}
+            <div className="fixed inset-0 z-0 bg-black pointer-events-none">
+                <div className="absolute inset-0">
+                    <img src="https://images.unsplash.com/photo-1542051842920-84a48ed9c4d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" className="absolute inset-0 w-full h-full object-cover opacity-20 block md:hidden scale-105" />
+                    <div className="hidden md:block absolute inset-0 w-[400vw] h-[400vh] -top-[150vh] -left-[150vw] sm:w-[150vw] sm:h-[150vh] sm:-top-[25vh] sm:-left-[25vw]">
+                        <iframe
+                            src={`https://www.youtube.com/embed/xXiSN8Tftjg?autoplay=1&mute=1&controls=0&loop=1&playlist=xXiSN8Tftjg&playsinline=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1`}
+                            allow="autoplay; fullscreen; picture-in-picture"
+                            className="w-full h-full object-cover opacity-50 pointer-events-none mix-blend-screen scale-110"
+                        />
+                    </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90"></div>
+            </div>
+
+            <div className="min-h-screen flex items-center justify-center px-6 py-10 relative z-10 w-full">
+                <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm bg-black/40 backdrop-blur-2xl border border-white/10 p-8 sm:p-10 rounded-sm shadow-[0_0_60px_rgba(0,0,0,0.8)] relative overflow-hidden group">
+                    {/* subtle red ambient glow behind form */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#E02424]/10 rounded-full blur-3xl group-hover:bg-[#E02424]/20 transition-colors pointer-events-none"></div>
 
                     {/* Logo */}
-                    <div className="text-center mb-8">
+                    <div className="text-center mb-8 relative z-10">
                         <Link href="/">
-                            <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-xl font-black text-white cursor-pointer"
-                                style={{ background: 'linear-gradient(135deg, #E02424, #FF8E53)', boxShadow: '0 8px 24px rgba(224,36,36,0.4)' }}>
-                                JP
+                            <div className="flex items-center justify-center gap-2 sm:gap-3 mb-6 mx-auto w-max cursor-pointer">
+                                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white flex items-center justify-center p-1 font-bold">
+                                    <div className="w-full h-full bg-[#E02424] rounded-full"></div>
+                                </div>
+                                <span className="font-display font-black text-white tracking-[0.1em] text-[9px] uppercase">OUStudyJapan.</span>
                             </div>
                         </Link>
-                        <h1 className="text-2xl font-display font-black text-white tracking-tight">
-                            {step === 1 ? 'Create your account' : 'Academic profile'}
+                        <h1 className="text-3xl font-display font-medium text-white tracking-tight mb-2">
+                            {step === 1 ? 'Create account.' : 'Academic info.'}
                         </h1>
-                        <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                            {step === 1 ? 'Join the OU Japan experience' : 'Tell us about your program'}
+                        <p className="text-[10px] font-bold tracking-[0.2em] text-white/50 uppercase">
+                            {step === 1 ? 'Join the experience' : 'Tell us about your program'}
                         </p>
                     </div>
 
                     {/* Step indicators */}
-                    <div className="flex gap-2 mb-6">
+                    <div className="flex gap-2 mb-8 relative z-10">
                         {[1, 2].map(s => (
-                            <div key={s} className="flex-1 h-1 rounded-full transition-all"
+                            <div key={s} className="flex-1 h-[2px] rounded-full transition-all"
                                 style={{ background: s <= step ? '#E02424' : 'rgba(255,255,255,0.1)' }} />
                         ))}
                     </div>
 
                     {step === 1 ? (
-                        <form onSubmit={handleCredentials} className="space-y-3">
+                        <form onSubmit={handleCredentials} className="space-y-4 relative z-10">
                             <input type="text" placeholder="Full Name" value={form.name}
                                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                                className="input-field" autoComplete="name" required />
+                                className="w-full bg-white/5 border border-white/10 text-white placeholder-white/40 px-5 py-4 text-sm focus:outline-none focus:border-white/40 transition-colors rounded-sm" autoComplete="name" required />
                             <input type="email" placeholder="Email (ou.edu preferred)" value={form.email}
                                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                                className="input-field" autoComplete="email" required />
-                            <input type="password" placeholder="Password (8+ characters)" value={form.password}
+                                className="w-full bg-white/5 border border-white/10 text-white placeholder-white/40 px-5 py-4 text-sm focus:outline-none focus:border-white/40 transition-colors rounded-sm" autoComplete="email" required />
+                            <input type="password" placeholder="Password (8+ chars)" value={form.password}
                                 onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                                className="input-field" autoComplete="new-password" required />
+                                className="w-full bg-white/5 border border-white/10 text-white placeholder-white/40 px-5 py-4 text-sm focus:outline-none focus:border-white/40 transition-colors rounded-sm" autoComplete="new-password" required />
                             <input type="password" placeholder="Confirm Password" value={form.confirmPassword}
                                 onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
-                                className="input-field" autoComplete="new-password" required />
+                                className="w-full bg-white/5 border border-white/10 text-white placeholder-white/40 px-5 py-4 text-sm focus:outline-none focus:border-white/40 transition-colors rounded-sm" autoComplete="new-password" required />
                             <button type="submit"
-                                className="w-full py-3.5 rounded-2xl font-display font-bold text-white transition-all active:scale-95 mt-2"
-                                style={{ background: '#E02424', boxShadow: '0 4px 16px rgba(224,36,36,0.4)' }}>
+                                className="w-full py-4 mt-2 bg-[#E02424] text-white font-bold text-[10px] tracking-[0.2em] uppercase hover:bg-red-700 transition-colors shadow-2xl rounded-sm">
                                 Continue →
                             </button>
                         </form>
                     ) : (
-                        <form onSubmit={handleSignUp} className="space-y-3">
+                        <form onSubmit={handleSignUp} className="space-y-4 relative z-10">
                             <div>
-                                <p className="text-[10px] font-display font-bold uppercase tracking-widest mb-1.5" style={{ color: 'rgba(255,255,255,0.4)' }}>University</p>
+                                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/50 mb-2">University</p>
                                 <select value={form.university} onChange={e => setForm(f => ({ ...f, university: e.target.value }))}
-                                    className="input-field" style={{ background: 'rgba(255,255,255,0.07)', color: 'white' }}>
-                                    {UNIVERSITIES.map(u => <option key={u}>{u}</option>)}
+                                    className="w-full bg-white/5 border border-white/10 text-white px-5 py-4 text-sm focus:outline-none focus:border-white/40 transition-colors rounded-sm appearance-none">
+                                    {UNIVERSITIES.map(u => <option key={u} className="bg-black text-white">{u}</option>)}
                                 </select>
                             </div>
                             <div>
-                                <p className="text-[10px] font-display font-bold uppercase tracking-widest mb-1.5" style={{ color: 'rgba(255,255,255,0.4)' }}>Major</p>
+                                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/50 mb-2">Major</p>
                                 <select value={form.major} onChange={e => setForm(f => ({ ...f, major: e.target.value }))}
-                                    className="input-field" style={{ background: 'rgba(255,255,255,0.07)', color: 'white' }}>
-                                    {MAJORS.map(m => <option key={m}>{m}</option>)}
+                                    className="w-full bg-white/5 border border-white/10 text-white px-5 py-4 text-sm focus:outline-none focus:border-white/40 transition-colors rounded-sm appearance-none">
+                                    {MAJORS.map(m => <option key={m} className="bg-black text-white">{m}</option>)}
                                 </select>
                             </div>
                             <div>
-                                <p className="text-[10px] font-display font-bold uppercase tracking-widest mb-1.5" style={{ color: 'rgba(255,255,255,0.4)' }}>Year</p>
+                                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/50 mb-2">Year</p>
                                 <select value={form.year} onChange={e => setForm(f => ({ ...f, year: e.target.value }))}
-                                    className="input-field" style={{ background: 'rgba(255,255,255,0.07)', color: 'white' }}>
-                                    {YEARS.map(y => <option key={y}>{y}</option>)}
+                                    className="w-full bg-white/5 border border-white/10 text-white px-5 py-4 text-sm focus:outline-none focus:border-white/40 transition-colors rounded-sm appearance-none">
+                                    {YEARS.map(y => <option key={y} className="bg-black text-white">{y}</option>)}
                                 </select>
                             </div>
 
-                            <div className="flex gap-2 pt-1">
+                            <div className="flex gap-3 pt-2">
                                 <button type="button" onClick={() => setStep(1)}
-                                    className="flex-1 py-3.5 rounded-2xl font-display font-bold text-sm transition-all active:scale-95"
-                                    style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                    ← Back
+                                    className="flex-[0.5] py-4 bg-white/5 border border-white/10 text-white font-bold text-[10px] tracking-[0.2em] uppercase hover:bg-white/10 transition-colors rounded-sm text-center">
+                                    Back
                                 </button>
                                 <button type="submit" disabled={loading}
-                                    className="flex-1 py-3.5 rounded-2xl font-display font-bold text-white text-sm transition-all active:scale-95 disabled:opacity-60 flex items-center justify-center"
-                                    style={{ background: '#E02424', boxShadow: '0 4px 16px rgba(224,36,36,0.4)' }}>
-                                    {loading ? <span className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" /> : 'Create Account 🎌'}
+                                    className="flex-1 py-4 bg-[#E02424] text-white font-bold text-[10px] tracking-[0.2em] uppercase hover:bg-red-700 transition-colors shadow-2xl disabled:opacity-50 flex items-center justify-center rounded-sm">
+                                    {loading ? <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" /> : 'Create Account'}
                                 </button>
                             </div>
                         </form>
                     )}
 
-                    <p className="text-center text-sm mt-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                    <p className="text-center text-[10px] font-bold tracking-[0.1em] uppercase text-white/40 mt-8 relative z-10">
                         Already have an account?{' '}
-                        <Link href="/login" className="font-bold" style={{ color: '#FF6B6B' }}>Sign in</Link>
+                        <Link href="/login" className="text-white hover:text-white/70 transition-colors ml-1">Sign in</Link>
                     </p>
                 </motion.div>
             </div>
