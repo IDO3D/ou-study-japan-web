@@ -167,7 +167,7 @@ function StaticMap({ lat, lng, name, zoom = 14 }) {
   const tileX = Math.floor(((lng + 180) / 360) * Math.pow(2, zoom))
   const tileY = Math.floor(
     (1 - Math.log(Math.tan((lat * Math.PI) / 180) + 1 / Math.cos((lat * Math.PI) / 180)) / Math.PI) /
-      2 * Math.pow(2, zoom)
+    2 * Math.pow(2, zoom)
   )
   const tileUrl = `https://tile.openstreetmap.org/${zoom}/${tileX}/${tileY}.png`
 
@@ -199,7 +199,7 @@ function StaticMap({ lat, lng, name, zoom = 14 }) {
 }
 
 // Welcome Page slide-in
-function WelcomePage({ stay, onClose }) {
+function WelcomePage({ stay, onClose, onNavigateToMap }) {
   return (
     <motion.div
       className="absolute inset-0 z-50 flex flex-col"
@@ -286,16 +286,20 @@ function WelcomePage({ stay, onClose }) {
           <p className="text-[10px] font-display font-bold uppercase tracking-widest mb-3"
             style={{ color: 'rgba(255,255,255,0.3)' }}>Location</p>
           <StaticMap lat={stay.lat} lng={stay.lng} name={stay.name} zoom={stay.mapZoom} />
-          <p className="text-[10px] text-center mt-2 font-display" style={{ color: 'rgba(255,255,255,0.3)' }}>
-            {stay.lat.toFixed(4)}, {stay.lng.toFixed(4)}
-          </p>
+          <button
+            onClick={() => onNavigateToMap?.({ name: stay.name, lat: stay.lat, lng: stay.lng, icon: '🏠' })}
+            className="mt-2 w-full py-2.5 rounded-xl font-display font-bold text-xs text-white transition-all active:scale-95"
+            style={{ background: 'var(--brand, #E02424)', boxShadow: '0 4px 12px rgba(224,36,36,0.3)' }}
+          >
+            📍 Navigate In-App
+          </button>
         </div>
       </div>
     </motion.div>
   )
 }
 
-export default function HousingView() {
+export default function HousingView({ onNavigateToMap }) {
   const [welcomeStay, setWelcomeStay] = useState(null)
   const [expandedId, setExpandedId] = useState('oic')
 
@@ -319,7 +323,7 @@ export default function HousingView() {
           <p className="text-xs font-display font-bold uppercase tracking-widest mb-1"
             style={{ color: '#FFB7C5' }}>Your Accommodation</p>
           <h2 className="text-2xl font-display font-black text-white relative z-10">
-            Housing Guide 
+            Housing Guide
           </h2>
           <p className="text-xs mt-1.5 relative z-10" style={{ color: 'rgba(255,255,255,0.45)' }}>
             {totalNights} nights across 3 cities · 1–2 roommates
@@ -417,7 +421,14 @@ export default function HousingView() {
                   className="flex-1 py-2 rounded-xl text-xs font-display font-bold transition-all active:scale-95 text-white"
                   style={{ background: stay.color, boxShadow: `0 4px 12px ${stay.colorBg}` }}
                 >
-                   Welcome Page
+                  🗺 Welcome Page
+                </button>
+                <button
+                  onClick={() => onNavigateToMap?.({ name: stay.name, lat: stay.lat, lng: stay.lng, icon: '🏠' })}
+                  className="flex-1 py-2 rounded-xl text-xs font-display font-bold transition-all active:scale-95 text-white"
+                  style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)' }}
+                >
+                  📍 Navigate
                 </button>
               </div>
 
@@ -477,7 +488,7 @@ export default function HousingView() {
       {/* ── Welcome Page Overlay ─────────────── */}
       <AnimatePresence>
         {welcomeStay && (
-          <WelcomePage stay={welcomeStay} onClose={() => setWelcomeStay(null)} />
+          <WelcomePage stay={welcomeStay} onClose={() => setWelcomeStay(null)} onNavigateToMap={onNavigateToMap} />
         )}
       </AnimatePresence>
     </div>

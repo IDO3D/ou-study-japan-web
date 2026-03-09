@@ -1,4 +1,3 @@
-// components/MapView.jsx — Enhanced with Navigation Mode (Mapbox Directions)
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../utils/store'
@@ -55,12 +54,12 @@ export default function MapView() {
   const [activeCity, setActiveCity] = useState('ibaraki')
   const [filter, setFilter] = useState('all')
   const [selectedPoi, setSelectedPoi] = useState(null)
-  const [navMode, setNavMode] = useState(null) // null = explore, else navigation
+  const [navMode, setNavMode] = useState(null)
   const [navTransport, setNavTransport] = useState('walking')
   const [destination, setDestination] = useState(null)
   const [route, setRoute] = useState(null)
   const [routeLoading, setRouteLoading] = useState(false)
-  const { userLocation } = useStore()
+  const { userLocation, navDestination, clearNavDestination } = useStore()
 
   const city = CITIES.find(c => c.id === activeCity)
   const pois = CITY_POIS[activeCity] || []
@@ -68,6 +67,19 @@ export default function MapView() {
 
   const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
   const hasMapbox = MAPBOX_TOKEN?.startsWith('pk.')
+
+  // Auto-navigate when arriving from another view (Discover, Housing, etc.)
+  useEffect(() => {
+    if (navDestination && mapLoaded) {
+      setDestination(navDestination)
+      setNavMode('navigate')
+      getDirections(navDestination)
+      if (mapInstance.current) {
+        mapInstance.current.flyTo({ center: [navDestination.lng, navDestination.lat], zoom: 16, pitch: 50, duration: 1200 })
+      }
+      clearNavDestination()
+    }
+  }, [navDestination, mapLoaded])
 
   // Initialize map
   useEffect(() => {

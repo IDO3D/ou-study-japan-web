@@ -17,6 +17,7 @@ const CATEGORIES = [
 const RESTAURANTS = [
   {
     id: 1, name: 'Ichiran Ramen', category: 'ramen', city: 'kyoto',
+    lat: 35.0048, lng: 135.7684,
     rating: 4.8, reviews: 2341, priceRange: '¥890–¥1,500',
     avgPrice: 890, halal: false, vegan: false,
     image: 'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?auto=format&fit=crop&q=80&w=600',
@@ -34,6 +35,7 @@ const RESTAURANTS = [
   },
   {
     id: 2, name: 'Nishiki Market Food Stalls', category: 'sushi', city: 'kyoto',
+    lat: 35.0050, lng: 135.7650,
     rating: 4.6, reviews: 5820, priceRange: '¥200–¥800',
     avgPrice: 400, halal: false, vegan: true,
     image: 'https://images.unsplash.com/photo-1617196034183-421b4040ed20?auto=format&fit=crop&q=80&w=600',
@@ -52,6 +54,7 @@ const RESTAURANTS = [
   },
   {
     id: 3, name: 'Halal Ramen Honolu', category: 'halal', city: 'kyoto',
+    lat: 35.0090, lng: 135.7620,
     rating: 4.7, reviews: 892, priceRange: '¥950–¥1,400',
     avgPrice: 1050, halal: true, vegan: false,
     image: 'https://images.unsplash.com/photo-1591814468924-caf88d1232e1?auto=format&fit=crop&q=80&w=600',
@@ -69,6 +72,7 @@ const RESTAURANTS = [
   },
   {
     id: 4, name: 'Sushiro Conveyor Belt', category: 'conveyor', city: 'ibaraki',
+    lat: 34.8082, lng: 135.5737,
     rating: 4.4, reviews: 12400, priceRange: '¥110–¥440/plate',
     avgPrice: 330, halal: false, vegan: false,
     image: 'https://images.unsplash.com/photo-1617196034183-421b4040ed20?auto=format&fit=crop&q=80&w=600',
@@ -87,6 +91,7 @@ const RESTAURANTS = [
   },
   {
     id: 5, name: 'Afuri Ramen', category: 'ramen', city: 'tokyo',
+    lat: 35.6706, lng: 135.7023,
     rating: 4.9, reviews: 3210, priceRange: '¥990–¥1,600',
     avgPrice: 1100, halal: false, vegan: true,
     image: 'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?auto=format&fit=crop&q=80&w=600',
@@ -104,6 +109,7 @@ const RESTAURANTS = [
   },
   {
     id: 6, name: '7-Eleven Japan', category: 'convenience', city: 'ibaraki',
+    lat: 34.8149, lng: 135.5710,
     rating: 4.5, reviews: 88420, priceRange: '¥100–¥600',
     avgPrice: 280, halal: false, vegan: false,
     image: 'https://images.unsplash.com/photo-1601924638867-3a6de6b7a500?auto=format&fit=crop&q=80&w=600',
@@ -122,6 +128,7 @@ const RESTAURANTS = [
   },
   {
     id: 7, name: 'Shibuya Cast Izakaya', category: 'izakaya', city: 'tokyo',
+    lat: 35.6600, lng: 139.7000,
     rating: 4.3, reviews: 1820, priceRange: '¥500–¥2,000',
     avgPrice: 1200, halal: false, vegan: false,
     image: 'https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&q=80&w=600',
@@ -140,6 +147,7 @@ const RESTAURANTS = [
   },
   {
     id: 8, name: 'Vegan Ramen Shinjuku', category: 'vegan', city: 'tokyo',
+    lat: 35.6905, lng: 135.6995,
     rating: 4.6, reviews: 650, priceRange: '¥980–¥1,400',
     avgPrice: 1050, halal: false, vegan: true,
     image: 'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?auto=format&fit=crop&q=80&w=600',
@@ -167,7 +175,7 @@ function StarRating({ rating }) {
   )
 }
 
-function RestaurantCard({ r, onSelect, selected }) {
+function RestaurantCard({ r, onSelect, selected, onNavigateToMap }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -261,11 +269,13 @@ function RestaurantCard({ r, onSelect, selected }) {
 
               {/* Actions */}
               <div className="flex gap-2">
-                <a href={r.mapUrl} target="_blank" rel="noopener noreferrer"
+                <button
+                  onClick={(e) => { e.stopPropagation(); onNavigateToMap({ name: r.name, lat: r.lat || 35.0, lng: r.lng || 135.7, icon: r.menuItems?.[0] ? '🍽️' : '📍' }) }}
                   className="flex-1 py-2.5 rounded-xl font-display font-bold text-xs text-white text-center transition-all active:scale-95"
-                  style={{ background: 'var(--brand)', boxShadow: '0 4px 12px var(--brand-glow)' }}>
-                  📍 Get Directions
-                </a>
+                  style={{ background: 'var(--brand)', boxShadow: '0 4px 12px var(--brand-glow)' }}
+                >
+                  📍 Navigate In-App
+                </button>
                 {r.menuUrl && (
                   <a href={r.menuUrl} target="_blank" rel="noopener noreferrer"
                     className="flex-1 py-2.5 rounded-xl font-display font-bold text-xs text-center transition-all active:scale-95"
@@ -282,7 +292,7 @@ function RestaurantCard({ r, onSelect, selected }) {
   )
 }
 
-export default function DiscoverView() {
+export default function DiscoverView({ onNavigateToMap }) {
   const [activeCategory, setActiveCategory] = useState('all')
   const [activeCity, setActiveCity] = useState('all')
   const [selected, setSelected] = useState(null)
@@ -359,7 +369,7 @@ export default function DiscoverView() {
         <div className="space-y-3">
           {filtered.map((r, i) => (
             <motion.div key={r.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-              <RestaurantCard r={r} onSelect={setSelected} selected={selected?.id === r.id} />
+              <RestaurantCard r={r} onSelect={setSelected} selected={selected?.id === r.id} onNavigateToMap={onNavigateToMap} />
             </motion.div>
           ))}
         </div>

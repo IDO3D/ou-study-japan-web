@@ -20,7 +20,7 @@ export default function Dashboard() {
     const router = useRouter()
     const [view, setView] = useState('home')
     const [authReady, setAuthReady] = useState(false)
-    const { setRestaurants, setQuests, setExchangeRate, setUserLocation, setUser } = useStore()
+    const { setRestaurants, setQuests, setExchangeRate, setUserLocation, setUser, setNavDestination } = useStore()
 
     // Auth guard + load user profile
     useEffect(() => {
@@ -114,15 +114,21 @@ export default function Dashboard() {
         router.push('/')
     }
 
+    // Helper: set destination in store, then switch to map tab
+    const navigateInApp = (dest) => {
+        setNavDestination(dest)
+        setView('map')
+    }
+
     const VIEWS = {
         home: <HomeView onNavigate={setView} />,
-        discover: <DiscoverView />,
+        discover: <DiscoverView onNavigateToMap={navigateInApp} />,
         camera: <CameraView />,
         map: <MapView />,
         quests: <QuestsView />,
         profile: <ProfileView onSignOut={handleSignOut} />,
         canvas: <CanvasView />,
-        housing: <HousingView />,
+        housing: <HousingView onNavigateToMap={navigateInApp} />,
     }
 
     if (!authReady) {

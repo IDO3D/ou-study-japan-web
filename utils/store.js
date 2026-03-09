@@ -28,7 +28,12 @@ const useStore = create((set, get) => ({
   },
 
 
-  // ─── Exchange Rate ───────────────────────
+  // ─── In-App Navigation ──────────────────
+  navDestination: null, // { name, lat, lng, icon }
+  setNavDestination: (dest) => set({ navDestination: dest }),
+  clearNavDestination: () => set({ navDestination: null }),
+
+
   exchangeRate: 0.0067, // JPY to USD
   setExchangeRate: (rate) => set({ exchangeRate: rate }),
 
