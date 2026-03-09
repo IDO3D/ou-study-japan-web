@@ -53,7 +53,7 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-12 font-medium text-[10px] uppercase tracking-[0.2em] text-white/70">
             <Link href="#features" className="hover:text-white transition-colors">Features</Link>
             <Link href="#wallet" className="hover:text-white transition-colors">Wallet</Link>
-            <Link href="#safety" className="hover:text-white transition-colors">Safety</Link>
+            <Link href="#safety" className="hover:text-white transition-colors">Safety & Travel</Link>
             <Link href="#food" className="hover:text-white transition-colors">Food</Link>
           </div>
 
@@ -171,7 +171,7 @@ export default function LandingPage() {
         </section>
 
         {/* Sleek Features Typography */}
-        <section className="relative z-10 py-24 sm:py-32 px-6 lg:px-16">
+        <section id="features" className="relative z-10 py-24 sm:py-32 px-6 lg:px-16">
           <div className="max-w-7xl mx-auto border-t border-white/20 pt-16">
             <div className="mb-16 sm:mb-24 flex flex-col sm:flex-row justify-between items-end gap-10">
               <h2 className="font-display font-medium text-4xl sm:text-5xl lg:text-6xl tracking-tight m-0 text-white max-w-xl">
@@ -202,7 +202,7 @@ export default function LandingPage() {
         </section>
 
         {/* Wallet Visual Break-out Section */}
-        <section className="relative z-10 py-24 px-6 lg:px-16 overflow-hidden border-t border-white/20">
+        <section id="wallet" className="relative z-10 py-24 px-6 lg:px-16 overflow-hidden border-t border-white/20">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#E02424]/10 blur-[120px] rounded-full pointer-events-none"></div>
 
           <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-16 relative z-10">
@@ -287,6 +287,55 @@ export default function LandingPage() {
                   </div>
                 </div>
               </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Safety & Travel Section */}
+        <section id="safety" className="relative z-10 py-24 lg:py-32 px-6 lg:px-16 border-t border-white/20 bg-black/30 backdrop-blur-sm">
+          <div className="max-w-6xl mx-auto flex flex-col lg:flex-row-reverse items-center justify-between gap-16 relative z-10">
+            <div className="flex-1 space-y-8 text-center lg:text-left">
+              <h2 className="font-display font-medium text-5xl lg:text-7xl tracking-tighter leading-tight m-0 text-white">Safety & <br /><span className="text-[#E02424] font-black italic">Travel</span></h2>
+              <p className="text-lg sm:text-xl text-white/50 leading-relaxed max-w-xl mx-auto lg:mx-0 m-0 font-medium">
+                Live embassy updates, instant emergency dialing, local health tips, and customized transit strategies all in one place. Never feel lost in translation.
+              </p>
+            </div>
+            <div className="flex-1 w-full max-w-lg mx-auto relative group">
+              <div className="absolute inset-0 bg-[#E02424]/10 blur-3xl rounded-full group-hover:bg-[#E02424]/20 transition-colors"></div>
+              <div className="aspect-[4/3] rounded-sm bg-black/60 border border-white/10 backdrop-blur-md relative overflow-hidden flex items-center justify-center p-8 transition-transform group-hover:scale-105 duration-500">
+                <div className="absolute inset-0 border border-white/5 m-4"></div>
+                <div className="text-center relative z-10">
+                  <span className="block mb-6 text-white/80"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="mx-auto"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg></span>
+                  <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-[#E02424] mb-3">Emergency Hub</p>
+                  <h4 className="font-display text-3xl text-white font-medium tracking-tight">Active Pulse Monitoring</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Food Section */}
+        <section id="food" className="relative z-10 py-24 lg:py-32 px-6 lg:px-16 border-t border-white/20 bg-[#060608]/80 backdrop-blur-sm">
+          <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-16 relative z-10">
+            <div className="flex-1 space-y-8 text-center lg:text-left">
+              <h2 className="font-display font-medium text-5xl lg:text-7xl tracking-tighter leading-tight m-0 text-white">Curated <br /><span className="text-white border-b-2 border-[#E02424] pb-3 block mt-2 max-w-max font-black mx-auto lg:mx-0">Food Discoveries</span></h2>
+              <p className="text-lg sm:text-xl text-white/50 leading-relaxed max-w-xl mx-auto lg:mx-0 m-0 font-medium pt-4">
+                From hunting down hidden gem izakayas to exploring the endless aisles of local convenience stores. Explore interactive menus with built-in translations perfectly mapped before you even order.
+              </p>
+            </div>
+            <div className="flex-1 w-full max-w-lg mx-auto relative group cursor-pointer">
+              <div className="aspect-[4/3] rounded-sm bg-black/60 border border-white/10 backdrop-blur-md relative overflow-hidden p-6 flex flex-col justify-between transition-transform group-hover:-translate-y-2 duration-500 hover:shadow-[0_20px_40px_rgba(224,36,36,0.15)]">
+                <div className="w-full h-48 bg-white/5 overflow-hidden mb-5 relative border border-white/5">
+                  <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" className="w-full h-full object-cover opacity-60 filter grayscale group-hover:grayscale-0 transition-all duration-700" />
+                </div>
+                <div className="flex justify-between items-end border-t border-white/10 pt-5">
+                  <div>
+                    <h4 className="font-bold text-white text-xl font-display mb-1.5 tracking-tight">Sushi Zanmai Honten</h4>
+                    <p className="text-[10px] text-white/50 tracking-[0.2em] uppercase m-0">9.4km • Tsukiji Market</p>
+                  </div>
+                  <span className="text-[#E02424] font-bold tracking-widest bg-[#E02424]/10 px-3 py-1 rounded-sm border border-[#E02424]/30">¥¥¥</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
