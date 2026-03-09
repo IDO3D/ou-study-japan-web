@@ -41,12 +41,12 @@ function WalletPanel({ onNavigateToMap }) {
         </button>
       </div>
 
-      <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 dark:bg-[#121214] dark:border-white/10">
-        <h3 className="font-display font-bold text-lg m-0 mb-3">Nearby ATMs</h3>
-        <p className="text-xs text-gray-500 mb-4 leading-relaxed">7-Eleven and Japan Post are the most reliable for foreign debit/credit cards.</p>
+      <div className="p-5 rounded-3xl shadow-sm border border-gray-100" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+        <h3 className="font-display font-bold text-lg m-0 mb-3" style={{ color: 'var(--text)' }}>Nearby ATMs</h3>
+        <p className="text-xs mb-4 leading-relaxed" style={{ color: 'var(--text-muted)' }}>7-Eleven and Japan Post are the most reliable for foreign debit/credit cards.</p>
         <div className="space-y-2">
           {ATMs.map(atm => (
-            <div key={atm.name} className="flex justify-between items-center p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5">
+            <div key={atm.name} className="flex justify-between items-center p-3 rounded-2xl border" style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
               <div>
                 <p className="font-bold text-sm m-0 leading-tight">{atm.name}</p>
                 <p className="text-[10px] text-gray-500 m-0 mt-0.5">{atm.hours} • {atm.free ? 'Free' : 'Fee applies'}</p>
@@ -89,24 +89,24 @@ function FinancePanel() {
 
   return (
     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 dark:bg-[#121214] dark:border-white/10">
+      <div className="p-5 rounded-3xl shadow-sm border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
         <div className="flex justify-between items-end mb-4">
-          <h3 className="font-display font-bold text-lg m-0 leading-tight">Live Converter</h3>
+          <h3 className="font-display font-bold text-lg m-0 leading-tight" style={{ color: 'var(--text)' }}>Live Converter</h3>
           <span className="text-[10px] font-bold px-2 py-1 bg-green-100 text-green-700 rounded-lg">
             LIVE: ¥{currentRate.toFixed(2)}
           </span>
         </div>
         <div className="space-y-3">
           <div className="flex gap-3">
-            <div className="flex-1 bg-gray-50 dark:bg-white/5 p-3 rounded-2xl border border-gray-100 dark:border-white/5 relative">
-              <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase block mb-1">USD $</span>
+            <div className="flex-1 p-3 rounded-2xl border relative" style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
+              <span className="text-[10px] font-bold tracking-widest uppercase block mb-1" style={{ color: 'var(--text-muted)' }}>USD $</span>
               <input type="number"
                 value={activeInput === 'usd' ? usdInput : displayUsd}
                 onChange={e => { setActiveInput('usd'); setUsdInput(e.target.value) }}
                 className="w-full bg-transparent text-xl font-black outline-none" />
             </div>
-            <div className="flex-1 bg-gray-50 dark:bg-white/5 p-3 rounded-2xl border border-gray-100 dark:border-white/5 relative">
-              <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase block mb-1">JPY ¥</span>
+            <div className="flex-1 p-3 rounded-2xl border relative" style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
+              <span className="text-[10px] font-bold tracking-widest uppercase block mb-1" style={{ color: 'var(--text-muted)' }}>JPY ¥</span>
               <input type="number"
                 value={activeInput === 'jpy' ? jpyInput : displayJpy}
                 onChange={e => { setActiveInput('jpy'); setJpyInput(e.target.value) }}
@@ -116,12 +116,12 @@ function FinancePanel() {
         </div>
       </div>
 
-      <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 dark:bg-[#121214] dark:border-white/10">
-        <h3 className="font-display font-bold text-lg m-0 mb-3">Daily Budget</h3>
+      <div className="p-5 rounded-3xl shadow-sm border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+        <h3 className="font-display font-bold text-lg m-0 mb-3" style={{ color: 'var(--text)' }}>Daily Budget</h3>
         <div className="space-y-2 mb-4">
           {BUDGET.map(b => (
-            <div key={b.cat} className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-white/5 last:border-0">
-              <span className="text-sm font-semibold">{b.cat}</span>
+            <div key={b.cat} className="flex justify-between items-center py-2 border-b last:border-0" style={{ borderColor: 'var(--border)' }}>
+              <span className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{b.cat}</span>
               <span className="text-sm font-display font-bold text-brand">{b.price}</span>
             </div>
           ))}
@@ -188,11 +188,11 @@ function PhotoReelPanel() {
           <button onClick={() => setPlaying(false)} className="mt-8 mx-auto w-12 h-12 bg-white/20 backdrop-blur-md rounded-full text-white text-xl flex items-center justify-center">×</button>
         </div>
       ) : (
-        <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 dark:bg-[#121214] dark:border-white/10">
+        <div className="p-5 rounded-3xl shadow-sm border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h3 className="font-display font-bold text-lg m-0 leading-tight">Trip Reel</h3>
-              <p className="text-xs text-gray-400 m-0 mt-0.5">Stored in Google Photos Album</p>
+              <h3 className="font-display font-bold text-lg m-0 leading-tight" style={{ color: 'var(--text)' }}>Trip Reel</h3>
+              <p className="text-xs m-0 mt-0.5" style={{ color: 'var(--text-muted)' }}>Stored in Google Photos Album</p>
             </div>
             {photos.length > 0 && (
               <button onClick={() => { setSlideIdx(0); setPlaying(true) }} className="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center">▶</button>
@@ -210,7 +210,7 @@ function PhotoReelPanel() {
                 )}
               </div>
             ))}
-            <button onClick={() => fileRef.current?.click()} className="aspect-square rounded-2xl border-2 border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center justify-center gap-2 text-gray-400 active:scale-95 transition-transform">
+            <button onClick={() => fileRef.current?.click()} className="aspect-square rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform" style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
               <span className="text-2xl">+</span>
               <span className="text-[10px] font-bold">Add Photo</span>
             </button>
@@ -220,8 +220,8 @@ function PhotoReelPanel() {
           {photos.length === 0 && (
             <div className="text-center mt-6 mb-2">
               <span className="text-4xl opacity-50 block mb-2">🖼️</span>
-              <p className="text-sm font-semibold text-gray-500 m-0">Your reel is empty</p>
-              <p className="text-xs text-gray-400 m-0 mt-1">Upload photos to create a cinematic recap of your study abroad experience.</p>
+              <p className="text-sm font-semibold m-0" style={{ color: 'var(--text-muted)' }}>Your reel is empty</p>
+              <p className="text-xs m-0 mt-1" style={{ color: 'var(--text-muted)' }}>Upload photos to create a cinematic recap of your study abroad experience.</p>
             </div>
           )}
         </div>
@@ -231,22 +231,23 @@ function PhotoReelPanel() {
       <AnimatePresence>
         {activePhotoModal && (
           <div className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white dark:bg-[#121214] w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl" style={{ background: 'var(--surface)' }}>
               <div className="w-full aspect-square bg-black">
                 <img src={activePhotoModal.url} className="w-full h-full object-contain" />
               </div>
               <div className="p-5">
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Add Caption</p>
+                <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>Add Caption</p>
                 <input type="text" autoFocus
                   defaultValue={activePhotoModal.caption}
                   onKeyDown={e => { if (e.key === 'Enter') saveCaption(activePhotoModal.id, e.target.value) }}
-                  className="w-full bg-gray-50 dark:bg-white/5 p-3 rounded-xl border border-gray-100 dark:border-white/10 outline-none text-sm mb-4"
+                  className="w-full p-3 rounded-xl border outline-none text-sm mb-4"
+                  style={{ background: 'var(--surface2)', borderColor: 'var(--border)', color: 'var(--text)' }}
                   placeholder="E.g., Amazing matcha in Kyoto..."
                   id={`cap-${activePhotoModal.id}`}
                 />
                 <div className="flex gap-2">
-                  <button onClick={() => setActivePhotoModal(null)} className="flex-1 py-3 bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-white rounded-xl font-bold text-sm">Cancel</button>
-                  <button onClick={() => saveCaption(activePhotoModal.id, document.getElementById(`cap-${activePhotoModal.id}`).value)} className="flex-1 py-3 bg-black text-white rounded-xl font-bold text-sm">Save</button>
+                  <button onClick={() => setActivePhotoModal(null)} className="flex-1 py-3 rounded-xl font-bold text-sm" style={{ background: 'var(--surface2)', color: 'var(--text)' }}>Cancel</button>
+                  <button onClick={() => saveCaption(activePhotoModal.id, document.getElementById(`cap-${activePhotoModal.id}`).value)} className="flex-1 py-3 rounded-xl font-bold text-sm" style={{ background: 'var(--text)', color: 'var(--bg)' }}>Save</button>
                 </div>
               </div>
             </motion.div>
@@ -261,8 +262,8 @@ function PhotoReelPanel() {
 function UniversalPanel({ title, content }) {
   return (
     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 dark:bg-[#121214] dark:border-white/10">
-        <h3 className="font-display font-black text-xl m-0 mb-4">{title}</h3>
+      <div className="p-6 rounded-3xl shadow-sm border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+        <h3 className="font-display font-black text-xl m-0 mb-4" style={{ color: 'var(--text)' }}>{title}</h3>
         {content}
       </div>
     </div>
@@ -306,32 +307,32 @@ export default function ProfileView({ onNavigateToMap, onSignOut }) {
 
       {/* Settings Bar */}
       <div className="flex justify-between items-center pt-2">
-        <h1 className="font-display font-black text-2xl m-0">My Profile</h1>
+        <h1 className="font-display font-black text-2xl m-0" style={{ color: 'var(--text)' }}>My Profile</h1>
         <button className="text-xl rotate-0 active:rotate-45 transition-transform"><IconSettings /></button>
       </div>
 
       {/* Identity Card */}
-      <div className="bg-white p-5 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 dark:bg-[#121214] dark:border-white/10 relative overflow-hidden">
+      <div className="p-5 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border relative overflow-hidden" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
         {/* Abstract BG */}
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-brand/10 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"></div>
 
         <div className="flex items-center gap-4 relative z-10 mb-5">
-          <img src="https://i.pravatar.cc/150?img=33" className="w-16 h-16 rounded-full border-2 border-white shadow-md object-cover" />
+          <img src="https://i.pravatar.cc/150?img=33" className="w-16 h-16 rounded-full border-2 border-[var(--surface2)] shadow-md object-cover" />
           <div>
-            <h2 className="font-display font-black text-xl m-0 leading-tight">Student</h2>
-            <p className="font-body text-xs mt-1 text-gray-500 font-semibold tracking-wide">UNIVERSITY OF OKLAHOMA</p>
+            <h2 className="font-display font-black text-xl m-0 leading-tight" style={{ color: 'var(--text)' }}>Student</h2>
+            <p className="font-body text-xs mt-1 font-semibold tracking-wide" style={{ color: 'var(--text-muted)' }}>UNIVERSITY OF OKLAHOMA</p>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3 relative z-10">
-          <div className="bg-gray-50 dark:bg-white/5 p-3 rounded-2xl border border-gray-100 dark:border-white/5">
-            <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Course Hours</span>
-            <p className="font-black text-lg m-0 mt-0.5">45 Hrs</p>
+          <div className="p-3 rounded-2xl border" style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
+            <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Course Hours</span>
+            <p className="font-black text-lg m-0 mt-0.5" style={{ color: 'var(--text)' }}>45 Hrs</p>
           </div>
-          <div className="bg-gray-50 dark:bg-white/5 p-3 rounded-2xl border border-gray-100 dark:border-white/5">
-            <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Class Size</span>
-            <p className="font-black text-lg m-0 mt-0.5">25 Pax</p>
+          <div className="p-3 rounded-2xl border" style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
+            <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Class Size</span>
+            <p className="font-black text-lg m-0 mt-0.5" style={{ color: 'var(--text)' }}>25 Pax</p>
           </div>
           <div className="bg-brand/10 p-3 rounded-2xl border border-brand/20 col-span-2 flex justify-between items-center">
             <div>
@@ -344,43 +345,43 @@ export default function ProfileView({ onNavigateToMap, onSignOut }) {
       </div>
 
       {/* Live Map Widget */}
-      <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 dark:bg-[#121214] dark:border-white/10 flex justify-between items-center">
+      <div className="p-4 rounded-3xl shadow-sm border flex justify-between items-center" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
         <div>
-          <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Current City</span>
+          <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Current City</span>
           <div className="flex items-center gap-1.5 mt-0.5">
             <span className="text-xl">📍</span>
-            <span className="font-display font-black text-xl text-black dark:text-white tracking-tight">Tokyo, Japan</span>
+            <span className="font-display font-black text-xl tracking-tight" style={{ color: 'var(--text)' }}>Tokyo, Japan</span>
           </div>
         </div>
-        <button onClick={() => onNavigateToMap?.({})} className="bg-gray-100 dark:bg-white/10 px-4 py-2 rounded-xl text-xs font-bold active:scale-95 transition-transform">
+        <button onClick={() => onNavigateToMap?.({})} className="px-4 py-2 rounded-xl text-xs font-bold active:scale-95 transition-transform" style={{ background: 'var(--surface2)', color: 'var(--text)' }}>
           Open Map
         </button>
       </div>
 
       {/* Tools Grid */}
       <div>
-        <h3 className="font-display font-black text-lg m-0 mb-3 ml-1">Essentials</h3>
+        <h3 className="font-display font-black text-lg m-0 mb-3 ml-1" style={{ color: 'var(--text)' }}>Essentials</h3>
         <div className="grid grid-cols-2 gap-3">
           {SECTIONS.map(s => (
-            <div key={s.id} onClick={() => setActiveSection(s.id)} className="bg-white dark:bg-[#121214] p-4 rounded-3xl shadow-sm border border-gray-100 dark:border-white/10 cursor-pointer active:scale-[0.98] transition-all group">
-              <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center mb-3 group-hover:bg-brand/10 transition-colors">
+            <div key={s.id} onClick={() => setActiveSection(s.id)} className="p-4 rounded-3xl shadow-sm border cursor-pointer active:scale-[0.98] transition-all group" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center mb-3 group-hover:bg-brand/10 transition-colors" style={{ background: 'var(--surface2)' }}>
                 {s.icon}
               </div>
-              <h4 className="font-display font-bold text-sm m-0">{s.title}</h4>
-              <p className="text-[10px] font-medium text-gray-500 m-0 mt-1 leading-snug">{s.desc}</p>
+              <h4 className="font-display font-bold text-sm m-0" style={{ color: 'var(--text)' }}>{s.title}</h4>
+              <p className="text-[10px] font-medium m-0 mt-1 leading-snug" style={{ color: 'var(--text-muted)' }}>{s.desc}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Gamification Toggle (Hidden by default but viewable) */}
-      <div className="bg-gray-50 dark:bg-white/5 p-4 rounded-3xl border border-gray-100 dark:border-white/10 flex justify-between items-center cursor-pointer" onClick={() => setQuestsEnabled(!questsEnabled)}>
+      <div className="p-4 rounded-3xl border flex justify-between items-center cursor-pointer" onClick={() => setQuestsEnabled(!questsEnabled)} style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
         <div>
-          <h4 className="font-display font-bold text-sm m-0">Points & Quests Mode</h4>
-          <p className="text-[10px] font-medium text-gray-500 m-0 mt-0.5 leading-snug">Toggle gamification features</p>
+          <h4 className="font-display font-bold text-sm m-0" style={{ color: 'var(--text)' }}>Points & Quests Mode</h4>
+          <p className="text-[10px] font-medium m-0 mt-0.5 leading-snug" style={{ color: 'var(--text-muted)' }}>Toggle gamification features</p>
         </div>
-        <div className={`w-12 h-6 rounded-full p-1 transition-colors ${questsEnabled ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-600'}`}>
-          <div className={`w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${questsEnabled ? 'translate-x-6' : 'translate-x-0'}`}></div>
+        <div className={`w-12 h-6 rounded-full p-1 transition-colors ${questsEnabled ? 'bg-brand' : ''}`} style={{ background: questsEnabled ? '' : 'var(--text-muted)' }}>
+          <div className={`w-4 h-4 rounded-full shadow-sm transition-transform ${questsEnabled ? 'translate-x-6' : 'translate-x-0'}`} style={{ background: 'var(--bg)' }}></div>
         </div>
       </div>
 
