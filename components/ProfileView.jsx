@@ -4,6 +4,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../utils/store'
+import { IcPhone, IcCheck, IcJapan, IcX, IcWallet, IcHeart, IcMoney, IcPlay, IcArrow, IcCamera, IcPin, IcTrophy, IcStar } from './ui/Icons'
 import { formatJpy, jpyToUsd, formatUsd } from '../utils/helpers'
 import toast from 'react-hot-toast'
 
@@ -19,7 +20,7 @@ function AuthScreen({ onAuth }) {
     setLoading(true)
     await new Promise(r => setTimeout(r, 1200))
     setLoading(false)
-    toast.success(mode === 'signup' ? `Welcome, ${form.name}! 🎉` : 'Welcome back! 👋')
+    toast.success(mode === 'signup' ? `Welcome, ${form.name}! ` : 'Welcome back! ')
     onAuth({ ...form, id: Date.now().toString(), avatarUrl: `https://i.pravatar.cc/150?u=${form.email}`, points: 2450, dailyBudgetJpy: 4500 })
   }
 
@@ -30,7 +31,7 @@ function AuthScreen({ onAuth }) {
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-3xl"
             style={{ background: 'linear-gradient(135deg, #E02424, #FF8E53)', boxShadow: '0 8px 24px rgba(224,36,36,0.4)' }}>
-            🗾
+            JP
           </div>
           <h2 className="text-3xl font-display font-black text-white" style={{ letterSpacing: '-0.03em' }}>
             OUStudyJapan
@@ -88,7 +89,7 @@ function AuthScreen({ onAuth }) {
 
           <button onClick={handleSubmit} disabled={loading}
             className="w-full btn-primary flex items-center justify-center gap-2 mt-2 disabled:opacity-60">
-            {loading ? <span className="animate-spin text-lg">⟳</span> : (mode === 'signup' ? '🎌 Create Account' : '→ Sign In')}
+            {loading ? <span className="animate-spin text-lg">⟳</span> : (mode === 'signup' ? ' Create Account' : '→ Sign In')}
           </button>
         </div>
 
@@ -100,7 +101,7 @@ function AuthScreen({ onAuth }) {
             <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
           </div>
           {[
-            { icon: '🍎', label: 'Continue with Apple', bg: 'rgba(255,255,255,0.95)', color: '#09090b' },
+            { icon: '', label: 'Continue with Apple', bg: 'rgba(255,255,255,0.95)', color: '#09090b' },
             { icon: 'G', label: 'Continue with Google', bg: 'rgba(255,255,255,0.08)', color: 'white' },
           ].map(s => (
             <button key={s.label} onClick={() => { toast.success('OAuth coming soon!'); onAuth({ name: 'Demo Student', email: 'demo@ou.edu', university: 'University of Oklahoma', major: 'Marketing', year: 'Junior', id: 'demo', avatarUrl: 'https://i.pravatar.cc/150?img=33', points: 2450, dailyBudgetJpy: 4500 }) }}
@@ -125,10 +126,10 @@ function WalletPanel({ exchangeRate }) {
   const [tab, setTab] = useState('overview')
 
   const ATM_LOCATIONS = [
-    { name: '7-Eleven ATM', dist: '120m', fee: 'Free (7am–11pm)', hours: '24/7', icon: '🏪' },
-    { name: 'Japan Post Bank ATM', dist: '340m', fee: '¥110', hours: '9am–9pm', icon: '📮' },
-    { name: 'Lawson ATM', dist: '550m', fee: '¥220 (nights)', hours: '24/7', icon: '🟡' },
-    { name: 'AEON Bank ATM', dist: '820m', fee: 'Free (AEON card)', hours: '9am–8pm', icon: '🏬' },
+    { name: '7-Eleven ATM', dist: '120m', fee: 'Free (7am–11pm)', hours: '24/7', icon: '' },
+    { name: 'Japan Post Bank ATM', dist: '340m', fee: '¥110', hours: '9am–9pm', icon: '' },
+    { name: 'Lawson ATM', dist: '550m', fee: '¥220 (nights)', hours: '24/7', icon: '' },
+    { name: 'AEON Bank ATM', dist: '820m', fee: 'Free (AEON card)', hours: '9am–8pm', icon: '' },
   ]
 
   const TRANSACTIONS = [
@@ -144,7 +145,7 @@ function WalletPanel({ exchangeRate }) {
     if (!amt || amt <= 0) { toast.error('Enter a valid amount'); return }
     setBalance(b => b + amt)
     setAddAmount('')
-    toast.success(`+¥${amt.toLocaleString()} added to Suica! ✅`)
+    toast.success(`+¥${amt.toLocaleString()} added to Suica! `)
   }
 
   const doWithdraw = () => {
@@ -154,7 +155,7 @@ function WalletPanel({ exchangeRate }) {
     setUsdBalance(b => parseFloat((b - amt * exchangeRate).toFixed(2)))
     setBalance(b => b + amt)
     setWithdrawAmount('')
-    toast.success(`Converted $${(amt * exchangeRate).toFixed(2)} → ¥${amt.toLocaleString()} 💴`)
+    toast.success(`Converted $${(amt * exchangeRate).toFixed(2)} → ¥${amt.toLocaleString()} `)
   }
 
   return (
@@ -170,7 +171,7 @@ function WalletPanel({ exchangeRate }) {
               <p className="text-[10px] font-display font-bold uppercase tracking-widest text-blue-300">Suica Card</p>
               <p className="text-xs text-blue-200/60 mt-0.5">JR East · IC Card</p>
             </div>
-            <span className="text-2xl">🚃</span>
+            <span className="text-2xl"></span>
           </div>
           <p className="font-display font-black text-3xl text-white" style={{ letterSpacing: '-0.03em' }}>¥{balance.toLocaleString()}</p>
           <p className="text-xs text-blue-300/60 mt-1">≈ {formatUsd(jpyToUsd(balance, exchangeRate))}</p>
@@ -184,7 +185,7 @@ function WalletPanel({ exchangeRate }) {
               <p className="text-[10px] font-display font-bold uppercase tracking-widest text-green-300">USD Wallet</p>
               <p className="text-xs text-green-200/60 mt-0.5">US Dollars · Connected</p>
             </div>
-            <span className="text-2xl">💵</span>
+            <span className="text-2xl"></span>
           </div>
           <p className="font-display font-black text-3xl text-white">${usdBalance.toFixed(2)}</p>
           <p className="text-xs text-green-300/60 mt-1">≈ ¥{(usdBalance / exchangeRate).toLocaleString('ja-JP', {maximumFractionDigits: 0})}</p>
@@ -197,7 +198,7 @@ function WalletPanel({ exchangeRate }) {
           <button key={t} onClick={() => setTab(t)}
             className="flex-1 py-2 rounded-xl text-[9px] font-display font-bold uppercase tracking-wide transition-all active:scale-95"
             style={{ background: tab === t ? '#E02424' : 'transparent', color: tab === t ? 'white' : 'rgba(255,255,255,0.35)' }}>
-            {t === 'overview' ? '📊' : t === 'topup' ? '➕' : t === 'atm' ? '🏧' : '📋'} {t}
+            {''} {t}
           </button>
         ))}
       </div>
@@ -223,7 +224,7 @@ function WalletPanel({ exchangeRate }) {
           {/* Apple / Google Pay pills */}
           <div className="flex gap-2">
             {[
-              { icon: '🍎', label: 'Apple Wallet', sub: 'Add Suica to iPhone', color: 'rgba(255,255,255,0.95)', textColor: '#09090b' },
+              { icon: '', label: 'Apple Wallet', sub: 'Add Suica to iPhone', color: 'rgba(255,255,255,0.95)', textColor: '#09090b' },
               { icon: 'G', label: 'Google Wallet', sub: 'Add to Android', color: 'rgba(79,70,229,0.2)', textColor: 'white' },
             ].map(w => (
               <button key={w.label} onClick={() => toast.success(`Opening ${w.label}...`)}
@@ -243,7 +244,7 @@ function WalletPanel({ exchangeRate }) {
       {tab === 'topup' && (
         <div className="space-y-3">
           <div className="p-4 rounded-2xl" style={{ background: 'rgba(18,18,20,0.9)', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <p className="text-xs font-display font-bold text-white mb-3">➕ Add to Suica (JPY)</p>
+            <p className="text-xs font-display font-bold text-white mb-3">Add to Suica (JPY)</p>
             <div className="flex gap-2">
               <input value={addAmount} onChange={e => setAddAmount(e.target.value)} type="number"
                 placeholder="Amount in ¥" className="input-field flex-1" />
@@ -260,7 +261,7 @@ function WalletPanel({ exchangeRate }) {
             </div>
           </div>
           <div className="p-4 rounded-2xl" style={{ background: 'rgba(18,18,20,0.9)', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <p className="text-xs font-display font-bold text-white mb-3">💱 Convert USD → JPY (to Suica)</p>
+            <p className="text-xs font-display font-bold text-white mb-3">Convert USD → JPY (to Suica)</p>
             <div className="flex gap-2">
               <input value={withdrawAmount} onChange={e => setWithdrawAmount(e.target.value)} type="number"
                 placeholder="¥ to receive" className="input-field flex-1" />
@@ -276,7 +277,7 @@ function WalletPanel({ exchangeRate }) {
       {tab === 'atm' && (
         <div className="space-y-3">
           <div className="p-3 rounded-xl flex gap-2" style={{ background: 'rgba(91,138,94,0.1)', border: '1px solid rgba(91,138,94,0.25)' }}>
-            <span>💡</span>
+            <span></span>
             <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
               <strong className="text-white">7-Eleven & Japan Post ATMs</strong> are best for foreign cards. Use your US debit card with the Visa/Mastercard logo.
             </p>
@@ -304,7 +305,7 @@ function WalletPanel({ exchangeRate }) {
               style={{ background: 'rgba(18,18,20,0.9)', border: '1px solid rgba(255,255,255,0.06)' }}>
               <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0"
                 style={{ background: tx.amount > 0 ? 'rgba(91,138,94,0.2)' : 'rgba(224,36,36,0.12)' }}>
-                {tx.type === 'food' ? '🍜' : tx.type === 'transit' ? '🚃' : '➕'}
+                {''}
               </div>
               <div className="flex-1">
                 <p className="font-display font-semibold text-white text-xs">{tx.desc}</p>
@@ -329,10 +330,10 @@ function HealthPanel() {
   const [insurance, setInsurance] = useState('OU Student Insurance')
 
   const HOSPITALS = [
-    { name: 'Osaka University Hospital', dist: '2.4km', phone: '+81-6-6879-5111', eng: true, emoji: '🏥' },
-    { name: 'Kyoto University Hospital', dist: '1.1km', phone: '+81-75-751-3111', eng: true, emoji: '🏥' },
-    { name: 'Tokyo Medical University', dist: '0.8km', phone: '+81-3-3342-6111', eng: true, emoji: '🏥' },
-    { name: 'AMDA Osaka Clinic', dist: '3.2km', phone: '+81-6-4395-0555', eng: true, emoji: '🩺', note: 'English-speaking' },
+    { name: 'Osaka University Hospital', dist: '2.4km', phone: '+81-6-6879-5111', eng: true, emoji: '' },
+    { name: 'Kyoto University Hospital', dist: '1.1km', phone: '+81-75-751-3111', eng: true, emoji: '' },
+    { name: 'Tokyo Medical University', dist: '0.8km', phone: '+81-3-3342-6111', eng: true, emoji: '' },
+    { name: 'AMDA Osaka Clinic', dist: '3.2km', phone: '+81-6-4395-0555', eng: true, emoji: '', note: 'English-speaking' },
   ]
 
   const EMERGENCY_PHRASES = [
@@ -348,7 +349,7 @@ function HealthPanel() {
       {/* Emergency Banner */}
       <div className="p-4 rounded-2xl flex items-center gap-3"
         style={{ background: 'rgba(224,36,36,0.12)', border: '1px solid rgba(224,36,36,0.3)' }}>
-        <span className="text-3xl">🚨</span>
+        <span className="text-3xl"></span>
         <div>
           <p className="font-display font-black text-white">Japan Emergency Numbers</p>
           <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.55)' }}>
@@ -388,7 +389,7 @@ function HealthPanel() {
             {allergies.map(a => (
               <span key={a} onClick={() => setAllergies(arr => arr.filter(x => x !== a))}
                 className="badge badge-brand text-[10px] cursor-pointer">
-                {a} ✕
+                {a} ×
               </span>
             ))}
           </div>
@@ -464,7 +465,7 @@ function HealthPanel() {
               style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0"
                 style={{ background: checked ? 'rgba(91,138,94,0.3)' : 'rgba(255,255,255,0.06)', border: checked ? '1px solid #86efac' : '1px solid rgba(255,255,255,0.15)' }}>
-                {checked && <span className="text-[10px] text-green-400">✓</span>}
+                {checked && <IcCheck size={10} color="#86efac" strokeWidth={3} />}
               </div>
               <p className="text-xs" style={{ color: checked ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.4)', textDecoration: checked ? 'line-through' : 'none' }}>{doc}</p>
             </button>
@@ -485,19 +486,19 @@ function SimPanel() {
   ]
 
   const WIFI_SPOTS = [
-    { name: 'Starbucks Japan', icon: '☕', free: true },
-    { name: 'McDonald\'s Japan', icon: '🍔', free: true },
-    { name: '7-Eleven Wi-Fi', icon: '🏪', free: true },
-    { name: 'JR Station Wi-Fi', icon: '🚉', free: true },
-    { name: 'Lawson Wi-Fi', icon: '🟡', free: true },
-    { name: 'Airport Free Wi-Fi', icon: '✈️', free: true },
+    { name: 'Starbucks Japan', icon: 'Starbucks', free: true },
+    { name: 'McDonald\'s Japan', icon: null, free: true },
+    { name: '7-Eleven Wi-Fi', icon: '', free: true },
+    { name: 'JR Station Wi-Fi', icon: '', free: true },
+    { name: 'Lawson Wi-Fi', icon: '', free: true },
+    { name: 'Airport Free Wi-Fi', icon: '', free: true },
   ]
 
   return (
     <div className="space-y-4">
       <div className="p-3.5 rounded-2xl flex gap-2"
         style={{ background: 'rgba(79,70,229,0.1)', border: '1px solid rgba(79,70,229,0.25)' }}>
-        <span>📡</span>
+        <IcPhone size={16} color="#818CF8" />
         <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Get a Japan SIM before or on arrival. eSIMs can be activated from the US. Physical SIMs available at major airports (Narita, Kansai, Haneda).
         </p>
@@ -525,10 +526,10 @@ function SimPanel() {
             </div>
             <div className="grid grid-cols-2 gap-2 mt-3">
               <div>
-                {sim.pros.map(p => <p key={p} className="text-[10px] flex gap-1" style={{ color: '#86efac' }}><span>✓</span>{p}</p>)}
+                {sim.pros.map(p => <p key={p} className="text-[10px] flex gap-1 items-center" style={{ color: '#86efac' }}><span>✓</span>{p}</p>)}
               </div>
               <div>
-                {sim.cons.map(c => <p key={c} className="text-[10px] flex gap-1" style={{ color: '#F87171' }}><span>✗</span>{c}</p>)}
+                {sim.cons.map(c => <p key={c} className="text-[10px] flex gap-1 items-center" style={{ color: '#F87171' }}><IcX size={9} color='#F87171' strokeWidth={2.5} />{c}</p>)}
               </div>
             </div>
           </div>
@@ -562,30 +563,30 @@ function FinancePanel({ exchangeRate }) {
   const jpyVal = activeCalc === 'usd' ? Math.round(parseFloat(usdInput || 0) / exchangeRate) : jpyInput
 
   const BUDGET_TEMPLATE = [
-    { category: 'Meals (3×/day)', daily: 1500, icon: '🍜', tip: 'Convenience stores for breakfast (¥300), ramen for lunch (¥800), set meal dinner (¥900)' },
-    { category: 'Transit', daily: 400, icon: '🚃', tip: 'IC card is most efficient. Day passes available in Kyoto (¥600)' },
-    { category: 'Activities/Entry', daily: 500, icon: '⛩️', tip: 'Many shrines are free. Temple entries ~¥500. Plan 1-2 paid per day.' },
-    { category: 'Shopping/Souvenirs', daily: 800, icon: '🛍️', tip: 'Set a weekly shopping budget. 100-yen stores are great for gifts.' },
-    { category: 'Coffee/Snacks', daily: 300, icon: '☕', tip: 'Vending machines everywhere. 100-150 yen per drink.' },
-    { category: 'Emergency Buffer', daily: 500, icon: '🔐', tip: 'Always keep ¥2,000 cash on hand for emergencies.' },
+    { category: 'Meals (3×/day)', daily: 1500, icon: '', tip: 'Convenience stores for breakfast (¥300), ramen for lunch (¥800), set meal dinner (¥900)' },
+    { category: 'Transit', daily: 400, icon: '', tip: 'IC card is most efficient. Day passes available in Kyoto (¥600)' },
+    { category: 'Activities/Entry', daily: 500, icon: '', tip: 'Many shrines are free. Temple entries ~¥500. Plan 1-2 paid per day.' },
+    { category: 'Shopping/Souvenirs', daily: 800, icon: '', tip: 'Set a weekly shopping budget. 100-yen stores are great for gifts.' },
+    { category: 'Coffee/Snacks', daily: 300, icon: 'Starbucks', tip: 'Vending machines everywhere. 100-150 yen per drink.' },
+    { category: 'Emergency Buffer', daily: 500, icon: null, tip: 'Always keep ¥2,000 cash on hand for emergencies.' },
   ]
 
   const JAPAN_TIPS = [
-    { title: 'Cash is King', icon: '💴', desc: 'Japan is still very cash-heavy. Carry ¥5,000–10,000 at all times. Many small restaurants and shrines are cash-only.' },
-    { title: 'IC Card Everything', icon: '🚃', desc: 'Load your Suica with ¥5,000+ for transit. Also works at convenience stores, vending machines, and many restaurants.' },
-    { title: 'Convenience Store Meals', icon: '🏪', desc: 'Lawson, 7-Eleven, FamilyMart offer hot meals under ¥500. Onigiri (¥130), sandwiches, hot dogs, matcha desserts.' },
-    { title: 'Set Meals (定食)', icon: '🍱', desc: 'Teishoku (set meals) include rice, miso, protein for ¥700–1,200. Best value sit-down meal in Japan.' },
-    { title: 'Gyudon Chains', icon: '🥩', desc: 'Yoshinoya, Sukiya, Matsuya — beef bowls from ¥400. Open 24/7. No Japanese needed — just point at menu photos.' },
-    { title: 'Happy Hour', icon: '🍺', desc: 'Izakayas (Japanese pubs) often have 2-hour all-you-can-drink from ¥1,500. Great for group nights.' },
+    { title: 'Cash is King', icon: '', desc: 'Japan is still very cash-heavy. Carry ¥5,000–10,000 at all times. Many small restaurants and shrines are cash-only.' },
+    { title: 'IC Card Everything', icon: '', desc: 'Load your Suica with ¥5,000+ for transit. Also works at convenience stores, vending machines, and many restaurants.' },
+    { title: 'Convenience Store Meals', icon: '', desc: 'Lawson, 7-Eleven, FamilyMart offer hot meals under ¥500. Onigiri (¥130), sandwiches, hot dogs, matcha desserts.' },
+    { title: 'Set Meals (定食)', icon: null, desc: 'Teishoku (set meals) include rice, miso, protein for ¥700–1,200. Best value sit-down meal in Japan.' },
+    { title: 'Gyudon Chains', icon: null, desc: 'Yoshinoya, Sukiya, Matsuya — beef bowls from ¥400. Open 24/7. No Japanese needed — just point at menu photos.' },
+    { title: 'Happy Hour', icon: null, desc: 'Izakayas (Japanese pubs) often have 2-hour all-you-can-drink from ¥1,500. Great for group nights.' },
   ]
 
   const STUDY_TIPS = [
-    { icon: '📱', title: 'Document Everything', desc: 'Your photos, receipts, and experiences are also your academic portfolio. Use the Photo Reel below.' },
-    { icon: '🎤', title: 'Talk to Locals', desc: 'Your professors set up guest lectures — ask for contact info. A business connection in Japan is invaluable.' },
-    { icon: '📝', title: 'Keep a Field Journal', desc: 'Both MKT courses require site visit reports. Take notes immediately after every visit while details are fresh.' },
-    { icon: '🌐', title: 'Social Media for MKT 3513', desc: 'Document Japanese brand strategies, ad campaigns, and social media you see IRL. It\'s literal coursework!' },
-    { icon: '🤝', title: 'Network with Japanese Students', desc: 'Ritsumeikan has international students who may become future business contacts. Exchange LINE IDs.' },
-    { icon: '🗓️', title: 'Plan Buffer Days', desc: 'Don\'t over-schedule. Some of the best study abroad moments are spontaneous. Leave 2-3 free afternoons per city.' },
+    { icon: null, title: 'Document Everything', desc: 'Your photos, receipts, and experiences are also your academic portfolio. Use the Photo Reel below.' },
+    { icon: null, title: 'Talk to Locals', desc: 'Your professors set up guest lectures — ask for contact info. A business connection in Japan is invaluable.' },
+    { icon: null, title: 'Keep a Field Journal', desc: 'Both MKT courses require site visit reports. Take notes immediately after every visit while details are fresh.' },
+    { icon: null, title: 'Social Media for MKT 3513', desc: 'Document Japanese brand strategies, ad campaigns, and social media you see IRL. It\'s literal coursework!' },
+    { icon: null, title: 'Network with Japanese Students', desc: 'Ritsumeikan has international students who may become future business contacts. Exchange LINE IDs.' },
+    { icon: null, title: 'Plan Buffer Days', desc: 'Don\'t over-schedule. Some of the best study abroad moments are spontaneous. Leave 2-3 free afternoons per city.' },
   ]
 
   return (
@@ -717,7 +718,7 @@ function PhotoReelPanel() {
       const url = URL.createObjectURL(file)
       setPhotos(prev => [...prev, { id: Date.now() + Math.random(), url, caption: file.name.split('.')[0], city: 'Japan', date: `Day ${prev.length + 1}` }])
     })
-    toast.success(`${files.length} photo${files.length > 1 ? 's' : ''} added to your reel! 🎬`)
+    toast.success(`${files.length} photo${files.length > 1 ? 's' : ''} added to your reel!`)
   }
 
   const startReel = () => {
@@ -737,7 +738,7 @@ function PhotoReelPanel() {
     <div className="space-y-4">
       <div className="p-3.5 rounded-2xl flex gap-2"
         style={{ background: 'rgba(255,183,197,0.1)', border: '1px solid rgba(255,183,197,0.2)' }}>
-        <span>🎬</span>
+        <IcPlay size={20} color='#FFB7C5' />
         <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Add your trip photos and generate a <strong className="text-white">cinematic reel</strong>. Your memories, compiled and ready to share.
         </p>
@@ -758,7 +759,7 @@ function PhotoReelPanel() {
             <div className="absolute bottom-0 left-0 right-0 p-5">
               <p className="font-display font-black text-white text-xl">{photos[slideIdx]?.caption}</p>
               <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                📍 {photos[slideIdx]?.city} · {photos[slideIdx]?.date}
+                 {photos[slideIdx]?.city} · {photos[slideIdx]?.date}
               </p>
               <div className="flex gap-1 mt-3">
                 {photos.map((_, i) => (
@@ -770,7 +771,7 @@ function PhotoReelPanel() {
             <button onClick={() => { clearInterval(intervalRef.current); setPlaying(false) }}
               className="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center active:scale-90 transition-transform"
               style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}>
-              <span className="text-white text-sm">✕</span>
+              <span className="text-white text-sm">×</span>
             </button>
           </motion.div>
         </AnimatePresence>
@@ -815,13 +816,13 @@ function PhotoReelPanel() {
             <button onClick={() => fileRef.current?.click()}
               className="py-3 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition-transform"
               style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <span>📷</span>
+              <span></span>
               <span className="font-display font-bold text-white text-xs">Add Photos</span>
             </button>
-            <button onClick={() => toast.success('Export feature coming soon! 🎞️')}
+            <button onClick={() => toast.success('Export feature coming soon!')}
               className="py-3 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition-transform"
               style={{ background: 'rgba(255,183,197,0.12)', border: '1px solid rgba(255,183,197,0.2)' }}>
-              <span>📤</span>
+              <IcArrow dir='up' size={16} color='white' strokeWidth={2} />
               <span className="font-display font-bold text-white text-xs">Export Reel</span>
             </button>
           </div>
@@ -831,13 +832,19 @@ function PhotoReelPanel() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2">
         {[
-          { label: 'Photos', val: photos.length, icon: '📸' },
-          { label: 'Cities', val: new Set(photos.map(p => p.city)).size, icon: '📍' },
-          { label: 'Days', val: photos.length, icon: '📅' },
+          { label: 'Photos', val: photos.length, icon: 'cam' },
+          { label: 'Cities', val: new Set(photos.map(p => p.city)).size, icon: '' },
+          { label: 'Days', val: photos.length, icon: 'cal' },
         ].map(s => (
           <div key={s.label} className="p-3 rounded-2xl text-center"
             style={{ background: 'rgba(18,18,20,0.9)', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <p className="text-xl mb-0.5">{s.icon}</p>
+            <div className="mb-0.5 flex justify-center">
+                  {s.icon==='cam'&&<IcCamera size={18} color="rgba(255,255,255,0.5)"/>}
+                  {s.icon==='cal'&&<IcPin size={18} color="rgba(255,255,255,0.5)"/>}
+                  {s.icon==='trophy'&&<IcTrophy size={18} color="rgba(255,255,255,0.5)"/>}
+                  {s.icon==='pin'&&<IcPin size={18} color="rgba(255,255,255,0.5)"/>}
+                  {s.icon==='star'&&<IcStar size={18} color="rgba(255,255,255,0.5)"/>}
+                </div>
             <p className="font-display font-black text-white text-lg">{s.val}</p>
             <p className="text-[9px] font-display uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>{s.label}</p>
           </div>
@@ -849,11 +856,11 @@ function PhotoReelPanel() {
 
 // ─── MAIN PROFILE VIEW ────────────────────────────────────────────────────────
 const PROFILE_SECTIONS = [
-  { key: 'wallet',  label: 'Wallet',  icon: '💳' },
-  { key: 'health',  label: 'Health',  icon: '🏥' },
-  { key: 'sim',     label: 'SIM',     icon: '📡' },
-  { key: 'finance', label: 'Finance', icon: '💰' },
-  { key: 'reel',    label: 'Reel',    icon: '🎬' },
+  { key: 'wallet',  label: 'Wallet',  icon: 'wallet' },
+  { key: 'health',  label: 'Health',  icon: '' },
+  { key: 'sim',     label: 'SIM',     icon: 'sim' },
+  { key: 'finance', label: 'Finance', icon: 'money' },
+  { key: 'reel',    label: 'Reel',    icon: 'reel' },
 ]
 
 export default function ProfileView() {
@@ -873,7 +880,7 @@ export default function ProfileView() {
     setIsLoggedIn(false)
     setAuthUser(null)
     setActiveSection(null)
-    toast.success('Signed out. See you next time! 👋')
+    toast.success('Signed out. See you next time! ')
   }
 
   if (!isLoggedIn) return <AuthScreen onAuth={handleAuth} />
@@ -957,14 +964,19 @@ export default function ProfileView() {
       {/* ── Quick Stats ──────────────────────── */}
       <div className="grid grid-cols-4 gap-2">
         {[
-          { label: 'Quests', val: completedQuests.size, icon: '🏆' },
+          { label: 'Quests', val: completedQuests.size, icon: 'trophy' },
           { label: 'Points', val: currentUser.points > 999 ? `${(currentUser.points/1000).toFixed(1)}k` : currentUser.points, icon: '⭐' },
-          { label: 'Days Left', val: '18', icon: '📅' },
-          { label: 'City', val: 'Ibaraki', icon: '📍' },
+          { label: 'Days Left', val: '18', icon: 'cal' },
+          { label: 'City', val: 'Ibaraki', icon: '' },
         ].map(s => (
           <div key={s.label} className="p-2.5 rounded-2xl text-center"
             style={{ background: 'rgba(18,18,20,0.9)', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <p className="text-lg mb-0.5">{s.icon}</p>
+            <div className="mb-0.5 flex justify-center">
+            {s.icon==='trophy'&&<IcTrophy size={16} color="rgba(255,255,255,0.4)"/>}
+            {s.icon==='star'&&<IcStar size={16} color="rgba(255,255,255,0.4)"/>}
+            {s.icon==='cal'&&<IcPin size={16} color="rgba(255,255,255,0.4)"/>}
+            {s.icon==='pin'&&<IcPin size={16} color="rgba(255,255,255,0.4)"/>}
+          </div>
             <p className="font-display font-black text-white text-sm">{s.val}</p>
             <p className="text-[8px] font-display uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>{s.label}</p>
           </div>
@@ -977,11 +989,11 @@ export default function ProfileView() {
           style={{ color: 'rgba(255,255,255,0.3)' }}>Student Tools</p>
         <div className="grid grid-cols-2 gap-3">
           {[
-            { key: 'wallet', icon: '💳', title: 'Wallet & ATM', desc: 'Suica, Apple/Google Pay, nearby ATMs', color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.25)' },
-            { key: 'health', icon: '🏥', title: 'Health & Safety', desc: 'Hospitals, allergies, emergency docs', color: '#F87171', bg: 'rgba(248,113,113,0.12)', border: 'rgba(248,113,113,0.25)' },
-            { key: 'sim',    icon: '📡', title: 'SIM & Data', desc: 'eSIM options, Wi-Fi spots, carriers', color: '#818CF8', bg: 'rgba(129,140,248,0.12)', border: 'rgba(129,140,248,0.25)' },
-            { key: 'finance',icon: '💰', title: 'Finance & Tips', desc: 'Budget template, spending guide, converter', color: '#86efac', bg: 'rgba(134,239,172,0.12)', border: 'rgba(134,239,172,0.25)' },
-            { key: 'reel',   icon: '🎬', title: 'Photo Reel', desc: 'Cinematic trip montage & memories', color: '#FFB7C5', bg: 'rgba(255,183,197,0.12)', border: 'rgba(255,183,197,0.25)', full: true },
+            { key: 'wallet', icon: null, title: 'Wallet & ATM', desc: 'Suica, Apple/Google Pay, nearby ATMs', color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.25)' },
+            { key: 'health', icon: '', title: 'Health & Safety', desc: 'Hospitals, allergies, emergency docs', color: '#F87171', bg: 'rgba(248,113,113,0.12)', border: 'rgba(248,113,113,0.25)' },
+            { key: 'sim',    icon: null, title: 'SIM & Data', desc: 'eSIM options, Wi-Fi spots, carriers', color: '#818CF8', bg: 'rgba(129,140,248,0.12)', border: 'rgba(129,140,248,0.25)' },
+            { key: 'finance',icon: null, title: 'Finance & Tips', desc: 'Budget template, spending guide, converter', color: '#86efac', bg: 'rgba(134,239,172,0.12)', border: 'rgba(134,239,172,0.25)' },
+            { key: 'reel',   icon: null, title: 'Photo Reel', desc: 'Cinematic trip montage & memories', color: '#FFB7C5', bg: 'rgba(255,183,197,0.12)', border: 'rgba(255,183,197,0.25)', full: true },
           ].map(section => (
             <button
               key={section.key}
@@ -989,7 +1001,13 @@ export default function ProfileView() {
               className={`p-4 rounded-2xl text-left flex flex-col gap-2 active:scale-95 transition-all ${section.full ? 'col-span-2 flex-row items-center' : ''}`}
               style={{ background: section.bg, border: `1px solid ${section.border}` }}
             >
-              <span className="text-2xl">{section.icon}</span>
+              <div className="mb-0.5">
+              {section.icon==='wallet'&&<IcWallet size={22} color={section.color}/>}
+              {section.icon==='sim'&&<IcPhone size={22} color={section.color}/>}
+              {section.icon==='money'&&<IcMoney size={22} color={section.color}/>}
+              {section.icon==='reel'&&<IcPlay size={22} color={section.color}/>}
+              {section.icon==='health'&&<IcHeart size={22} color={section.color}/>}
+            </div>
               <div>
                 <p className="font-display font-bold text-white text-sm">{section.title}</p>
                 <p className="text-[10px] mt-0.5 leading-snug" style={{ color: 'rgba(255,255,255,0.5)' }}>{section.desc}</p>
@@ -1010,7 +1028,7 @@ export default function ProfileView() {
       <div className="text-center pb-2">
         <p className="font-display font-black text-gradient">OUStudyJapan</p>
         <p className="text-[10px] font-display mt-0.5" style={{ color: 'rgba(255,255,255,0.25)' }}>
-          v2.0 · Made for OU Students 🎓
+          v2.0 · Made for OU Students 
         </p>
       </div>
     </div>

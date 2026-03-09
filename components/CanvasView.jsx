@@ -1,6 +1,7 @@
 // components/CanvasView.jsx
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { IcCheck, IcAlert } from './ui/Icons'
 
 const PROGRAM_COST = {
   tuition: 3072,       // 2 courses × 3 credit hours × ~$512/credit (OU rate example)
@@ -24,12 +25,12 @@ const COURSES = [
     gradePoints: 4.0,
     gradePercent: 94,
     location: 'Ritsumeikan University — OIC Campus',
-    locationNote: 'Ibaraki City, Osaka Prefecture 🇯🇵',
+    locationNote: 'Ibaraki City, Osaka Prefecture',
     isOnline: false,
     color: '#E02424',
     colorBg: 'rgba(224,36,36,0.12)',
     colorBorder: 'rgba(224,36,36,0.25)',
-    emoji: '📊',
+    emoji: null,
     description: 'Foundational understanding of the intertwined disciplines of Marketing & Supply Chain Management — two critical components of modern business operations.',
     assignments: [
       { name: 'Business Site Visit Report', score: 96, total: 100, due: 'Week 3' },
@@ -51,12 +52,12 @@ const COURSES = [
     gradePoints: 3.7,
     gradePercent: 91,
     location: 'Ritsumeikan University — OIC Campus',
-    locationNote: 'Ibaraki City, Osaka Prefecture 🇯🇵',
+    locationNote: 'Ibaraki City, Osaka Prefecture',
     isOnline: false,
     color: '#4F46E5',
     colorBg: 'rgba(79,70,229,0.12)',
     colorBorder: 'rgba(79,70,229,0.25)',
-    emoji: '📱',
+    emoji: null,
     description: 'Practical knowledge and insights to establish objectives and strategies, select social media platforms, and monitor and measure marketing results.',
     assignments: [
       { name: 'Platform Strategy Audit', score: 93, total: 100, due: 'Week 2' },
@@ -104,7 +105,7 @@ function AssignmentRow({ a }) {
           color: done ? '#86efac' : 'rgba(255,255,255,0.3)',
         }}
       >
-        {done ? '✓' : '○'}
+        {done ? 'Done' : 'Open'}
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-xs font-display font-semibold text-white truncate">{a.name}</p>
@@ -129,19 +130,19 @@ function AssignmentRow({ a }) {
 
 function CostBreakdown() {
   const items = [
-    { label: 'Tuition (6 credit hrs)', amount: PROGRAM_COST.tuition, icon: '🎓', color: '#818CF8' },
-    { label: 'Program Fee', amount: PROGRAM_COST.programFee, icon: '📋', color: '#E02424' },
-    { label: 'Housing (Hall + Hotels)', amount: PROGRAM_COST.housing, icon: '🏨', color: '#FFB7C5' },
-    { label: 'Round-Trip Airfare', amount: PROGRAM_COST.airfare, icon: '✈️', color: '#60A5FA' },
-    { label: 'Meals Allowance', amount: PROGRAM_COST.meals, icon: '🍜', color: '#86efac' },
-    { label: 'Excursions & Activities', amount: PROGRAM_COST.excursions, icon: '🗺️', color: '#FCD34D' },
+    { label: 'Tuition (6 credit hrs)', amount: PROGRAM_COST.tuition, icon: '', color: '#818CF8' },
+    { label: 'Program Fee', amount: PROGRAM_COST.programFee, icon: '', color: '#E02424' },
+    { label: 'Housing (Hall + Hotels)', amount: PROGRAM_COST.housing, icon: null, color: '#FFB7C5' },
+    { label: 'Round-Trip Airfare', amount: PROGRAM_COST.airfare, icon: '', color: '#60A5FA' },
+    { label: 'Meals Allowance', amount: PROGRAM_COST.meals, icon: '', color: '#86efac' },
+    { label: 'Excursions & Activities', amount: PROGRAM_COST.excursions, icon: null, color: '#FCD34D' },
   ]
   return (
     <div className="space-y-2">
       {items.map((item) => (
         <div key={item.label} className="flex items-center gap-3 py-2"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <span className="text-base w-6 text-center">{item.icon}</span>
+          
           <p className="flex-1 text-xs font-display font-semibold" style={{ color: 'rgba(255,255,255,0.7)' }}>
             {item.label}
           </p>
@@ -223,8 +224,8 @@ export default function CanvasView() {
       {/* ── Tab Switcher ─────────────────────── */}
       <div className="flex gap-2 p-1 rounded-2xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
         {[
-          { key: 'courses', label: '📚 Courses' },
-          { key: 'cost', label: '💰 Cost Breakdown' },
+          { key: 'courses', label: 'Courses' },
+          { key: 'cost', label: 'Costs' },
         ].map(tab => (
           <button
             key={tab.key}
@@ -309,7 +310,7 @@ export default function CanvasView() {
                         {/* Location */}
                         <div className="p-3.5 rounded-2xl flex items-start gap-3"
                           style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                          <span className="text-xl">📍</span>
+                          <span className="text-xl"></span>
                           <div>
                             <p className="text-xs font-display font-bold text-white">{course.location}</p>
                             <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
@@ -317,7 +318,7 @@ export default function CanvasView() {
                             </p>
                             <div className="flex items-center gap-1.5 mt-2">
                               <span className={`badge text-[9px] ${course.isOnline ? 'badge-blue' : 'badge-green'}`}>
-                                {course.isOnline ? '💻 Online' : '🏫 In Person'}
+                                {course.isOnline ? 'Online' : 'OIC In Person'}
                               </span>
                             </div>
                           </div>
@@ -326,7 +327,7 @@ export default function CanvasView() {
                         {/* Features */}
                         <div className="flex gap-2 flex-wrap">
                           {course.features.map(f => (
-                            <span key={f} className="badge badge-sakura text-[9px]">✦ {f}</span>
+                            <span key={f} className="badge badge-sakura" style={{fontSize:"9px"}}>{f}</span>
                           ))}
                         </div>
 
@@ -342,7 +343,7 @@ export default function CanvasView() {
                         {/* Prereq */}
                         <div className="p-3 rounded-xl flex items-center gap-2"
                           style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.2)' }}>
-                          <span className="text-sm">⚠️</span>
+                          <IcAlert size={14} color="#FCD34D" />
                           <p className="text-[11px]" style={{ color: '#FCD34D' }}>
                             Pre-req: {course.prereq}
                           </p>
@@ -358,7 +359,7 @@ export default function CanvasView() {
           {/* Program Note */}
           <div className="p-4 rounded-2xl"
             style={{ background: 'rgba(79,70,229,0.08)', border: '1px solid rgba(79,70,229,0.2)' }}>
-            <p className="text-xs font-display font-bold text-white mb-1">📋 Program Requirement</p>
+            <p className="text-xs font-display font-bold text-white mb-1"> Program Requirement</p>
             <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
               Students are required to take <strong className="text-white">both courses</strong> to participate in this program. Non-business majors may apply for a pre-req exception via the OU Education Abroad office.
             </p>
@@ -384,7 +385,7 @@ export default function CanvasView() {
 
           <div className="p-4 rounded-2xl"
             style={{ background: 'rgba(91,138,94,0.08)', border: '1px solid rgba(91,138,94,0.2)' }}>
-            <p className="text-xs font-display font-bold text-white mb-1">💡 Financial Aid</p>
+            <p className="text-xs font-display font-bold text-white mb-1"> Financial Aid</p>
             <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
               OU study abroad programs may be eligible for financial aid. Contact the OU Education Abroad office at <span className="text-white font-semibold">educationabroad@ou.edu</span> for scholarship information.
             </p>
@@ -406,7 +407,7 @@ export default function CanvasView() {
             ].map(item => (
               <div key={item} className="flex items-center gap-2 py-1.5"
                 style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                <span className="text-[10px]" style={{ color: '#86efac' }}>✓</span>
+                <IcCheck size={10} color="#86efac" strokeWidth={3} />
                 <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{item}</p>
               </div>
             ))}

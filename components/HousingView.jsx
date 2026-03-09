@@ -12,7 +12,7 @@ const STAYS = [
     nights: 10,
     lat: 34.8154,
     lng: 135.5686,
-    emoji: '🏫',
+    emoji: 'OIC',
     color: '#E02424',
     colorBg: 'rgba(224,36,36,0.12)',
     colorBorder: 'rgba(224,36,36,0.25)',
@@ -45,7 +45,7 @@ const STAYS = [
     nights: 11,
     lat: 35.0116,
     lng: 135.7681,
-    emoji: '🏯',
+    emoji: 'KYO',
     color: '#4F46E5',
     colorBg: 'rgba(79,70,229,0.12)',
     colorBorder: 'rgba(79,70,229,0.25)',
@@ -78,7 +78,7 @@ const STAYS = [
     nights: 3,
     lat: 35.6762,
     lng: 139.6503,
-    emoji: '🗼',
+    emoji: 'TYO',
     color: '#10B981',
     colorBg: 'rgba(16,185,129,0.12)',
     colorBorder: 'rgba(16,185,129,0.25)',
@@ -238,9 +238,9 @@ function WelcomePage({ stay, onClose }) {
         {/* Stay info */}
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: 'Nights', value: stay.nights, icon: '🌙' },
-            { label: 'City', value: stay.city.split(',')[0], icon: '📍' },
-            { label: 'Type', value: stay.type, icon: '🏠' },
+            { label: 'Nights', value: stay.nights, icon: '' },
+            { label: 'City', value: stay.city.split(',')[0], icon: '' },
+            { label: 'Type', value: stay.type, icon: '' },
           ].map(s => (
             <div key={s.label} className="p-3 rounded-2xl text-center"
               style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -258,7 +258,7 @@ function WelcomePage({ stay, onClose }) {
             style={{ color: 'rgba(255,255,255,0.3)' }}>Amenities</p>
           <div className="flex flex-wrap gap-2">
             {stay.amenities.map(a => (
-              <span key={a} className="badge badge-sakura text-[10px]">✦ {a}</span>
+              <span key={a} className="badge badge-sakura text-[10px]">{a}</span>
             ))}
           </div>
         </div>
@@ -319,7 +319,7 @@ export default function HousingView() {
           <p className="text-xs font-display font-bold uppercase tracking-widest mb-1"
             style={{ color: '#FFB7C5' }}>Your Accommodation</p>
           <h2 className="text-2xl font-display font-black text-white relative z-10">
-            Housing Guide 🏠
+            Housing Guide 
           </h2>
           <p className="text-xs mt-1.5 relative z-10" style={{ color: 'rgba(255,255,255,0.45)' }}>
             {totalNights} nights across 3 cities · 1–2 roommates
@@ -417,7 +417,7 @@ export default function HousingView() {
                   className="flex-1 py-2 rounded-xl text-xs font-display font-bold transition-all active:scale-95 text-white"
                   style={{ background: stay.color, boxShadow: `0 4px 12px ${stay.colorBg}` }}
                 >
-                  🏠 Welcome Page
+                   Welcome Page
                 </button>
               </div>
 
@@ -453,7 +453,7 @@ export default function HousingView() {
                       {/* Roommates */}
                       <div className="flex items-center gap-2 p-3 rounded-xl"
                         style={{ background: 'rgba(255,183,197,0.08)', border: '1px solid rgba(255,183,197,0.15)' }}>
-                        <span className="text-base">👥</span>
+                        <span className="text-base"></span>
                         <p className="text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>
                           Rooming: <span className="text-white font-semibold">{stay.roommates}</span>
                         </p>
@@ -462,7 +462,7 @@ export default function HousingView() {
                       {/* Amenities */}
                       <div className="flex flex-wrap gap-1.5">
                         {stay.amenities.map(a => (
-                          <span key={a} className="badge badge-blue text-[9px]">✦ {a}</span>
+                          <span key={a} className="badge badge-blue text-[9px]">{a}</span>
                         ))}
                       </div>
                     </div>

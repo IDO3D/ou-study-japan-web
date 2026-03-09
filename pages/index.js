@@ -13,62 +13,65 @@ import HousingView from '../components/HousingView'
 import useStore from '../utils/store'
 import { getCurrentPosition } from '../utils/helpers'
 
-export default function Home() {
-  const [currentView, setCurrentView] = useState('home')
+export default function App() {
+  const [view, setView] = useState('home')
   const { setRestaurants, setQuests, setExchangeRate, setUserLocation } = useStore()
 
+  // Expose navigate globally for avatar tap
   useEffect(() => {
-    getCurrentPosition().then(setUserLocation)
+    if (typeof window !== 'undefined') window.__ouNav = setView
+  }, [setView])
+
+  useEffect(() => {
+    getCurrentPosition().then(setUserLocation).catch(() => {})
 
     fetch('/api/restaurants')
       .then(r => r.json())
       .then(d => setRestaurants(d.restaurants || []))
-      .catch(console.error)
+      .catch(() => {})
 
     fetch('/api/quests')
       .then(r => r.json())
       .then(d => setQuests(d.quests || []))
-      .catch(console.error)
+      .catch(() => {})
 
     fetch('/api/exchange-rate')
       .then(r => r.json())
       .then(d => { if (d.rate) setExchangeRate(d.rate) })
-      .catch(console.error)
+      .catch(() => {})
   }, [])
 
-  const navigate = (view) => {
-    setCurrentView(view)
-    if (typeof window !== 'undefined') window.__ouNavigate = (v) => setCurrentView(v)
-  }
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') window.__ouNavigate = (v) => setCurrentView(v)
-  }, [])
-
-  const renderView = () => {
-    switch (currentView) {
-      case 'home': return <HomeView onNavigate={navigate} />
-      case 'discover': return <DiscoverView />
-      case 'camera': return <CameraView />
-      case 'map': return <MapView />
-      case 'quests': return <QuestsView />
-      case 'profile': return <ProfileView />
-      case 'canvas': return <CanvasView />
-      case 'housing': return <HousingView />
-      default: return <HomeView onNavigate={navigate} />
-    }
+  const VIEWS = {
+    home:     <HomeView onNavigate={setView} />,
+    discover: <DiscoverView />,
+    camera:   <CameraView />,
+    map:      <MapView />,
+    quests:   <QuestsView />,
+    profile:  <ProfileView />,
+    canvas:   <CanvasView />,
+    housing:  <HousingView />,
   }
 
   return (
     <>
       <Head>
         <title>OUStudyJapan</title>
-        <meta name="description" content="Your OU study abroad travel assistant for Japan" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="OU Study Abroad travel assistant for Japan" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        <meta name="theme-color" content="#09090b" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="OUJapan" />
+        <meta property="og:title" content="OUStudyJapan" />
+        <meta property="og:description" content="Your OU study abroad companion for Japan" />
+        <meta property="og:type" content="website" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div style={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <AppShell currentView={currentView} onNavigate={navigate}>
-          {renderView()}
+
+      <div style={{ minHeight: '100svh', background: '#09090b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <AppShell currentView={view} onNavigate={setView}>
+          {VIEWS[view] || VIEWS.home}
         </AppShell>
       </div>
     </>

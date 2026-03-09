@@ -166,7 +166,7 @@ export default function CameraView() {
           onClick={startCamera}
           className={`flex-1 py-2.5 rounded-xl text-sm font-display font-bold transition-all ${mode === 'camera' || mode === 'loading' ? 'bg-brand text-white' : 'text-white/40'}`}
         >
-          📸 Camera
+          Camera
         </button>
       </div>
 
@@ -221,7 +221,7 @@ export default function CameraView() {
                 className="w-12 h-12 rounded-full flex items-center justify-center active:scale-90 transition-transform"
                 style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)' }}
               >
-                <span className="text-white text-lg">✕</span>
+                <IcX size={16} color="white" strokeWidth={2.5} />
               </button>
               <button
                 onClick={captureAndTranslate}

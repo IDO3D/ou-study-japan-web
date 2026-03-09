@@ -1,85 +1,84 @@
 // components/layout/Header.jsx
 import { motion } from 'framer-motion'
 import useStore from '../../utils/store'
+import { IcStar } from '../ui/Icons'
 
-const VIEW_TITLES = {
-  home:     'Home',
-  discover: 'Discover',
-  camera:   'Translate',
-  map:      'Map',
-  quests:   'Quests',
-  canvas:   'Canvas',
-  housing:  'Housing',
-  profile:  'Profile',
+const VIEW_META = {
+  home:     { title: 'Home',          sub: null },
+  discover: { title: 'Discover',      sub: 'Restaurants & Halal' },
+  camera:   { title: 'Translate',     sub: 'Point at any text' },
+  map:      { title: 'Map',           sub: 'Ibaraki · Kyoto · Tokyo' },
+  quests:   { title: 'Quests',        sub: 'OU Study Japan' },
+  canvas:   { title: 'Canvas',        sub: 'OU · Japan Program' },
+  housing:  { title: 'Housing',       sub: '24 Nights · 3 Cities' },
+  profile:  { title: 'Profile',       sub: 'Account & Tools' },
 }
 
-const VIEW_SUBTITLES = {
-  canvas:  'OU · Japan Program',
-  housing: '24 Nights · 3 Cities',
-  quests:  'OU Study Japan',
-  map:     'Ibaraki · Kyoto · Tokyo',
-}
-
-export default function Header({ currentView }) {
+export default function Header({ currentView, onNavigate }) {
   const { user } = useStore()
+  const meta = VIEW_META[currentView] || VIEW_META.home
 
   return (
     <header
-      className="absolute top-0 left-0 right-0 z-40 px-5 pt-12 pb-4"
+      className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-5"
       style={{
-        background: 'linear-gradient(to bottom, rgba(9,9,11,0.97) 0%, rgba(9,9,11,0.82) 70%, transparent 100%)',
+        paddingTop: 'max(48px, env(safe-area-inset-top))',
+        paddingBottom: '14px',
+        background: 'linear-gradient(to bottom, rgba(9,9,11,0.98) 0%, rgba(9,9,11,0.85) 75%, transparent 100%)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
       }}
     >
-      <div className="flex items-center justify-between">
-        <motion.div
-          key={currentView}
-          initial={{ opacity: 0, x: -12 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+      <motion.div
+        key={currentView}
+        initial={{ opacity: 0, x: -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <h1
+          className="font-display font-black text-white leading-none"
+          style={{ fontSize: '1.35rem', letterSpacing: '-0.025em' }}
         >
-          <h1
-            className="font-display font-black text-white leading-none"
-            style={{ fontSize: '1.4rem', letterSpacing: '-0.025em' }}
-          >
-            {VIEW_TITLES[currentView] || 'OUStudyJapan'}
-          </h1>
-          {VIEW_SUBTITLES[currentView] && (
-            <p className="text-[10px] font-display font-bold mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
-              {VIEW_SUBTITLES[currentView]}
-            </p>
-          )}
-        </motion.div>
+          {meta.title}
+        </h1>
+        {meta.sub && (
+          <p className="font-display font-medium mt-0.5" style={{ fontSize: '10px', color: 'rgba(255,255,255,0.32)', letterSpacing: '0.04em' }}>
+            {meta.sub}
+          </p>
+        )}
+      </motion.div>
 
-        <div className="flex items-center gap-2.5">
-          {/* Points */}
-          <motion.div
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-            style={{ background: 'rgba(224,36,36,0.15)', border: '1px solid rgba(224,36,36,0.25)' }}
-          >
-            <span className="text-xs font-display font-black" style={{ color: '#FF6B6B' }}>
-              ★ {user.points.toLocaleString()}
-            </span>
-          </motion.div>
-
-          {/* Avatar → Profile */}
-          <div
-            onClick={() => typeof window !== 'undefined' && window.__ouNavigate?.('profile')}
-            className="w-9 h-9 rounded-full p-[2px] active:scale-90 transition-transform cursor-pointer"
-            style={{
-              background: 'linear-gradient(135deg, #E02424, #FF8E53)',
-              boxShadow: '0 0 14px rgba(224,36,36,0.4)',
-            }}
-          >
-            <img
-              src={user.avatarUrl}
-              alt={user.name}
-              className="w-full h-full rounded-full object-cover"
-              style={{ border: '2px solid #09090b' }}
-            />
-          </div>
+      <div className="flex items-center gap-2.5">
+        {/* Points badge */}
+        <div
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+          style={{ background: 'rgba(224,36,36,0.14)', border: '1px solid rgba(224,36,36,0.22)' }}
+        >
+          <IcStar size={11} color="#FF6B6B" strokeWidth={2.5} style={{ fill: '#FF6B6B' }} />
+          <span className="font-display font-bold" style={{ fontSize: '11px', color: '#FF8E8E' }}>
+            {user.points.toLocaleString()}
+          </span>
         </div>
+
+        {/* Avatar */}
+        <button
+          onClick={() => { if (typeof onNavigate === 'function') onNavigate('profile'); else if (typeof window !== 'undefined' && window.__ouNav) window.__ouNav('profile') }}
+          className="rounded-full active:scale-90 transition-transform"
+          style={{
+            padding: '2px',
+            background: 'linear-gradient(135deg, #E02424, #FF8E53)',
+            boxShadow: '0 0 12px rgba(224,36,36,0.35)',
+          }}
+        >
+          <img
+            src={user.avatarUrl}
+            alt={user.name}
+            width={34}
+            height={34}
+            className="rounded-full block object-cover"
+            style={{ border: '2px solid #09090b' }}
+          />
+        </button>
       </div>
     </header>
   )

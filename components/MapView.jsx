@@ -12,7 +12,7 @@ const CITIES = [
     lat: 34.8154,
     lng: 135.5686,
     zoom: 13,
-    emoji: '🏫',
+    emoji: 'OIC',
     color: '#E02424',
     nights: 10,
     desc: 'OIC Seminar House · Ritsumeikan University',
@@ -24,7 +24,7 @@ const CITIES = [
     lat: 35.0116,
     lng: 135.7681,
     zoom: 13,
-    emoji: '🏯',
+    emoji: 'KYO',
     color: '#4F46E5',
     nights: 11,
     desc: 'Historic temples, tea ceremonies & orientation tours',
@@ -36,7 +36,7 @@ const CITIES = [
     lat: 35.6762,
     lng: 139.6503,
     zoom: 12,
-    emoji: '🗼',
+    emoji: 'TYO',
     color: '#10B981',
     nights: 3,
     desc: 'Shibuya, Shinjuku, business site visits & final tours',
@@ -45,26 +45,26 @@ const CITIES = [
 
 const CITY_POIS = {
   ibaraki: [
-    { name: 'OIC Seminar House', type: 'housing', lat: 34.8154, lng: 135.5686, icon: '🏫' },
-    { name: 'Ibaraki-shi Station', type: 'transit', lat: 34.8147, lng: 135.5721, icon: '🚉' },
-    { name: 'AEON Mall Ibaraki', type: 'food', lat: 34.8082, lng: 135.5737, icon: '🛍️' },
-    { name: 'Ritsumeikan University OIC', type: 'edu', lat: 34.8160, lng: 135.5692, icon: '🎓' },
+    { name: 'OIC Seminar House', type: 'housing', lat: 34.8154, lng: 135.5686, icon: 'OIC' },
+    { name: 'Ibaraki-shi Station', type: 'transit', lat: 34.8147, lng: 135.5721, icon: '' },
+    { name: 'AEON Mall Ibaraki', type: 'food', lat: 34.8082, lng: 135.5737, icon: '' },
+    { name: 'Ritsumeikan University OIC', type: 'edu', lat: 34.8160, lng: 135.5692, icon: '' },
   ],
   kyoto: [
-    { name: 'Kinkaku-ji (Golden Pavilion)', type: 'culture', lat: 35.0394, lng: 135.7292, icon: '⛩️' },
-    { name: 'Fushimi Inari Shrine', type: 'culture', lat: 34.9671, lng: 135.7727, icon: '🦊' },
-    { name: 'Nishiki Market', type: 'food', lat: 35.0050, lng: 135.7650, icon: '🍜' },
-    { name: 'Kyoto Station', type: 'transit', lat: 34.9858, lng: 135.7588, icon: '🚉' },
-    { name: 'Gion District', type: 'culture', lat: 35.0036, lng: 135.7780, icon: '🏮' },
-    { name: "Philosopher's Path", type: 'culture', lat: 35.0271, lng: 135.7944, icon: '🌸' },
+    { name: 'Kinkaku-ji (Golden Pavilion)', type: 'culture', lat: 35.0394, lng: 135.7292, icon: '' },
+    { name: 'Fushimi Inari Shrine', type: 'culture', lat: 34.9671, lng: 135.7727, icon: '' },
+    { name: 'Nishiki Market', type: 'food', lat: 35.0050, lng: 135.7650, icon: '' },
+    { name: 'Kyoto Station', type: 'transit', lat: 34.9858, lng: 135.7588, icon: '' },
+    { name: 'Gion District', type: 'culture', lat: 35.0036, lng: 135.7780, icon: '' },
+    { name: "Philosopher's Path", type: 'culture', lat: 35.0271, lng: 135.7944, icon: '' },
   ],
   tokyo: [
-    { name: 'Shibuya Crossing', type: 'landmark', lat: 35.6595, lng: 139.7004, icon: '🚶' },
-    { name: 'Senso-ji Temple', type: 'culture', lat: 35.7147, lng: 139.7966, icon: '⛩️' },
-    { name: 'Shinjuku Station', type: 'transit', lat: 35.6900, lng: 139.7006, icon: '🚉' },
-    { name: 'Tokyo Tower', type: 'landmark', lat: 35.6586, lng: 139.7454, icon: '🗼' },
-    { name: 'Tsukiji Outer Market', type: 'food', lat: 35.6654, lng: 139.7706, icon: '🐟' },
-    { name: 'Harajuku / Takeshita St', type: 'culture', lat: 35.6702, lng: 139.7027, icon: '🎨' },
+    { name: 'Shibuya Crossing', type: 'landmark', lat: 35.6595, lng: 139.7004, icon: '' },
+    { name: 'Senso-ji Temple', type: 'culture', lat: 35.7147, lng: 139.7966, icon: '' },
+    { name: 'Shinjuku Station', type: 'transit', lat: 35.6900, lng: 139.7006, icon: '' },
+    { name: 'Tokyo Tower', type: 'landmark', lat: 35.6586, lng: 139.7454, icon: 'TYO' },
+    { name: 'Tsukiji Outer Market', type: 'food', lat: 35.6654, lng: 139.7706, icon: '' },
+    { name: 'Harajuku / Takeshita St', type: 'culture', lat: 35.6702, lng: 139.7027, icon: '' },
   ],
 }
 
@@ -82,7 +82,7 @@ function CityStaticMap({ city, pois }) {
   const tileX = Math.floor(((city.lng + 180) / 360) * Math.pow(2, zoom))
   const tileY = Math.floor(
     (1 - Math.log(Math.tan((city.lat * Math.PI) / 180) + 1 / Math.cos((city.lat * Math.PI) / 180)) / Math.PI) /
-    2 * Math.pow(2, zoom)
+      2 * Math.pow(2, zoom)
   )
 
   return (
@@ -179,7 +179,7 @@ export default function MapView() {
   }, [activeCity, city])
 
   const filterTypes = ['all', ...new Set(pois.map(p => p.type))]
-  const filterIcons = { all: '🗺️', transit: '🚉', food: '🍜', culture: '⛩️', landmark: '📍', housing: '🏠', edu: '🎓' }
+  const filterIcons = { all: 'All', transit: 'Train', food: 'Food', culture: 'Culture', landmark: 'Site', housing: '', edu: '' }
 
   return (
     <div className="px-5 pb-6 space-y-4">
@@ -258,7 +258,7 @@ export default function MapView() {
               border: filter === f ? '1px solid rgba(224,36,36,0.4)' : '1px solid rgba(255,255,255,0.08)',
             }}
           >
-            {filterIcons[f] || '📌'} {f.charAt(0).toUpperCase() + f.slice(1)}
+            {filterIcons[f] || f} {f.charAt(0).toUpperCase() + f.slice(1)}
           </button>
         ))}
       </div>
