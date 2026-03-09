@@ -4,6 +4,13 @@ import Link from 'next/link'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 
+// =========================================================================
+// TO EDIT THE BACKGROUND VIDEO:
+// Simply upload an unlisted or public 4K video to YouTube and paste its ID below.
+// Example: URL is https://youtube.com/watch?v=dQw4w9WgXcQ -> ID is "dQw4w9WgXcQ"
+// =========================================================================
+const YOUTUBE_BACKGROUND_ID = "F3zks8sLzYI"
+
 const FEATURES = [
   { icon: '🗾', title: 'Interactive Route Map', desc: 'Seamlessly navigate through Ibaraki, Kyoto, and Tokyo. Live updates and curated points of interest.' },
   { icon: '💳', title: 'Digital Suica Wallet', desc: 'Manage your transit card, convert USD to JPY instantly, and locate the nearest foreign-friendly ATMs.' },
@@ -62,13 +69,16 @@ export default function LandingPage() {
         </nav>
 
         {/* Cinematic Hero Section */}
-        <section ref={heroRef} className="relative h-[100dvh] w-full flex items-center bg-[#09090b] overflow-hidden">
+        <section ref={heroRef} className="relative min-h-screen w-full flex items-center bg-[#09090b] overflow-hidden pt-24 pb-16">
           {/* Animated Background Reel */}
           <motion.div style={{ y, opacity }} className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+            {/* Mobile Fallback Image / Poster */}
             <img src="https://images.unsplash.com/photo-1542051842920-84a48ed9c4d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" className="absolute inset-0 w-full h-full object-cover opacity-60 block md:hidden scale-105" />
+
+            {/* YouTube Embed Background */}
             <div className="hidden md:block absolute inset-0 w-[400vw] h-[400vh] -top-[150vh] -left-[150vw] sm:w-[150vw] sm:h-[150vh] sm:-top-[25vh] sm:-left-[25vw]">
               <iframe
-                src="https://www.youtube.com/embed/F3zks8sLzYI?autoplay=1&mute=1&controls=0&loop=1&playlist=F3zks8sLzYI&playsinline=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1"
+                src={`https://www.youtube.com/embed/${YOUTUBE_BACKGROUND_ID}?autoplay=1&mute=1&controls=0&loop=1&playlist=${YOUTUBE_BACKGROUND_ID}&playsinline=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1`}
                 allow="autoplay; fullscreen; picture-in-picture"
                 className="w-full h-full object-cover opacity-50 pointer-events-none mix-blend-screen scale-110"
               />
@@ -119,15 +129,15 @@ export default function LandingPage() {
           </motion.div>
 
           {/* Main Hero Content (Left Aligned) */}
-          <div className="relative z-10 w-full px-6 md:px-32 lg:px-44 pt-10">
+          <div className="relative z-10 w-full px-6 md:px-32 lg:px-44">
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.4 }}
-              className="font-display font-medium text-white leading-[1.05] tracking-tight mb-10 text-shadow-xl"
-              style={{ fontSize: 'clamp(3.5rem, 8vw, 6.5rem)' }}
+              className="font-display font-medium text-white leading-[1.1] tracking-tight mb-8 text-shadow-xl"
+              style={{ fontSize: 'clamp(3rem, 7vw, 6rem)' }}
             >
-              Capture Your <br />
+              Capture Your <br className="hidden sm:block" />
               Japan Story.
             </motion.h1>
 
