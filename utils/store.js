@@ -18,10 +18,11 @@ const useStore = create((set, get) => ({
   setUser: (userData) => set((state) => ({ user: { ...state.user, ...userData } })),
 
   // ─── Theme ──────────────────────────────
-  theme: 'dark', // dark | japan | ou | business
+  theme: 'dark',
   setTheme: (theme) => {
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute('data-theme', theme)
+      localStorage.setItem('ou_theme', theme)
     }
     set({ theme })
   },

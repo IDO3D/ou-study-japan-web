@@ -78,15 +78,14 @@ export default function CanvasView() {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('https://ou.instructure.com/api/v1/courses?enrollment_state=active&per_page=20', {
-        headers: { 'Authorization': `Bearer ${tok}` }
-      })
-      if (!res.ok) throw new Error('Invalid token or no courses found')
+      // Use our server-side proxy to avoid CORS
+      const res = await fetch(`/api/canvas-proxy?token=${encodeURIComponent(tok)}&path=courses`)
       const data = await res.json()
-      setCourses(data.filter(c => c.workflow_state !== 'unpublished'))
+      if (!res.ok || data.error) throw new Error(data.error || 'Failed to load courses')
+      setCourses(Array.isArray(data) ? data.filter(c => c.workflow_state !== 'unpublished') : [])
     } catch (err) {
       setError(err.message)
-      toast.error('Could not load Canvas courses')
+      toast.error('Canvas: ' + err.message)
     }
     setLoading(false)
   }

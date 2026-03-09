@@ -12,7 +12,7 @@ export default function AppShell({ children, currentView, onNavigate }) {
         maxWidth: '430px',
         height: '100dvh',
         overflow: 'hidden',
-        background: 'radial-gradient(ellipse at 15% 8%, rgba(224,36,36,0.07) 0%, transparent 55%), #09090b',
+        background: 'var(--bg)',
       }}
     >
       <Header currentView={currentView} onNavigate={onNavigate} />
