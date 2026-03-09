@@ -28,20 +28,26 @@ export default function LoginPage() {
             return
         }
 
-        // Check if tutorial completed
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('tutorial_completed, name')
-            .eq('id', data.user.id)
-            .single()
+        toast.success(`Welcome back! 🎌`)
 
-        toast.success(`Welcome back${profile?.name ? `, ${profile.name}` : ''}! 🎌`)
+        // Try to check tutorial status — default to /tutorial if anything fails
+        try {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('tutorial_completed')
+                .eq('id', data.user.id)
+                .single()
 
-        if (profile && !profile.tutorial_completed) {
+            if (profile?.tutorial_completed === true) {
+                router.push('/dashboard')
+            } else {
+                router.push('/tutorial')
+            }
+        } catch (_) {
+            // If profiles table doesn't exist yet or any error, send to tutorial
             router.push('/tutorial')
-        } else {
-            router.push('/dashboard')
         }
+
         setLoading(false)
     }
 

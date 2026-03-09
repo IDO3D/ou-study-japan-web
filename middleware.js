@@ -6,51 +6,47 @@ const PUBLIC_ROUTES = ['/', '/login', '/sign-up', '/api/auth/callback']
 
 export async function middleware(req) {
     const res = NextResponse.next()
-    const supabase = createMiddlewareClient({ req, res })
-    const { data: { session } } = await supabase.auth.getSession()
     const { pathname } = req.nextUrl
 
-    // Allow public routes and API routes
+    // Always allow public routes and all API routes through
     if (PUBLIC_ROUTES.includes(pathname) || pathname.startsWith('/api/')) {
-        // If already logged in, redirect away from login/signup
-        if (session && (pathname === '/login' || pathname === '/sign-up')) {
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('tutorial_completed')
-                .eq('id', session.user.id)
-                .single()
+        return res
+    }
 
-            if (profile && !profile.tutorial_completed) {
-                return NextResponse.redirect(new URL('/tutorial', req.url))
+    // For protected routes, check session
+    try {
+        const supabase = createMiddlewareClient({ req, res })
+        const { data: { session } } = await supabase.auth.getSession()
+
+        // Not logged in → send to login
+        if (!session) {
+            return NextResponse.redirect(new URL('/login', req.url))
+        }
+
+        // Tutorial page — just needs to be logged in
+        if (pathname === '/tutorial') {
+            return res
+        }
+
+        // Dashboard/settings — check tutorial completion
+        if (pathname === '/dashboard' || pathname === '/settings') {
+            try {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('tutorial_completed')
+                    .eq('id', session.user.id)
+                    .single()
+
+                // Only redirect to tutorial if we KNOW tutorial is not done
+                if (profile && profile.tutorial_completed === false) {
+                    return NextResponse.redirect(new URL('/tutorial', req.url))
+                }
+            } catch (_) {
+                // If profiles table doesn't exist yet, allow through
             }
-            return NextResponse.redirect(new URL('/dashboard', req.url))
         }
-        return res
-    }
-
-    // All other routes require authentication
-    if (!session) {
-        const loginUrl = new URL('/login', req.url)
-        loginUrl.searchParams.set('redirected', '1')
-        return NextResponse.redirect(loginUrl)
-    }
-
-    // For /tutorial — must be logged in (no tutorial check needed here)
-    if (pathname === '/tutorial') {
-        return res
-    }
-
-    // For /dashboard — must have completed tutorial
-    if (pathname === '/dashboard' || pathname === '/settings') {
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('tutorial_completed')
-            .eq('id', session.user.id)
-            .single()
-
-        if (profile && !profile.tutorial_completed) {
-            return NextResponse.redirect(new URL('/tutorial', req.url))
-        }
+    } catch (_) {
+        // On any auth error, allow through (client-side will handle it)
     }
 
     return res
