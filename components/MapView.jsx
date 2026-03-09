@@ -1,359 +1,561 @@
+// components/MapView.jsx — Apple Maps-style full-screen experience
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../utils/store'
 
-const CITIES = [
-  { id: 'ibaraki', name: 'Ibaraki City', subtitle: 'Osaka Prefecture', lat: 34.8154, lng: 135.5686, zoom: 13, emoji: '🏫', color: '#E02424', nights: 10, desc: 'OIC Seminar House · Ritsumeikan University' },
-  { id: 'kyoto', name: 'Kyoto', subtitle: 'Kyoto Prefecture', lat: 35.0116, lng: 135.7681, zoom: 13, emoji: '⛩️', color: '#4F46E5', nights: 11, desc: 'Historic temples, tea ceremonies & orientation tours' },
-  { id: 'tokyo', name: 'Tokyo', subtitle: 'Tokyo Metropolis', lat: 35.6762, lng: 139.6503, zoom: 12, emoji: '🗼', color: '#10B981', nights: 3, desc: 'Shibuya, Shinjuku, business site visits & final tours' },
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
+
+// ─── Japan POIs ──────────────────────────────────────────────
+const JAPAN_POIS = [
+  // Ibaraki / Osaka
+  { id: 'oic', name: 'OIC Seminar House', cat: 'housing', lat: 34.8154, lng: 135.5686, icon: '🏠', city: 'Ibaraki' },
+  { id: 'ibaraki-st', name: 'Ibaraki-shi Station', cat: 'transit', lat: 34.8147, lng: 135.5721, icon: '🚉', city: 'Ibaraki' },
+  { id: 'aeon', name: 'AEON Mall Ibaraki', cat: 'shopping', lat: 34.8082, lng: 135.5737, icon: '🛒', city: 'Ibaraki' },
+  { id: 'rits', name: 'Ritsumeikan OIC Campus', cat: 'edu', lat: 34.8160, lng: 135.5692, icon: '🎓', city: 'Ibaraki' },
+  // Kyoto
+  { id: 'kinkaku', name: 'Kinkaku-ji', cat: 'culture', lat: 35.0394, lng: 135.7292, icon: '🏯', city: 'Kyoto' },
+  { id: 'fushimi', name: 'Fushimi Inari Shrine', cat: 'culture', lat: 34.9671, lng: 135.7727, icon: '⛩️', city: 'Kyoto' },
+  { id: 'nishiki', name: 'Nishiki Market', cat: 'food', lat: 35.0050, lng: 135.7650, icon: '🍜', city: 'Kyoto' },
+  { id: 'kyoto-st', name: 'Kyoto Station', cat: 'transit', lat: 34.9858, lng: 135.7588, icon: '🚉', city: 'Kyoto' },
+  { id: 'gion', name: 'Gion District', cat: 'culture', lat: 35.0036, lng: 135.7780, icon: '🏮', city: 'Kyoto' },
+  { id: 'arashiyama', name: 'Arashiyama Bamboo Grove', cat: 'nature', lat: 35.0170, lng: 135.6727, icon: '🎋', city: 'Kyoto' },
+  // Tokyo
+  { id: 'shibuya', name: 'Shibuya Crossing', cat: 'landmark', lat: 35.6595, lng: 139.7004, icon: '🚦', city: 'Tokyo' },
+  { id: 'sensoji', name: 'Senso-ji Temple', cat: 'culture', lat: 35.7147, lng: 139.7966, icon: '⛩️', city: 'Tokyo' },
+  { id: 'shinjuku', name: 'Shinjuku Station', cat: 'transit', lat: 35.6900, lng: 139.7006, icon: '🚉', city: 'Tokyo' },
+  { id: 'tokyo-twr', name: 'Tokyo Tower', cat: 'landmark', lat: 35.6586, lng: 139.7454, icon: '🗼', city: 'Tokyo' },
+  { id: 'tsukiji', name: 'Tsukiji Outer Market', cat: 'food', lat: 35.6654, lng: 139.7706, icon: '🐟', city: 'Tokyo' },
+  { id: 'harajuku', name: 'Harajuku / Takeshita St', cat: 'culture', lat: 35.6702, lng: 139.7027, icon: '🎀', city: 'Tokyo' },
+  { id: 'teamlab', name: 'teamLab Borderless', cat: 'landmark', lat: 35.6255, lng: 139.7857, icon: '🌊', city: 'Tokyo' },
 ]
 
-const CITY_POIS = {
-  ibaraki: [
-    { name: 'OIC Seminar House', type: 'housing', lat: 34.8154, lng: 135.5686, icon: '🏠' },
-    { name: 'Ibaraki-shi Station', type: 'transit', lat: 34.8147, lng: 135.5721, icon: '🚉' },
-    { name: 'AEON Mall Ibaraki', type: 'food', lat: 34.8082, lng: 135.5737, icon: '🛒' },
-    { name: 'Ritsumeikan OIC Campus', type: 'edu', lat: 34.8160, lng: 135.5692, icon: '🎓' },
-    { name: 'Ibaraki City Hall', type: 'landmark', lat: 34.8156, lng: 135.5685, icon: '🏛️' },
-    { name: 'Lawson Convenience Store', type: 'food', lat: 34.8149, lng: 135.5710, icon: '🏪' },
-  ],
-  kyoto: [
-    { name: 'Kinkaku-ji (Golden Pavilion)', type: 'culture', lat: 35.0394, lng: 135.7292, icon: '🏯' },
-    { name: 'Fushimi Inari Shrine', type: 'culture', lat: 34.9671, lng: 135.7727, icon: '⛩️' },
-    { name: 'Nishiki Market', type: 'food', lat: 35.0050, lng: 135.7650, icon: '🍜' },
-    { name: 'Kyoto Station', type: 'transit', lat: 34.9858, lng: 135.7588, icon: '🚉' },
-    { name: 'Gion District', type: 'culture', lat: 35.0036, lng: 135.7780, icon: '🏮' },
-    { name: "Philosopher's Path", type: 'culture', lat: 35.0271, lng: 135.7944, icon: '🌸' },
-    { name: 'Arashiyama Bamboo Grove', type: 'landmark', lat: 35.0170, lng: 135.6727, icon: '🎋' },
-  ],
-  tokyo: [
-    { name: 'Shibuya Crossing', type: 'landmark', lat: 35.6595, lng: 139.7004, icon: '🚦' },
-    { name: 'Senso-ji Temple', type: 'culture', lat: 35.7147, lng: 139.7966, icon: '⛩️' },
-    { name: 'Shinjuku Station', type: 'transit', lat: 35.6900, lng: 139.7006, icon: '🚉' },
-    { name: 'Tokyo Tower', type: 'landmark', lat: 35.6586, lng: 139.7454, icon: '🗼' },
-    { name: 'Tsukiji Outer Market', type: 'food', lat: 35.6654, lng: 139.7706, icon: '🐟' },
-    { name: 'Harajuku / Takeshita', type: 'culture', lat: 35.6702, lng: 139.7027, icon: '🎀' },
-    { name: 'TeamLab Borderless', type: 'landmark', lat: 35.6255, lng: 139.7857, icon: '🌊' },
-  ],
+const CAT_COLORS = {
+  housing: '#E02424', transit: '#4F46E5', food: '#10B981',
+  culture: '#FFB7C5', landmark: '#FCD34D', edu: '#60A5FA',
+  shopping: '#F97316', nature: '#22c55e',
 }
 
-const POI_COLORS = { housing: '#E02424', transit: '#4F46E5', food: '#10B981', culture: '#FFB7C5', landmark: '#FCD34D', edu: '#60A5FA' }
+const CATS = [
+  { id: 'all', label: 'All', emoji: '🗾' },
+  { id: 'food', label: 'Food', emoji: '🍜' },
+  { id: 'culture', label: 'Culture', emoji: '⛩️' },
+  { id: 'transit', label: 'Transit', emoji: '🚉' },
+  { id: 'landmark', label: 'Sights', emoji: '🗼' },
+  { id: 'housing', label: 'Housing', emoji: '🏠' },
+  { id: 'nature', label: 'Nature', emoji: '🌸' },
+]
 
 const NAV_MODES = [
-  { id: 'walking', icon: '🚶', label: 'Walk', profile: 'mapbox/walking', color: '#10B981' },
-  { id: 'transit', icon: '🚇', label: 'Transit', profile: 'mapbox/driving', color: '#4F46E5' },
-  { id: 'cycling', icon: '🚲', label: 'Bike', profile: 'mapbox/cycling', color: '#F59E0B' },
-  { id: 'driving', icon: '🚗', label: 'Drive', profile: 'mapbox/driving', color: '#60A5FA' },
-  { id: 'taxi', icon: '🚕', label: 'Taxi', profile: 'mapbox/driving', color: '#FBBF24' },
+  { id: 'walking', label: 'Walk', icon: '🚶', profile: 'mapbox/walking', color: '#10B981' },
+  { id: 'transit', label: 'Transit', icon: '🚇', profile: 'mapbox/driving', color: '#4F46E5' },
+  { id: 'cycling', label: 'Bike', icon: '🚲', profile: 'mapbox/cycling', color: '#F59E0B' },
+  { id: 'driving', label: 'Drive', icon: '🚗', profile: 'mapbox/driving', color: '#60A5FA' },
 ]
+
+const CITY_CENTERS = {
+  Ibaraki: { lat: 34.8154, lng: 135.5686, zoom: 14 },
+  Kyoto: { lat: 35.0116, lng: 135.7681, zoom: 13 },
+  Tokyo: { lat: 35.6762, lng: 139.6503, zoom: 12 },
+}
 
 export default function MapView() {
   const mapRef = useRef(null)
+  const mapboxglRef = useRef(null)
   const mapInstance = useRef(null)
-  const [mapLoaded, setMapLoaded] = useState(false)
-  const [activeCity, setActiveCity] = useState('ibaraki')
-  const [filter, setFilter] = useState('all')
+  const markersRef = useRef([])
+  const searchTimeoutRef = useRef(null)
+
+  const [mapReady, setMapReady] = useState(false)
+  const [query, setQuery] = useState('')
+  const [suggestions, setSuggestions] = useState([])
   const [selectedPoi, setSelectedPoi] = useState(null)
-  const [navMode, setNavMode] = useState(null)
-  const [navTransport, setNavTransport] = useState('walking')
-  const [destination, setDestination] = useState(null)
+  const [activeCity, setActiveCity] = useState('Kyoto')
+  const [activeCat, setActiveCat] = useState('all')
+  const [navMode, setNavMode] = useState('walking')
   const [route, setRoute] = useState(null)
   const [routeLoading, setRouteLoading] = useState(false)
+  const [bottomSheet, setBottomSheet] = useState('peek') // 'hidden' | 'peek' | 'partial' | 'full'
+  const [showSearch, setShowSearch] = useState(false)
+
   const { userLocation, navDestination, clearNavDestination } = useStore()
 
-  const city = CITIES.find(c => c.id === activeCity)
-  const pois = CITY_POIS[activeCity] || []
-  const filteredPois = filter === 'all' ? pois : pois.filter(p => p.type === filter)
+  const filteredPois = JAPAN_POIS.filter(p =>
+    activeCat === 'all' || p.cat === activeCat
+  )
 
-  const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
-  const hasMapbox = MAPBOX_TOKEN?.startsWith('pk.')
-
-  // Auto-navigate when arriving from another view (Discover, Housing, etc.)
+  // ── Init Mapbox ──────────────────────────────────────────────
   useEffect(() => {
-    if (navDestination && mapLoaded) {
-      setDestination(navDestination)
-      setNavMode('navigate')
-      getDirections(navDestination)
-      if (mapInstance.current) {
-        mapInstance.current.flyTo({ center: [navDestination.lng, navDestination.lat], zoom: 16, pitch: 50, duration: 1200 })
-      }
-      clearNavDestination()
-    }
-  }, [navDestination, mapLoaded])
+    if (!mapRef.current || !MAPBOX_TOKEN?.startsWith('pk.')) return
 
-  // Initialize map
-  useEffect(() => {
-    if (!mapRef.current || !hasMapbox) return
-    if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null }
+    const init = async () => {
+      const mapboxgl = (await import('mapbox-gl')).default
+      await import('mapbox-gl/dist/mapbox-gl.css')
+      mapboxglRef.current = mapboxgl
+      mapboxgl.accessToken = MAPBOX_TOKEN
 
-    const initMap = async () => {
-      try {
-        const mapboxgl = (await import('mapbox-gl')).default
-        await import('mapbox-gl/dist/mapbox-gl.css')
-        mapboxgl.accessToken = MAPBOX_TOKEN
+      const map = new mapboxgl.Map({
+        container: mapRef.current,
+        style: 'mapbox://styles/mapbox/dark-v11',
+        center: [135.7681, 35.0116],
+        zoom: 13,
+        pitch: 45,
+        bearing: -10,
+        antialias: true,
+      })
 
-        const map = new mapboxgl.Map({
-          container: mapRef.current,
-          style: 'mapbox://styles/mapbox/dark-v11',
-          center: [city.lng, city.lat],
-          zoom: city.zoom,
-          pitch: 40,
-          bearing: 0,
+      map.addControl(new mapboxgl.GeolocateControl({
+        positionOptions: { enableHighAccuracy: true },
+        trackUserLocation: true,
+        showUserHeadingIndicator: true,
+      }), 'top-right')
+
+      map.on('load', () => {
+        mapInstance.current = map
+        setMapReady(true)
+
+        // 3D buildings
+        map.addLayer({
+          id: '3d-buildings', source: 'composite', 'source-layer': 'building',
+          filter: ['==', 'extrude', 'true'], type: 'fill-extrusion', minzoom: 14,
+          paint: {
+            'fill-extrusion-color': '#1a1a2e',
+            'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 14, 0, 14.05, ['get', 'height']],
+            'fill-extrusion-base': ['get', 'min_height'],
+            'fill-extrusion-opacity': 0.75,
+          }
         })
+      })
 
-        map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right')
-        map.addControl(new mapboxgl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true }), 'top-right')
-
-        map.on('load', () => {
-          setMapLoaded(true)
-          mapInstance.current = map
-          // Add 3D buildings
-          map.addLayer({ id: '3d-buildings', source: 'composite', 'source-layer': 'building', filter: ['==', 'extrude', 'true'], type: 'fill-extrusion', minzoom: 14, paint: { 'fill-extrusion-color': '#1a1a2e', 'fill-extrusion-height': ['get', 'height'], 'fill-extrusion-base': ['get', 'min_height'], 'fill-extrusion-opacity': 0.7 } })
-
-          pois.forEach(poi => {
-            const el = document.createElement('div')
-            el.innerHTML = `<div style="background:${POI_COLORS[poi.type] || '#E02424'};border:2.5px solid white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.5);">${poi.icon}</div>`
-            new mapboxgl.Marker(el).setLngLat([poi.lng, poi.lat])
-              .setPopup(new mapboxgl.Popup({ offset: 20, closeButton: false }).setHTML(
-                `<div style="font-family:'DM Sans',sans-serif;padding:8px;"><p style="font-weight:700;font-size:13px;margin:0 0 3px;">${poi.icon} ${poi.name}</p><p style="color:${POI_COLORS[poi.type]};font-size:11px;margin:0;text-transform:capitalize;">${poi.type}</p></div>`
-              )).addTo(map)
-          })
-        })
-      } catch (err) { console.error('Map error:', err) }
+      // Close search on map click
+      map.on('click', () => { setShowSearch(false); setSuggestions([]) })
     }
-    initMap()
+    init()
     return () => { if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null } }
-  }, [activeCity])
+  }, [])
 
-  // Get directions
+  // ── Render POI markers when map ready ───────────────────────
+  useEffect(() => {
+    if (!mapReady || !mapboxglRef.current || !mapInstance.current) return
+    const map = mapInstance.current
+    const mapboxgl = mapboxglRef.current
+
+    // Clear old markers
+    markersRef.current.forEach(m => m.remove())
+    markersRef.current = []
+
+    filteredPois.forEach(poi => {
+      const el = document.createElement('div')
+      const color = CAT_COLORS[poi.cat] || '#E02424'
+      el.innerHTML = `
+        <div style="
+          background:${color};border:2.5px solid rgba(255,255,255,0.9);
+          border-radius:50%;width:34px;height:34px;
+          display:flex;align-items:center;justify-content:center;
+          font-size:16px;cursor:pointer;
+          box-shadow:0 4px 14px rgba(0,0,0,0.5),0 0 0 4px ${color}30;
+          transition:transform 0.15s;
+        ">${poi.icon}</div>`
+      el.style.cursor = 'pointer'
+      el.addEventListener('click', (e) => {
+        e.stopPropagation()
+        setSelectedPoi(poi)
+        setBottomSheet('partial')
+        map.flyTo({ center: [poi.lng, poi.lat], zoom: 15.5, pitch: 50, bearing: 10, duration: 900, essential: true })
+      })
+
+      const marker = new mapboxgl.Marker(el).setLngLat([poi.lng, poi.lat]).addTo(map)
+      markersRef.current.push(marker)
+    })
+  }, [mapReady, activeCat])
+
+  // ── Search autocomplete (Mapbox Geocoding) ──────────────────
+  const handleSearchInput = (val) => {
+    setQuery(val)
+    clearTimeout(searchTimeoutRef.current)
+    if (!val.trim() || val.length < 2) { setSuggestions([]); return }
+
+    // Local POI match first
+    const localMatches = JAPAN_POIS.filter(p =>
+      p.name.toLowerCase().includes(val.toLowerCase()) ||
+      p.city.toLowerCase().includes(val.toLowerCase())
+    ).slice(0, 4).map(p => ({ type: 'poi', ...p }))
+
+    setSuggestions(localMatches)
+
+    // Mapbox geocoding for extra results
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const center = mapInstance.current?.getCenter()
+        const prox = center ? `${center.lng},${center.lat}` : '135.7681,35.0116'
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(val)}.json?proximity=${prox}&country=jp&language=en&limit=4&access_token=${MAPBOX_TOKEN}`
+        const res = await fetch(url)
+        const data = await res.json()
+        const geocoded = (data.features || []).map(f => ({
+          type: 'geocode',
+          id: f.id,
+          name: f.text,
+          desc: f.place_name,
+          lat: f.center[1],
+          lng: f.center[0],
+          icon: '📍',
+          cat: 'search',
+        }))
+        setSuggestions(prev => {
+          const ids = prev.map(p => p.id)
+          return [...prev, ...geocoded.filter(g => !ids.includes(g.id))].slice(0, 8)
+        })
+      } catch { }
+    }, 320)
+  }
+
+  const handleSuggestionSelect = (s) => {
+    setQuery(s.name)
+    setSuggestions([])
+    setShowSearch(false)
+    setSelectedPoi(s)
+    setBottomSheet('partial')
+    mapInstance.current?.flyTo({ center: [s.lng, s.lat], zoom: 15.5, pitch: 50, bearing: 10, duration: 900, essential: true })
+  }
+
+  // ── City jump ────────────────────────────────────────────────
+  const jumpToCity = (city) => {
+    setActiveCity(city)
+    const c = CITY_CENTERS[city]
+    mapInstance.current?.flyTo({ center: [c.lng, c.lat], zoom: c.zoom, pitch: 40, bearing: -5, duration: 1200 })
+  }
+
+  // ── Directions ───────────────────────────────────────────────
   const getDirections = useCallback(async (dest) => {
     if (!userLocation || !MAPBOX_TOKEN) return
     setRouteLoading(true)
     setRoute(null)
-
-    const mode = NAV_MODES.find(m => m.id === navTransport)
-    const profile = mode?.profile || 'mapbox/walking'
+    const mode = NAV_MODES.find(m => m.id === navMode)
     const origin = `${userLocation.lng},${userLocation.lat}`
-    const destCoord = `${dest.lng},${dest.lat}`
-
+    const end = `${dest.lng},${dest.lat}`
     try {
-      const res = await fetch(
-        `https://api.mapbox.com/directions/v5/${profile}/${origin};${destCoord}?geometries=geojson&steps=true&access_token=${MAPBOX_TOKEN}`
-      )
+      const res = await fetch(`https://api.mapbox.com/directions/v5/${mode.profile}/${origin};${end}?geometries=geojson&steps=true&access_token=${MAPBOX_TOKEN}`)
       const data = await res.json()
-      if (data.routes?.[0]) {
-        const r = data.routes[0]
+      const r = data.routes?.[0]
+      if (r) {
         setRoute({
           distance: (r.distance / 1000).toFixed(1),
           duration: Math.ceil(r.duration / 60),
           steps: r.legs[0]?.steps?.slice(0, 5).map(s => s.maneuver?.instruction) || [],
+          color: mode.color,
         })
-
-        // Draw route on map
         const map = mapInstance.current
-        if (map) {
-          if (map.getSource('route')) {
-            map.getSource('route').setData({ type: 'Feature', geometry: r.geometry })
-          } else {
+        const mapboxgl = mapboxglRef.current
+        if (map && mapboxgl) {
+          if (map.getSource('route')) map.getSource('route').setData({ type: 'Feature', geometry: r.geometry })
+          else {
             map.addSource('route', { type: 'geojson', data: { type: 'Feature', geometry: r.geometry } })
-            map.addLayer({ id: 'route-line', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': mode?.color || '#4F46E5', 'line-width': 5, 'line-opacity': 0.9 } })
+            map.addLayer({ id: 'route-line', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': mode.color, 'line-width': 5, 'line-opacity': 0.95, 'line-blur': 0.5 } })
+            map.addLayer({ id: 'route-glow', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': mode.color, 'line-width': 14, 'line-opacity': 0.18, 'line-blur': 8 } }, 'route-line')
           }
-
-          // Fit map to route
           const coords = r.geometry.coordinates
-          const bounds = coords.reduce((b, c) => b.extend(c), new (await import('mapbox-gl')).default.LngLatBounds(coords[0], coords[0]))
-          map.fitBounds(bounds, { padding: 60, duration: 1000 })
+          const bounds = coords.reduce((b, c) => b.extend(c), new mapboxgl.LngLatBounds(coords[0], coords[0]))
+          map.fitBounds(bounds, { padding: 90, duration: 1000 })
         }
       }
-    } catch (err) { console.error('Directions error:', err) }
+    } catch (e) { console.error(e) }
     setRouteLoading(false)
-  }, [userLocation, navTransport, MAPBOX_TOKEN])
+  }, [userLocation, navMode])
 
-  const handlePoiNavigate = (poi) => {
-    setDestination(poi)
-    setNavMode('navigate')
-    getDirections(poi)
-    if (mapInstance.current) {
-      mapInstance.current.flyTo({ center: [poi.lng, poi.lat], zoom: 15, duration: 800 })
+  // ── Handle external navDestination ──────────────────────────
+  useEffect(() => {
+    if (navDestination && mapReady) {
+      const dest = navDestination
+      clearNavDestination()
+      setSelectedPoi(dest)
+      setBottomSheet('partial')
+      mapInstance.current?.flyTo({ center: [dest.lng, dest.lat], zoom: 15.5, pitch: 50, duration: 900 })
+      setTimeout(() => getDirections(dest), 500)
     }
-  }
+  }, [navDestination, mapReady])
 
-  const filterTypes = ['all', ...new Set(pois.map(p => p.type))]
+  // ─── Bottom sheet snap height ─────────────────────────────
+  const SHEET_HEIGHTS = { hidden: 0, peek: 90, partial: 340, full: '85%' }
 
   return (
-    <div className="px-5 pb-6 space-y-4">
+    // Full-screen overlay — covers entire app shell viewport
+    <div style={{ position: 'absolute', inset: 0, zIndex: 5, overflow: 'hidden', background: '#0a0a0f' }}>
 
-      {/* City Selector */}
-      <div>
-        <p className="text-[10px] font-display font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
-          Program Cities — 24 Nights
-        </p>
-        <div className="grid grid-cols-3 gap-2">
-          {CITIES.map(c => (
-            <button key={c.id} onClick={() => { setActiveCity(c.id); setSelectedPoi(null); setFilter('all'); setNavMode(null); setRoute(null) }}
-              className="p-3 rounded-2xl flex flex-col items-center gap-1 transition-all active:scale-95"
-              style={{ background: activeCity === c.id ? c.color : 'rgba(255,255,255,0.06)', border: `1px solid ${activeCity === c.id ? c.color : 'rgba(255,255,255,0.08)'}`, boxShadow: activeCity === c.id ? `0 4px 16px ${c.color}50` : 'none' }}>
-              <span className="text-xl">{c.emoji}</span>
-              <p className="text-[10px] font-display font-bold text-white leading-tight text-center">{c.name}</p>
-              <p className="text-[9px]" style={{ color: activeCity === c.id ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)' }}>{c.nights}n</p>
-            </button>
-          ))}
+      {/* ── MAP CANVAS ────────────────────────────────────────── */}
+      <div ref={mapRef} style={{ position: 'absolute', inset: 0 }} />
+
+      {/* Loading splash */}
+      {!mapReady && (
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0a0a0f', gap: 16 }}>
+          <div style={{ width: 56, height: 56, borderRadius: 16, background: '#841617', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 32px rgba(132,22,23,0.6)', fontSize: 28 }}>⛩️</div>
+          <div style={{ width: 40, height: 3, borderRadius: 99, background: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: '60%', background: '#CC2124', animation: 'pulse 1.2s ease-in-out infinite' }} />
+          </div>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', fontFamily: 'Syne, sans-serif', letterSpacing: '0.1em' }}>LOADING MAP</p>
         </div>
-      </div>
+      )}
 
-      {/* Map */}
-      <motion.div key={`map-${activeCity}`} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}>
-        {hasMapbox ? (
-          <div className="relative rounded-3xl overflow-hidden" style={{ height: '260px' }}>
-            <div ref={mapRef} className="w-full h-full" />
-            {!mapLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'var(--bg)' }}>
-                <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'var(--brand)', borderTopColor: 'transparent' }} />
-              </div>
+      {/* ── SEARCH BAR (floating top) ─────────────────────────── */}
+      <div style={{
+        position: 'absolute',
+        top: 'max(54px, calc(env(safe-area-inset-top) + 42px))',
+        left: 12, right: 12,
+        zIndex: 20,
+        display: 'flex', flexDirection: 'column', gap: 8,
+      }}>
+        {/* Search input */}
+        <motion.div
+          initial={false}
+          animate={{ scale: showSearch ? 1.01 : 1 }}
+          style={{
+            background: 'rgba(18,18,22,0.92)',
+            backdropFilter: 'blur(28px) saturate(200%)',
+            WebkitBackdropFilter: 'blur(28px) saturate(200%)',
+            border: `1px solid ${showSearch ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.08)'}`,
+            borderRadius: 18,
+            overflow: 'hidden',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingInline: 14, paddingBlock: 12 }}>
+            <span style={{ fontSize: 16, opacity: 0.6 }}>🔍</span>
+            <input
+              value={query}
+              onChange={e => handleSearchInput(e.target.value)}
+              onFocus={() => setShowSearch(true)}
+              placeholder="Search places in Japan..."
+              style={{
+                flex: 1, background: 'transparent', border: 'none', outline: 'none',
+                color: 'white', fontSize: 15, fontFamily: 'Inter, sans-serif',
+              }}
+            />
+            {query && (
+              <button onClick={() => { setQuery(''); setSuggestions([]); setShowSearch(false) }}
+                style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: 14, padding: 2 }}>✕</button>
             )}
           </div>
+
+          {/* Suggestions dropdown */}
+          <AnimatePresence>
+            {suggestions.length > 0 && showSearch && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                style={{ borderTop: '1px solid rgba(255,255,255,0.07)', overflow: 'hidden' }}
+              >
+                {suggestions.map((s, i) => (
+                  <button key={s.id || i} onClick={() => handleSuggestionSelect(s)}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '11px 16px',
+                      background: 'transparent', border: 'none', cursor: 'pointer',
+                      borderBottom: i < suggestions.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <div style={{
+                      width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+                      background: s.cat ? `${CAT_COLORS[s.cat] || '#555'}20` : 'rgba(255,255,255,0.08)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
+                    }}>{s.icon || '📍'}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: 'white', fontFamily: 'Syne, sans-serif', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</p>
+                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {s.city || s.desc || 'Japan'}
+                      </p>
+                    </div>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)' }}>→</span>
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+
+        {/* Category chips */}
+        {!showSearch && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
+            style={{ display: 'flex', gap: 7, overflowX: 'auto', paddingBottom: 2, scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {CATS.map(c => (
+              <button key={c.id} onClick={() => setActiveCat(c.id)}
+                style={{
+                  flexShrink: 0, display: 'flex', alignItems: 'center', gap: 5,
+                  padding: '7px 13px',
+                  background: activeCat === c.id ? 'var(--brand, #CC2124)' : 'rgba(18,18,22,0.88)',
+                  border: `1px solid ${activeCat === c.id ? 'transparent' : 'rgba(255,255,255,0.1)'}`,
+                  backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+                  borderRadius: 99, cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                  transition: 'all 0.15s',
+                }}
+              >
+                <span style={{ fontSize: 12 }}>{c.emoji}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: activeCat === c.id ? 'white' : 'rgba(255,255,255,0.7)', fontFamily: 'Syne, sans-serif' }}>{c.label}</span>
+              </button>
+            ))}
+          </motion.div>
+        )}
+
+        {/* City jumper */}
+        {!showSearch && (
+          <div style={{ display: 'flex', gap: 7 }}>
+            {Object.keys(CITY_CENTERS).map(city => (
+              <button key={city} onClick={() => jumpToCity(city)}
+                style={{
+                  flex: 1, padding: '7px 4px', borderRadius: 12, cursor: 'pointer', border: 'none',
+                  background: activeCity === city ? 'rgba(204,33,36,0.85)' : 'rgba(18,18,22,0.82)',
+                  backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+                  color: activeCity === city ? 'white' : 'rgba(255,255,255,0.55)',
+                  fontSize: 11, fontWeight: 700, fontFamily: 'Syne, sans-serif',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                  transition: 'all 0.15s',
+                }}
+              >{city}</button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── BOTTOM SHEET ─────────────────────────────────────── */}
+      <motion.div
+        animate={{ height: typeof SHEET_HEIGHTS[bottomSheet] === 'number' ? SHEET_HEIGHTS[bottomSheet] : SHEET_HEIGHTS[bottomSheet] }}
+        transition={{ type: 'spring', stiffness: 340, damping: 36 }}
+        style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 15,
+          background: 'rgba(12,12,16,0.97)',
+          backdropFilter: 'blur(30px) saturate(200%)',
+          WebkitBackdropFilter: 'blur(30px) saturate(200%)',
+          borderRadius: '24px 24px 0 0',
+          border: '1px solid rgba(255,255,255,0.07)',
+          borderBottom: 'none',
+          overflow: 'hidden',
+          boxShadow: '0 -8px 40px rgba(0,0,0,0.5)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }}
+      >
+        {/* Drag handle */}
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 10, paddingBottom: 4, cursor: 'pointer' }}
+          onClick={() => setBottomSheet(s => s === 'peek' ? 'partial' : s === 'partial' ? 'full' : 'peek')}>
+          <div style={{ width: 36, height: 4, borderRadius: 99, background: 'rgba(255,255,255,0.18)' }} />
+        </div>
+
+        {selectedPoi ? (
+          <div style={{ paddingInline: 16, paddingTop: 4, height: '100%', overflowY: 'auto' }}>
+            {/* POI header */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 16 }}>
+              <div style={{
+                width: 52, height: 52, borderRadius: 16, flexShrink: 0,
+                background: `${CAT_COLORS[selectedPoi.cat] || '#E02424'}20`,
+                border: `2px solid ${CAT_COLORS[selectedPoi.cat] || '#E02424'}40`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26,
+              }}>{selectedPoi.icon || '📍'}</div>
+              <div style={{ flex: 1 }}>
+                <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: 'white', fontFamily: 'Syne, sans-serif', letterSpacing: '-0.02em', lineHeight: 1.2 }}>{selectedPoi.name}</h2>
+                <p style={{ margin: '3px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.45)', fontFamily: 'Inter, sans-serif', textTransform: 'capitalize' }}>
+                  {selectedPoi.cat || 'Place'} · {selectedPoi.city || 'Japan'}
+                </p>
+              </div>
+              <button onClick={() => { setSelectedPoi(null); setBottomSheet('peek'); setRoute(null) }}
+                style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', flexShrink: 0, fontSize: 13 }}>✕</button>
+            </div>
+
+            {/* Transport mode selector */}
+            <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+              {NAV_MODES.map(m => (
+                <button key={m.id} onClick={() => { setNavMode(m.id); if (selectedPoi) setTimeout(() => getDirections(selectedPoi), 50) }}
+                  style={{
+                    flex: 1, padding: '8px 4px', borderRadius: 12, border: 'none', cursor: 'pointer',
+                    background: navMode === m.id ? `${m.color}25` : 'rgba(255,255,255,0.06)',
+                    outline: navMode === m.id ? `1px solid ${m.color}` : 'none',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+                    transition: 'all 0.15s',
+                  }}>
+                  <span style={{ fontSize: 18 }}>{m.icon}</span>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: navMode === m.id ? m.color : 'rgba(255,255,255,0.4)', fontFamily: 'Syne, sans-serif' }}>{m.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Navigate CTA */}
+            <button onClick={() => getDirections(selectedPoi)}
+              disabled={routeLoading}
+              style={{
+                width: '100%', padding: '13px', borderRadius: 16, border: 'none', cursor: 'pointer',
+                background: routeLoading ? 'rgba(255,255,255,0.08)' : 'linear-gradient(135deg, #CC2124, #841617)',
+                color: 'white', fontSize: 14, fontWeight: 800, fontFamily: 'Syne, sans-serif',
+                boxShadow: routeLoading ? 'none' : '0 6px 20px rgba(132,22,23,0.5)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                marginBottom: route ? 12 : 0,
+                transition: 'all 0.2s',
+              }}>
+              {routeLoading
+                ? <><span style={{ width: 18, height: 18, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', display: 'inline-block', animation: 'spin 0.8s linear infinite' }} /> Calculating...</>
+                : '📍 Get Directions'}
+            </button>
+
+            {/* Route result */}
+            <AnimatePresence>
+              {route && !routeLoading && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                    {[
+                      { label: 'Time', value: `${route.duration} min` },
+                      { label: 'Distance', value: `${route.distance} km` },
+                      { label: 'Mode', value: NAV_MODES.find(m => m.id === navMode)?.label },
+                    ].map(s => (
+                      <div key={s.label} style={{ flex: 1, padding: '10px 8px', borderRadius: 12, background: 'rgba(255,255,255,0.06)', textAlign: 'center' }}>
+                        <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'white', fontFamily: 'Syne, sans-serif' }}>{s.value}</p>
+                        <p style={{ margin: 0, fontSize: 9, color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {route.steps.length > 0 && (
+                    <div style={{ marginTop: 12, borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.07)' }}>
+                      <p style={{ margin: 0, padding: '8px 14px', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.35)', fontFamily: 'Syne, sans-serif', textTransform: 'uppercase', letterSpacing: '0.08em', background: 'rgba(255,255,255,0.04)' }}>Directions</p>
+                      {route.steps.map((step, i) => (
+                        <div key={i} style={{ display: 'flex', gap: 12, padding: '10px 14px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                          <span style={{ fontSize: 12, fontWeight: 800, color: route.color, fontFamily: 'Syne, sans-serif', minWidth: 18 }}>{i + 1}</span>
+                          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', fontFamily: 'Inter, sans-serif', lineHeight: 1.4 }}>{step}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         ) : (
-          <div className="w-full rounded-3xl flex items-center justify-center text-white font-display font-bold" style={{ height: 200, background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-            {city.emoji} {city.name}
+          /* Peek state — nearby places list */
+          <div style={{ paddingInline: 16, paddingTop: 4 }}>
+            <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', fontFamily: 'Syne, sans-serif', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              {filteredPois.length} places · {activeCity}
+            </p>
+            <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollbarWidth: 'none', paddingBottom: 4 }}>
+              {filteredPois.filter(p => p.city === activeCity).map(poi => (
+                <button key={poi.id} onClick={() => { setSelectedPoi(poi); setBottomSheet('partial'); mapInstance.current?.flyTo({ center: [poi.lng, poi.lat], zoom: 15.5, pitch: 50, duration: 900 }) }}
+                  style={{
+                    flexShrink: 0, width: 150, padding: '10px 12px', borderRadius: 16, border: 'none', cursor: 'pointer',
+                    background: 'rgba(255,255,255,0.06)', textAlign: 'left',
+                    display: 'flex', flexDirection: 'column', gap: 6,
+                    outline: '1px solid rgba(255,255,255,0.07)',
+                  }}>
+                  <span style={{ fontSize: 22 }}>{poi.icon}</span>
+                  <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: 'white', fontFamily: 'Syne, sans-serif', lineHeight: 1.3 }}>{poi.name}</p>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: CAT_COLORS[poi.cat] || '#fff', fontFamily: 'Inter, sans-serif', textTransform: 'capitalize' }}>{poi.cat}</span>
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </motion.div>
 
-      {/* Navigation Mode Panel */}
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-        <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
-          <p className="font-display font-black text-white text-sm">🧭 Navigation</p>
-          {navMode && (
-            <button onClick={() => { setNavMode(null); setRoute(null); setDestination(null) }}
-              className="text-xs font-display font-bold px-3 py-1 rounded-full"
-              style={{ background: 'rgba(255,100,100,0.15)', color: '#FF6B6B' }}>
-              ✕ Clear
-            </button>
-          )}
-        </div>
-
-        {/* Transport mode selector */}
-        <div className="flex gap-1 p-2">
-          {NAV_MODES.map(m => (
-            <button key={m.id} onClick={() => { setNavTransport(m.id); if (destination) getDirections(destination) }}
-              className="flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl transition-all"
-              style={{ background: navTransport === m.id ? m.color + '20' : 'transparent', border: navTransport === m.id ? `1px solid ${m.color}` : '1px solid transparent' }}>
-              <span className="text-base">{m.icon}</span>
-              <span className="text-[9px] font-display font-bold" style={{ color: navTransport === m.id ? m.color : 'rgba(255,255,255,0.4)' }}>{m.label}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Route result */}
-        <AnimatePresence>
-          {routeLoading && (
-            <div className="px-4 pb-3 flex items-center gap-2 text-sm" style={{ color: 'var(--text-muted)' }}>
-              <span className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'var(--brand)', borderTopColor: 'transparent' }} />
-              Calculating route...
-            </div>
-          )}
-          {route && !routeLoading && (
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="px-4 pb-4 space-y-2">
-              <div className="flex gap-3">
-                <div className="flex-1 p-3 rounded-xl text-center" style={{ background: 'var(--brand-subtle)' }}>
-                  <p className="font-display font-black text-white text-lg">{route.duration}</p>
-                  <p className="text-[9px] font-display uppercase" style={{ color: 'var(--text-muted)' }}>min</p>
-                </div>
-                <div className="flex-1 p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                  <p className="font-display font-black text-white text-lg">{route.distance}</p>
-                  <p className="text-[9px] font-display uppercase" style={{ color: 'var(--text-muted)' }}>km</p>
-                </div>
-                <div className="flex-1 p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                  <p className="text-lg">{NAV_MODES.find(m => m.id === navTransport)?.icon}</p>
-                  <p className="text-[9px] font-display uppercase" style={{ color: 'var(--text-muted)' }}>{navTransport}</p>
-                </div>
-              </div>
-              {route.steps.length > 0 && (
-                <div className="space-y-1">
-                  {route.steps.map((step, i) => (
-                    <div key={i} className="flex gap-2 text-xs py-1" style={{ borderBottom: '1px solid var(--border)' }}>
-                      <span className="font-display font-black" style={{ color: 'var(--brand-light)', minWidth: 16 }}>{i + 1}</span>
-                      <span style={{ color: 'var(--text-muted)' }}>{step}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          )}
-          {!route && !routeLoading && !destination && (
-            <div className="px-4 pb-3">
-              <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-                Tap a place below to get directions
-              </p>
-            </div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* POI Filter */}
-      <div className="flex gap-2 overflow-x-auto hide-scroll">
-        {filterTypes.map(f => (
-          <button key={f} onClick={() => setFilter(f)}
-            className="flex-shrink-0 px-3 py-1.5 rounded-full text-[10px] font-display font-bold transition-all active:scale-95"
-            style={{ background: filter === f ? 'var(--brand)' : 'rgba(255,255,255,0.07)', color: filter === f ? 'white' : 'rgba(255,255,255,0.4)', border: filter === f ? '1px solid var(--brand)' : '1px solid rgba(255,255,255,0.08)' }}>
-            {f.charAt(0).toUpperCase() + f.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      {/* POI Cards */}
-      <div>
-        <p className="text-[10px] font-display font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
-          {filteredPois.length} Places in {city.name}
-        </p>
-        <div className="space-y-2">
-          {filteredPois.map((poi, i) => {
-            const isSelected = selectedPoi?.name === poi.name
-            return (
-              <motion.div key={poi.name} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}
-                onClick={() => setSelectedPoi(isSelected ? null : poi)}
-                className="flex items-center gap-3 p-3.5 rounded-2xl cursor-pointer active:scale-[0.98] transition-all"
-                style={{ background: isSelected ? `${POI_COLORS[poi.type]}15` : 'var(--surface)', border: `1px solid ${isSelected ? POI_COLORS[poi.type] + '45' : 'var(--border)'}` }}>
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
-                  style={{ background: `${POI_COLORS[poi.type]}20` }}>
-                  {poi.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-display font-bold text-white text-sm truncate">{poi.name}</p>
-                  <p className="text-[10px] capitalize" style={{ color: 'var(--text-muted)' }}>{poi.type}</p>
-                </div>
-                {isSelected && (
-                  <button onClick={(e) => { e.stopPropagation(); handlePoiNavigate(poi) }}
-                    className="flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-display font-bold text-white transition-all"
-                    style={{ background: 'var(--brand)', boxShadow: '0 4px 12px var(--brand-glow)' }}>
-                    Navigate →
-                  </button>
-                )}
-              </motion.div>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Journey strip */}
-      <div className="p-4 rounded-2xl" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-        <p className="text-[10px] font-display font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>Full Itinerary</p>
-        {CITIES.map(c => (
-          <div key={c.id} className="flex items-center gap-3 py-2.5" style={{ borderBottom: '1px solid var(--border)' }}>
-            <span className="text-xl">{c.emoji}</span>
-            <div className="flex-1">
-              <p className="font-display font-semibold text-white text-xs">{c.name}</p>
-              <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{c.subtitle}</p>
-            </div>
-            <span className="font-display font-bold text-xs" style={{ color: c.color }}>{c.nights} nights</span>
-          </div>
-        ))}
-        <div className="flex justify-between pt-2.5">
-          <span className="font-display font-bold text-white text-sm">Total</span>
-          <span className="font-display font-black text-sm" style={{ color: 'var(--brand-light)' }}>24 Nights</span>
-        </div>
-      </div>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg) } }
+        input::placeholder { color: rgba(255,255,255,0.3); }
+      `}</style>
     </div>
   )
 }

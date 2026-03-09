@@ -36,17 +36,27 @@ function PhoneShell({ children, currentView, onNavigate }) {
         background: 'var(--bg)',
       }}
     >
-      <Header currentView={currentView} onNavigate={onNavigate} />
-      <main
-        className="flex-1 overflow-y-auto hide-scroll"
-        style={{
-          paddingTop: 'max(88px, calc(env(safe-area-inset-top) + 76px))',
-          paddingBottom: 'max(88px, calc(env(safe-area-inset-bottom) + 76px))',
-        }}
-      >
-        {children}
-      </main>
-      <Navigation currentView={currentView} onNavigate={onNavigate} />
+      {/* Map view is a full-screen overlay — skip header/nav padding */}
+      {currentView === 'map' ? (
+        <>
+          {children}
+          <Navigation currentView={currentView} onNavigate={onNavigate} />
+        </>
+      ) : (
+        <>
+          <Header currentView={currentView} onNavigate={onNavigate} />
+          <main
+            className="flex-1 overflow-y-auto hide-scroll"
+            style={{
+              paddingTop: 'max(88px, calc(env(safe-area-inset-top) + 76px))',
+              paddingBottom: 'max(88px, calc(env(safe-area-inset-bottom) + 76px))',
+            }}
+          >
+            {children}
+          </main>
+          <Navigation currentView={currentView} onNavigate={onNavigate} />
+        </>
+      )}
     </div>
   )
 }
