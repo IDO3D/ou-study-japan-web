@@ -4,14 +4,14 @@ import useStore from '../../utils/store'
 import { IcStar } from '../ui/Icons'
 
 const VIEW_META = {
-  home:     { title: 'Home',          sub: null },
-  discover: { title: 'Discover',      sub: 'Restaurants & Halal' },
-  camera:   { title: 'Translate',     sub: 'Point at any text' },
-  map:      { title: 'Map',           sub: 'Ibaraki · Kyoto · Tokyo' },
-  quests:   { title: 'Quests',        sub: 'OU Study Japan' },
-  canvas:   { title: 'Canvas',        sub: 'OU · Japan Program' },
-  housing:  { title: 'Housing',       sub: '24 Nights · 3 Cities' },
-  profile:  { title: 'Profile',       sub: 'Account & Tools' },
+  home: { title: 'Home', sub: null },
+  discover: { title: 'Discover', sub: 'Restaurants & Halal' },
+  camera: { title: 'Translate', sub: 'Point at any text' },
+  map: { title: 'Map', sub: 'Ibaraki · Kyoto · Tokyo' },
+  quests: { title: 'Quests', sub: 'OU Study Japan' },
+  canvas: { title: 'Canvas', sub: 'OU · Japan Program' },
+  housing: { title: 'Housing', sub: '24 Nights · 3 Cities' },
+  profile: { title: 'Profile', sub: 'Account & Tools' },
 }
 
 export default function Header({ currentView, onNavigate }) {
@@ -70,14 +70,23 @@ export default function Header({ currentView, onNavigate }) {
             boxShadow: '0 0 12px rgba(224,36,36,0.35)',
           }}
         >
-          <img
-            src={user.avatarUrl}
-            alt={user.name}
-            width={34}
-            height={34}
-            className="rounded-full block object-cover"
-            style={{ border: '2px solid #09090b' }}
-          />
+          {user.avatarUrl ? (
+            <img
+              src={user.avatarUrl}
+              alt={user.name}
+              width={34}
+              height={34}
+              className="rounded-full block object-cover"
+              style={{ border: '2px solid #09090b' }}
+            />
+          ) : (
+            <div
+              className="w-[34px] h-[34px] rounded-full flex items-center justify-center font-display font-black text-white text-sm"
+              style={{ border: '2px solid #09090b', background: '#09090b' }}
+            >
+              {user.name ? user.name[0].toUpperCase() : '?'}
+            </div>
+          )}
         </button>
       </div>
     </header>

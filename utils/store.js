@@ -4,15 +4,18 @@ import { create } from 'zustand'
 const useStore = create((set, get) => ({
   // ─── User ───────────────────────────────
   user: {
-    id: 'demo-user',
-    name: 'Alex',
-    email: 'alex@ou.edu',
+    id: '',
+    name: '',
+    email: '',
     university: 'University of Oklahoma',
-    points: 2450,
+    major: '',
+    year: '',
+    points: 0,
     dailyBudgetJpy: 4500,
     homeCurrency: 'USD',
-    avatarUrl: 'https://i.pravatar.cc/150?img=33',
+    avatarUrl: '',
   },
+  setUser: (userData) => set((state) => ({ user: { ...state.user, ...userData } })),
 
   // ─── Exchange Rate ───────────────────────
   exchangeRate: 0.0067, // JPY to USD

@@ -28,26 +28,46 @@ export default function Dashboard() {
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) { router.push('/login'); return }
 
-            // Load profile into store
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single()
+            // Try to load profile from DB, fall back to auth metadata
+            let name = session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Traveler'
+            let university = 'University of Oklahoma'
+            let major = ''
+            let year = ''
+            let points = 0
+            let dailyBudgetJpy = 4500
+            let avatarUrl = ''
 
-            if (profile) {
-                setUser({
-                    id: profile.id,
-                    name: profile.name || session.user.email.split('@')[0],
-                    email: profile.email || session.user.email,
-                    avatarUrl: profile.avatar_url || `https://i.pravatar.cc/150?u=${session.user.email}`,
-                    points: profile.points || 0,
-                    dailyBudgetJpy: profile.daily_budget_jpy || 4500,
-                    university: profile.university || 'University of Oklahoma',
-                    major: profile.major || '',
-                    year: profile.year || '',
-                })
+            try {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', session.user.id)
+                    .single()
+
+                if (profile) {
+                    name = profile.name || name
+                    university = profile.university || university
+                    major = profile.major || major
+                    year = profile.year || year
+                    points = profile.points || points
+                    dailyBudgetJpy = profile.daily_budget_jpy || dailyBudgetJpy
+                    avatarUrl = profile.avatar_url || ''
+                }
+            } catch (_) {
+                // profiles table not set up yet — use auth metadata
             }
+
+            setUser({
+                id: session.user.id,
+                name,
+                email: session.user.email,
+                avatarUrl: avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=E02424&color=fff&bold=true`,
+                points,
+                dailyBudgetJpy,
+                university,
+                major,
+                year,
+            })
 
             setAuthReady(true)
         }
