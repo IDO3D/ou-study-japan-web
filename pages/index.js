@@ -32,100 +32,129 @@ export default function LandingPage() {
 
       <div className="bg-black min-h-screen text-white selection:bg-[#E02424] selection:text-white font-sans overflow-x-hidden">
 
-        {/* Navigation - Glassmorphism */}
-        <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 lg:px-12 backdrop-blur-md bg-black/20 border-b border-white/10">
+        {/* JTRIP-Style Navigation */}
+        <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-8 lg:px-16 w-full mix-blend-difference">
+          {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="40" height="40" rx="12" fill="url(#brandGrad)" />
-                <path d="M12 28L20 12L28 28H23.5L20 19.5L16.5 28H12Z" fill="white" />
-                <circle cx="28" cy="14" r="3" fill="#FF8E53" />
-                <defs>
-                  <linearGradient id="brandGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#E02424" />
-                    <stop offset="1" stopColor="#991B1B" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <div className="flex flex-col hidden sm:flex">
-                <span className="font-display font-black text-lg tracking-tight leading-none">OU<span className="text-[#E02424]">Study</span>Japan</span>
-                <span className="text-[9px] uppercase tracking-widest text-white/50 font-bold mt-0.5">Global Experience</span>
-              </div>
+            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center p-1.5">
+              <div className="w-full h-full bg-[#E02424] rounded-full"></div>
             </div>
+            <span className="font-display font-black text-white tracking-[0.15em] text-xs uppercase hidden sm:block">OUStudyJapan.</span>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-bold text-white/70 hover:text-white transition-colors hidden sm:block">
-              Welcome Back
+
+          {/* Center Links (Desktop only) */}
+          <div className="hidden md:flex items-center gap-12 font-medium text-[10px] uppercase tracking-[0.2em] text-white/70">
+            <Link href="#features" className="hover:text-white transition-colors">Features</Link>
+            <Link href="#wallet" className="hover:text-white transition-colors">Wallet</Link>
+            <Link href="#safety" className="hover:text-white transition-colors">Safety</Link>
+            <Link href="#food" className="hover:text-white transition-colors">Food</Link>
+          </div>
+
+          {/* Right Action */}
+          <div className="flex items-center gap-8">
+            <Link href="/login" className="hidden sm:block text-[10px] font-bold text-white tracking-[0.2em] uppercase hover:text-white/70 transition-colors">
+              Sign In
             </Link>
-            <Link href="/sign-up" className="text-sm font-bold px-6 py-2.5 rounded-full bg-white text-black hover:scale-105 active:scale-95 transition-all shadow-xl shadow-white/10">
-              Enter Portal
+            <Link href="/sign-up" className="text-white hover:text-white/70 transition-colors">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </Link>
           </div>
         </nav>
 
         {/* Cinematic Hero Section */}
-        <section ref={heroRef} className="relative h-[100dvh] w-full flex items-center justify-center overflow-hidden">
+        <section ref={heroRef} className="relative h-[100dvh] w-full flex items-center bg-[#09090b] overflow-hidden">
           {/* Animated Background Reel */}
-          <motion.div style={{ y, opacity }} className="absolute inset-0 z-0 bg-black overflow-hidden pointer-events-none">
-            <img src="https://images.unsplash.com/photo-1542051842920-84a48ed9c4d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" className="absolute inset-0 w-full h-full object-cover scale-105 opacity-50 block md:hidden" />
+          <motion.div style={{ y, opacity }} className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+            <img src="https://images.unsplash.com/photo-1542051842920-84a48ed9c4d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" className="absolute inset-0 w-full h-full object-cover opacity-60 block md:hidden scale-105" />
             <div className="hidden md:block absolute inset-0 w-[400vw] h-[400vh] -top-[150vh] -left-[150vw] sm:w-[150vw] sm:h-[150vh] sm:-top-[25vh] sm:-left-[25vw]">
               <iframe
                 src="https://www.youtube.com/embed/F3zks8sLzYI?autoplay=1&mute=1&controls=0&loop=1&playlist=F3zks8sLzYI&playsinline=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1"
                 allow="autoplay; fullscreen; picture-in-picture"
-                className="w-full h-full object-cover opacity-70 pointer-events-none mix-blend-screen scale-110"
+                className="w-full h-full object-cover opacity-50 pointer-events-none mix-blend-screen scale-110"
               />
             </div>
-            {/* Vignette and Gradient Overlay */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,black_100%)] opacity-80"></div>
-            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black"></div>
+            {/* Dark moody gradient overlay for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/50"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
           </motion.div>
 
-          {/* Hero Content */}
-          <div className="relative z-10 text-center px-4 max-w-5xl mx-auto mt-20">
-            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.2 }}>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 text-[10px] sm:text-xs font-bold bg-white/10 backdrop-blur-md border border-white/20 uppercase tracking-widest text-white/90 shadow-2xl shadow-black/50">
-                <span className="w-2 h-2 rounded-full bg-[#E02424] animate-pulse"></span>
-                University of Oklahoma Study Abroad
-              </div>
-            </motion.div>
+          {/* Left Vertical Indicator */}
+          <div className="absolute left-6 lg:left-12 top-1/2 -translate-y-1/2 flex-col items-center gap-6 z-20 mix-blend-difference hidden md:flex">
+            <span className="text-[9px] font-bold text-white tracking-widest">01</span>
+            <div className="w-[1px] h-32 bg-white/20 relative">
+              <motion.div style={{ height: useTransform(scrollYProgress, [0, 0.5], ["0%", "100%"]) }} className="absolute top-0 left-0 w-full bg-white"></motion.div>
+            </div>
+            <span className="text-[9px] font-bold text-white/50 tracking-widest">03</span>
+          </div>
 
+          {/* Bottom Left Socials */}
+          <div className="absolute bottom-10 left-6 lg:left-12 items-center gap-8 z-20 text-[10px] font-bold text-white tracking-widest mix-blend-difference hidden md:flex">
+            <a href="#" className="hover:text-white/70 transition-colors">Fb.</a>
+            <a href="#" className="hover:text-white/70 transition-colors">Tw.</a>
+            <a href="#" className="hover:text-white/70 transition-colors">In.</a>
+          </div>
+
+          {/* Bottom Right Card (Matches JTRIP) */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.2, duration: 1 }}
+            className="absolute bottom-10 right-6 lg:right-16 z-20 w-[340px] bg-[#0c0c0e]/80 backdrop-blur-md p-6 flex items-center gap-5 hidden lg:flex hover:bg-black transition-colors cursor-pointer group shadow-2xl border border-white/5"
+          >
+            <div className="flex-1">
+              <div className="flex gap-1.5 mb-4">
+                <div className="w-4 h-[2px] bg-white"></div>
+                <div className="w-1 h-[2px] bg-white/30"></div>
+                <div className="w-1 h-[2px] bg-white/30"></div>
+                <div className="w-1 h-[2px] bg-white/30"></div>
+              </div>
+              <p className="text-sm font-bold text-white leading-snug pr-2 mb-2">5 best places to visit in Japan.</p>
+              <span className="text-[10px] font-bold text-white tracking-widest uppercase flex items-center gap-2 group-hover:gap-3 transition-all">
+                More <span className="text-[#E02424] text-lg leading-none">→</span>
+              </span>
+            </div>
+            <div className="w-28 h-20 bg-white/5 overflow-hidden relative rounded-sm group-hover:scale-105 transition-transform">
+              <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover" />
+            </div>
+          </motion.div>
+
+          {/* Main Hero Content (Left Aligned) */}
+          <div className="relative z-10 w-full px-6 md:px-32 lg:px-44 pt-10">
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.4 }}
-              className="font-display font-black text-white leading-[1.05] tracking-tighter mb-6 filter drop-shadow-2xl"
-              style={{ fontSize: 'clamp(3.5rem, 12vw, 8rem)' }}
+              className="font-display font-medium text-white leading-[1.05] tracking-tight mb-10 text-shadow-xl"
+              style={{ fontSize: 'clamp(3.5rem, 8vw, 6.5rem)' }}
             >
-              Capture Your<br />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-100 via-white to-[#E02424] pr-4">
-                Japan Story.
-              </span>
+              Capture Your <br />
+              Japan Story.
             </motion.h1>
 
-            <motion.p
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 0.6 }}
-              className="text-base sm:text-lg lg:text-2xl font-medium text-white/70 max-w-3xl mx-auto mb-10 leading-relaxed drop-shadow-sm"
+              className="flex items-center gap-5 mb-12"
             >
-              The ultimate cinematic companion for your journey. Maps, digital wallet, survival phrasing, immersive food guides, and your personal photo reel.
-            </motion.p>
+              <button className="w-16 h-16 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-black hover:border-white transition-all group backdrop-blur-sm shadow-xl">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="ml-1.5 group-hover:scale-110 transition-transform"><path d="M5 3l14 9-14 9V3z" /></svg>
+              </button>
+              <div>
+                <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-white/50 mb-1.5">See video</p>
+                <p className="text-xs uppercase font-bold tracking-[0.1em] text-white">OU STUDY ABROAD 2026</p>
+              </div>
+            </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.8 }}
             >
-              <Link href="/sign-up" className="inline-flex items-center justify-center gap-3 px-8 py-4 sm:px-10 sm:py-5 rounded-full bg-[#E02424] text-white font-bold text-lg sm:text-xl transition-all hover:brightness-110 hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(224,36,36,0.6)] group">
-                Begin Your Journey
-                <span className="group-hover:translate-x-1 transition-transform">→</span>
+              <Link href="/sign-up" className="inline-block px-12 py-5 bg-[#E02424] text-white font-bold text-xs tracking-[0.2em] uppercase hover:bg-red-700 transition-colors shadow-xl">
+                Explore
               </Link>
             </motion.div>
-          </div>
-
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/30 animate-bounce">
-            <span className="text-[10px] tracking-widest uppercase font-bold text-white/50">Explore Below</span>
-            <div className="text-xl mt-2 text-center">↓</div>
           </div>
         </section>
 
