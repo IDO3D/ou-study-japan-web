@@ -21,6 +21,17 @@ function WalletPanel({ onNavigateToMap }) {
     { name: 'Japan Post Bank ATM', dist: '340m', hours: '9am–9pm', free: false, lat: 35.0150, lng: 135.7700 },
     { name: 'Lawson ATM', dist: '550m', hours: '24/7', free: false, lat: 35.0125, lng: 135.7600 },
   ]
+  const [showWalletBridge, setShowWalletBridge] = useState(false)
+  const [bridgeStep, setBridgeStep] = useState(0)
+
+  const handleAddFunds = () => {
+    setShowWalletBridge(true)
+    setBridgeStep(0)
+    setTimeout(() => setBridgeStep(1), 1000)
+    setTimeout(() => setBridgeStep(2), 2500)
+    setTimeout(() => { setShowWalletBridge(false); toast.success('Added ¥5,000 to Suica via Apple Pay!') }, 4500)
+  }
+
   return (
     <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
       <div className="bg-black text-white p-5 rounded-3xl shadow-xl flex flex-col gap-6 relative overflow-hidden">
@@ -36,10 +47,37 @@ function WalletPanel({ onNavigateToMap }) {
           <p className="font-display font-black text-4xl m-0 tracking-tight">Suica ID</p>
           <p className="font-mono text-sm text-white/60 m-0 mt-1">**** **** 1234 5678</p>
         </div>
-        <button className="w-full bg-white text-black font-bold py-3 rounded-xl mt-2 active:scale-95 transition-transform" onClick={() => toast.success('Apple Wallet opened!')}>
+        <button className="w-full bg-white text-black font-bold py-3 rounded-xl mt-2 active:scale-95 transition-transform" onClick={handleAddFunds}>
           Add Funds via Apple Wallet
         </button>
       </div>
+
+      <AnimatePresence>
+        {showWalletBridge && (
+          <div className="fixed inset-0 z-[100] flex flex-col justify-end bg-black/60 backdrop-blur-sm">
+            <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="bg-white rounded-t-3xl pt-2 pb-10 px-6 shadow-2xl relative">
+              <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto my-3" />
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center text-xl">🍏</div>
+                <div>
+                  <h3 className="font-display font-black text-xl text-black m-0">Apple Pay</h3>
+                  <p className="text-xs text-gray-500 font-semibold m-0">Connecting to Wallet...</p>
+                </div>
+              </div>
+              <div className="h-24 flex items-center justify-center">
+                {bridgeStep === 0 && <span className="animate-spin text-3xl">⏳</span>}
+                {bridgeStep === 1 && <span className="text-4xl animate-pulse">💳</span>}
+                {bridgeStep === 2 && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-green-500 text-5xl">✅</motion.span>}
+              </div>
+              <p className="text-center font-bold text-gray-800">
+                {bridgeStep === 0 && 'Verifying with Apple...'}
+                {bridgeStep === 1 && 'Adding ¥5,000 to Suica...'}
+                {bridgeStep === 2 && 'Done!'}
+              </p>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <div className="p-5 rounded-3xl shadow-sm border border-gray-100" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
         <h3 className="font-display font-bold text-lg m-0 mb-3" style={{ color: 'var(--text)' }}>Nearby ATMs</h3>
@@ -270,6 +308,153 @@ function UniversalPanel({ title, content }) {
   )
 }
 
+function HealthPanel() {
+  const HOSPITALS = [
+    { name: 'Red Cross Hospital Tokyo', dist: '1.2km', phone: '03-3400-1311', type: 'General' },
+    { name: 'Kyoto University Hospital', dist: '3.4km', phone: '075-751-3111', type: 'University' },
+  ]
+  const PHRASES = [
+    { eng: 'Please help!', jp: '助けてください (Tasukete kudasai)' },
+    { eng: 'Call an ambulance', jp: '救急車を呼んでください (Kyukyusha wo yonde kudasai)' },
+    { eng: 'I have allergies', jp: 'アレルギーがあります (Arerugi ga arimasu)' }
+  ]
+  return (
+    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <div className="p-5 rounded-3xl shadow-sm border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+        <h3 className="font-display font-bold text-lg m-0 mb-3" style={{ color: 'var(--text)' }}>Emergency Contacts</h3>
+        <div className="flex gap-2">
+          <div className="flex-1 bg-red-100 dark:bg-red-500/20 p-4 rounded-2xl flex flex-col items-center justify-center">
+            <span className="font-black text-2xl text-red-600 dark:text-red-400">119</span>
+            <span className="text-[10px] font-bold text-red-600 dark:text-red-400 uppercase tracking-widest mt-1">Ambulance</span>
+          </div>
+          <div className="flex-1 bg-blue-100 dark:bg-blue-500/20 p-4 rounded-2xl flex flex-col items-center justify-center">
+            <span className="font-black text-2xl text-blue-600 dark:text-blue-400">110</span>
+            <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mt-1">Police</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-5 rounded-3xl shadow-sm border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+        <h3 className="font-display font-bold text-lg m-0 mb-3" style={{ color: 'var(--text)' }}>Nearby Hospitals (English)</h3>
+        <div className="space-y-2">
+          {HOSPITALS.map((h, i) => (
+            <div key={i} className="p-3 rounded-2xl border flex justify-between items-center" style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
+              <div>
+                <h4 className="font-bold text-sm m-0" style={{ color: 'var(--text)' }}>{h.name}</h4>
+                <p className="text-[10px] font-bold m-0 mt-0.5" style={{ color: 'var(--brand)' }}>{h.phone}</p>
+              </div>
+              <span className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>{h.dist}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="p-5 rounded-3xl shadow-sm border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+        <h3 className="font-display font-bold text-lg m-0 mb-3" style={{ color: 'var(--text)' }}>Medical Phrases</h3>
+        <div className="space-y-3">
+          {PHRASES.map(p => (
+            <div key={p.eng}>
+              <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>{p.eng}</p>
+              <p className="text-sm font-semibold m-0" style={{ color: 'var(--text)' }}>{p.jp}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function AirfarePanel() {
+  return (
+    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <div className="p-5 rounded-3xl shadow-sm border" style={{ background: 'var(--brand)', borderColor: 'var(--brand-light)', color: 'white' }}>
+        <div className="flex justify-between items-center mb-6">
+          <span className="font-bold uppercase tracking-widest text-[10px] opacity-80">Departure</span>
+          <span className="font-bold uppercase tracking-widest text-[10px] opacity-80">American Airlines</span>
+        </div>
+        <div className="flex justify-between items-end mb-6">
+          <div>
+            <p className="font-display font-black text-4xl m-0">DFW</p>
+            <p className="text-xs opacity-80 mt-1">Dallas</p>
+          </div>
+          <div className="flex-1 px-4 text-center pb-2 relative">
+            <div className="w-full border-t-2 border-dashed border-white/40 absolute bottom-4"></div>
+            <span className="text-2xl relative z-10">✈️</span>
+          </div>
+          <div className="text-right">
+            <p className="font-display font-black text-4xl m-0">NRT</p>
+            <p className="text-xs opacity-80 mt-1">Tokyo (Narita)</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-2 border-t border-white/20 pt-4">
+          <div>
+            <span className="block text-[9px] uppercase tracking-widest opacity-70 mb-1">Date</span>
+            <span className="font-bold text-sm">May 12, 2026</span>
+          </div>
+          <div>
+            <span className="block text-[9px] uppercase tracking-widest opacity-70 mb-1">Gate</span>
+            <span className="font-bold text-sm">Terminal D</span>
+          </div>
+          <div className="text-right">
+            <span className="block text-[9px] uppercase tracking-widest opacity-70 mb-1">Flight</span>
+            <span className="font-bold text-sm">AA175</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-5 rounded-3xl shadow-sm border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+        <h3 className="font-display font-bold text-lg m-0 mb-3" style={{ color: 'var(--text)' }}>Flight Pricing</h3>
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-semibold" style={{ color: 'var(--text-muted)' }}>Ticket</span>
+          <span className="text-sm font-bold" style={{ color: 'var(--text)' }}>$1,245.00</span>
+        </div>
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-semibold" style={{ color: 'var(--text-muted)' }}>Baggage (2 Checked)</span>
+          <span className="text-sm font-bold" style={{ color: 'var(--text)' }}>Included</span>
+        </div>
+        <div className="flex justify-between items-center pt-2 border-t mt-2" style={{ borderColor: 'var(--border)' }}>
+          <span className="text-sm font-bold" style={{ color: 'var(--text)' }}>Total</span>
+          <span className="text-lg font-black" style={{ color: 'var(--brand)' }}>$1,245.00</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SimPanel() {
+  const PLANS = [
+    { title: 'Airalo Ubigi eSIM', data: '10GB', days: '30 Days', price: '$15.00', rec: true },
+    { title: 'Sakura Mobile', data: 'Unlimited', days: '30 Days', price: '¥5,000' }
+  ]
+  return (
+    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <div className="p-5 rounded-3xl shadow-sm border bg-gradient-to-br from-blue-500/20 to-purple-500/20" style={{ borderColor: 'var(--border)' }}>
+        <h3 className="font-display font-black text-2xl m-0 mb-2" style={{ color: 'var(--text)' }}>Stay Connected</h3>
+        <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>Download your eSIM before you leave the US. You can activate it instantly using the Narita airport free Wi-Fi.</p>
+        <button className="bg-blue-600 text-white font-bold py-2 px-4 rounded-xl mt-4 active:scale-95 transition-transform" onClick={() => toast.success('Scanning for eSIM profiles...')}>Install eSIM Now</button>
+      </div>
+
+      <div className="p-5 rounded-3xl shadow-sm border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+        <h3 className="font-display font-bold text-lg m-0 mb-3" style={{ color: 'var(--text)' }}>Recommended Plans</h3>
+        <div className="space-y-2">
+          {PLANS.map((p, i) => (
+            <div key={i} className="p-3 rounded-2xl border flex justify-between items-center" style={{ background: 'var(--surface2)', borderColor: p.rec ? 'var(--brand)' : 'var(--border)' }}>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h4 className="font-bold text-sm m-0" style={{ color: 'var(--text)' }}>{p.title}</h4>
+                  {p.rec && <span className="text-[8px] font-bold bg-brand text-white px-2 py-0.5 rounded-full uppercase">Best</span>}
+                </div>
+                <p className="text-[10px] font-semibold m-0 mt-0.5" style={{ color: 'var(--text-muted)' }}>{p.data} • {p.days}</p>
+              </div>
+              <span className="text-sm font-black" style={{ color: 'var(--text)' }}>{p.price}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── MAIN PROFILE VIEW ───────────────────────────────────
 
 export default function ProfileView({ onNavigateToMap, onSignOut }) {
@@ -295,9 +480,9 @@ export default function ProfileView({ onNavigateToMap, onSignOut }) {
         {activeSection === 'wallet' && <WalletPanel onNavigateToMap={onNavigateToMap} />}
         {activeSection === 'finance' && <FinancePanel />}
         {activeSection === 'reel' && <PhotoReelPanel />}
-        {activeSection === 'health' && <UniversalPanel title="Health & Safety" content={<p className="text-sm leading-relaxed opacity-70">Emergency: 110 (Police), 119 (Ambulance). Carry your medical insurance card at all times.</p>} />}
-        {activeSection === 'airfare' && <UniversalPanel title="Airfare & Travel" content={<p className="text-sm leading-relaxed opacity-70">DFW → NRT: Flight AA175. Departure Next Monday. Required documents: Passport, Visa.</p>} />}
-        {activeSection === 'sim' && <UniversalPanel title="SIM & Data" content={<p className="text-sm leading-relaxed opacity-70">eSIMs activate immediately. Connect to airport Wi-Fi to scan the QR code before immigration.</p>} />}
+        {activeSection === 'health' && <HealthPanel />}
+        {activeSection === 'airfare' && <AirfarePanel />}
+        {activeSection === 'sim' && <SimPanel />}
       </div>
     )
   }
@@ -353,7 +538,7 @@ export default function ProfileView({ onNavigateToMap, onSignOut }) {
             <span className="font-display font-black text-xl tracking-tight" style={{ color: 'var(--text)' }}>Tokyo, Japan</span>
           </div>
         </div>
-        <button onClick={() => onNavigateToMap?.({})} className="px-4 py-2 rounded-xl text-xs font-bold active:scale-95 transition-transform" style={{ background: 'var(--surface2)', color: 'var(--text)' }}>
+        <button onClick={() => onNavigateToMap?.(null)} className="px-4 py-2 rounded-xl text-xs font-bold active:scale-95 transition-transform" style={{ background: 'var(--surface2)', color: 'var(--text)' }}>
           Open Map
         </button>
       </div>
