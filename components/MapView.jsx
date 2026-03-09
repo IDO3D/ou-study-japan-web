@@ -64,6 +64,7 @@ export default function MapView() {
   const mapInstance = useRef(null)
   const markersRef = useRef([])
   const searchTimeoutRef = useRef(null)
+  const navModeRef = useRef('walking') // always-fresh ref to avoid stale closure
 
   const [mapReady, setMapReady] = useState(false)
   const [query, setQuery] = useState('')
@@ -74,10 +75,14 @@ export default function MapView() {
   const [navMode, setNavMode] = useState('walking')
   const [route, setRoute] = useState(null)
   const [routeLoading, setRouteLoading] = useState(false)
-  const [bottomSheet, setBottomSheet] = useState('peek') // 'hidden' | 'peek' | 'partial' | 'full'
+  const [routeError, setRouteError] = useState(null)
+  const [bottomSheet, setBottomSheet] = useState('peek')
   const [showSearch, setShowSearch] = useState(false)
 
   const { userLocation, navDestination, clearNavDestination } = useStore()
+
+  // Keep ref in sync with state
+  useEffect(() => { navModeRef.current = navMode }, [navMode])
 
   const filteredPois = JAPAN_POIS.filter(p =>
     activeCat === 'all' || p.cat === activeCat
@@ -224,42 +229,81 @@ export default function MapView() {
     mapInstance.current?.flyTo({ center: [c.lng, c.lat], zoom: c.zoom, pitch: 40, bearing: -5, duration: 1200 })
   }
 
+  // ── Helpers: safely manage route layers ────────────────────
+  const clearRouteLayer = () => {
+    const map = mapInstance.current
+    if (!map) return
+    try { if (map.getLayer('route-glow')) map.removeLayer('route-glow') } catch { }
+    try { if (map.getLayer('route-line')) map.removeLayer('route-line') } catch { }
+    try { if (map.getSource('route')) map.removeSource('route') } catch { }
+  }
+
+  const drawRouteOnMap = (geometry, color) => {
+    const map = mapInstance.current
+    const mapboxgl = mapboxglRef.current
+    if (!map || !mapboxgl) return
+    clearRouteLayer()
+    map.addSource('route', { type: 'geojson', data: { type: 'Feature', geometry } })
+    map.addLayer({ id: 'route-glow', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': color, 'line-width': 16, 'line-opacity': 0.15, 'line-blur': 10 } })
+    map.addLayer({ id: 'route-line', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': color, 'line-width': 5, 'line-opacity': 0.97 } })
+    const coords = geometry.coordinates
+    const bounds = coords.reduce((b, c) => b.extend(c), new mapboxgl.LngLatBounds(coords[0], coords[0]))
+    map.fitBounds(bounds, { padding: { top: 160, bottom: 280, left: 40, right: 40 }, duration: 1200 })
+  }
+
   // ── Directions ───────────────────────────────────────────────
   const getDirections = useCallback(async (dest) => {
-    if (!userLocation || !MAPBOX_TOKEN) return
+    if (!MAPBOX_TOKEN?.startsWith('pk.')) {
+      setRouteError('Mapbox token not configured.')
+      return
+    }
     setRouteLoading(true)
     setRoute(null)
-    const mode = NAV_MODES.find(m => m.id === navMode)
-    const origin = `${userLocation.lng},${userLocation.lat}`
+    setRouteError(null)
+
+    // Use GPS if available, otherwise fall back to current map center
+    const currentMode = NAV_MODES.find(m => m.id === navModeRef.current) || NAV_MODES[0]
+    let originLng, originLat
+    if (userLocation?.lat && userLocation?.lng) {
+      originLng = userLocation.lng
+      originLat = userLocation.lat
+    } else {
+      // Fallback: use current map center (wherever user is viewing)
+      const center = mapInstance.current?.getCenter()
+      originLng = center?.lng ?? 135.7681
+      originLat = center?.lat ?? 35.0116
+    }
+
+    const origin = `${originLng},${originLat}`
     const end = `${dest.lng},${dest.lat}`
+    const url = `https://api.mapbox.com/directions/v5/${currentMode.profile}/${origin};${end}?geometries=geojson&steps=true&language=en&access_token=${MAPBOX_TOKEN}`
+
     try {
-      const res = await fetch(`https://api.mapbox.com/directions/v5/${mode.profile}/${origin};${end}?geometries=geojson&steps=true&access_token=${MAPBOX_TOKEN}`)
+      const res = await fetch(url)
       const data = await res.json()
-      const r = data.routes?.[0]
-      if (r) {
-        setRoute({
-          distance: (r.distance / 1000).toFixed(1),
-          duration: Math.ceil(r.duration / 60),
-          steps: r.legs[0]?.steps?.slice(0, 5).map(s => s.maneuver?.instruction) || [],
-          color: mode.color,
-        })
-        const map = mapInstance.current
-        const mapboxgl = mapboxglRef.current
-        if (map && mapboxgl) {
-          if (map.getSource('route')) map.getSource('route').setData({ type: 'Feature', geometry: r.geometry })
-          else {
-            map.addSource('route', { type: 'geojson', data: { type: 'Feature', geometry: r.geometry } })
-            map.addLayer({ id: 'route-line', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': mode.color, 'line-width': 5, 'line-opacity': 0.95, 'line-blur': 0.5 } })
-            map.addLayer({ id: 'route-glow', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': mode.color, 'line-width': 14, 'line-opacity': 0.18, 'line-blur': 8 } }, 'route-line')
-          }
-          const coords = r.geometry.coordinates
-          const bounds = coords.reduce((b, c) => b.extend(c), new mapboxgl.LngLatBounds(coords[0], coords[0]))
-          map.fitBounds(bounds, { padding: 90, duration: 1000 })
-        }
+
+      if (data.code && data.code !== 'Ok') {
+        throw new Error(data.message || `Directions error: ${data.code}`)
       }
-    } catch (e) { console.error(e) }
+
+      const r = data.routes?.[0]
+      if (!r) throw new Error('No route found between these points.')
+
+      setRoute({
+        distance: (r.distance / 1000).toFixed(1),
+        duration: Math.ceil(r.duration / 60),
+        steps: r.legs[0]?.steps?.slice(0, 6).map(s => s.maneuver?.instruction).filter(Boolean) || [],
+        color: currentMode.color,
+        mode: currentMode.label,
+        usedGPS: !!(userLocation?.lat),
+      })
+      drawRouteOnMap(r.geometry, currentMode.color)
+    } catch (err) {
+      console.error('Directions failed:', err)
+      setRouteError(err.message || 'Could not load directions. Check your connection.')
+    }
     setRouteLoading(false)
-  }, [userLocation, navMode])
+  }, [userLocation]) // navMode read from ref — always fresh
 
   // ── Handle external navDestination ──────────────────────────
   useEffect(() => {
@@ -478,6 +522,13 @@ export default function MapView() {
               ))}
             </div>
 
+            {/* Route Error message */}
+            {routeError && (
+              <div style={{ padding: '10px 12px', borderRadius: 12, background: 'rgba(224,36,36,0.15)', border: '1px solid rgba(224,36,36,0.3)', marginBottom: 12 }}>
+                <p style={{ margin: 0, fontSize: 12, color: '#fca5a5', fontFamily: 'Inter, sans-serif' }}>⚠️ {routeError}</p>
+              </div>
+            )}
+
             {/* Navigate CTA */}
             <button onClick={() => getDirections(selectedPoi)}
               disabled={routeLoading}
@@ -511,6 +562,14 @@ export default function MapView() {
                       </div>
                     ))}
                   </div>
+
+                  {route && route.usedGPS === false && (
+                    <div style={{ marginTop: 8, textAlign: 'center' }}>
+                      <p style={{ margin: 0, fontSize: 10, color: 'rgba(255,165,0,0.8)', fontFamily: 'Inter, sans-serif' }}>
+                        📍 Using map center as starting point (GPS unavailable)
+                      </p>
+                    </div>
+                  )}
 
                   {route.steps.length > 0 && (
                     <div style={{ marginTop: 12, borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.07)' }}>
