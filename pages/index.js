@@ -35,10 +35,23 @@ export default function LandingPage() {
         {/* Navigation - Glassmorphism */}
         <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 lg:px-12 backdrop-blur-md bg-black/20 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#E02424] to-red-600 flex items-center justify-center font-black text-white shadow-lg shadow-[#E02424]/20">
-              JP
+            <div className="flex items-center gap-2">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="40" height="40" rx="12" fill="url(#brandGrad)" />
+                <path d="M12 28L20 12L28 28H23.5L20 19.5L16.5 28H12Z" fill="white" />
+                <circle cx="28" cy="14" r="3" fill="#FF8E53" />
+                <defs>
+                  <linearGradient id="brandGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#E02424" />
+                    <stop offset="1" stopColor="#991B1B" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div className="flex flex-col hidden sm:flex">
+                <span className="font-display font-black text-lg tracking-tight leading-none">OU<span className="text-[#E02424]">Study</span>Japan</span>
+                <span className="text-[9px] uppercase tracking-widest text-white/50 font-bold mt-0.5">Global Experience</span>
+              </div>
             </div>
-            <span className="font-display font-black text-xl tracking-tight hidden sm:block">OUStudyJapan</span>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-sm font-bold text-white/70 hover:text-white transition-colors hidden sm:block">
@@ -53,20 +66,18 @@ export default function LandingPage() {
         {/* Cinematic Hero Section */}
         <section ref={heroRef} className="relative h-[100dvh] w-full flex items-center justify-center overflow-hidden">
           {/* Animated Background Reel */}
-          <motion.div style={{ y, opacity }} className="absolute inset-0 z-0">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover scale-105 opacity-80"
-              poster="https://images.unsplash.com/photo-1542051842920-84a48ed9c4d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-            >
-              {/* High-quality cinematic Tokyo intersection video */}
-              <source src="https://assets.mixkit.co/videos/preview/mixkit-timelapse-of-a-busy-intersection-in-tokyo-4100-large.mp4" type="video/mp4" />
-            </video>
+          <motion.div style={{ y, opacity }} className="absolute inset-0 z-0 bg-black overflow-hidden pointer-events-none">
+            <img src="https://images.unsplash.com/photo-1542051842920-84a48ed9c4d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" className="absolute inset-0 w-full h-full object-cover scale-105 opacity-50 block md:hidden" />
+            <div className="hidden md:block absolute inset-0 w-[400vw] h-[400vh] -top-[150vh] -left-[150vw] sm:w-[150vw] sm:h-[150vh] sm:-top-[25vh] sm:-left-[25vw]">
+              <iframe
+                src="https://www.youtube.com/embed/F3zks8sLzYI?autoplay=1&mute=1&controls=0&loop=1&playlist=F3zks8sLzYI&playsinline=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1"
+                allow="autoplay; fullscreen; picture-in-picture"
+                className="w-full h-full object-cover opacity-70 pointer-events-none mix-blend-screen scale-110"
+              />
+            </div>
             {/* Vignette and Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,black_100%)] opacity-80"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black"></div>
           </motion.div>
 
           {/* Hero Content */}
@@ -167,40 +178,67 @@ export default function LandingPage() {
                 whileInView={{ rotateY: -5, rotateX: 5, opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 1, type: 'spring' }}
-                className="aspect-[9/19] rounded-[3rem] border-[10px] border-zinc-800 bg-[#0a0a0c] relative overflow-hidden shadow-2xl shadow-[#E02424]/20"
+                className="aspect-[9/19] rounded-[3rem] border-[10px] border-[#0a0a0c] bg-[#0a0a0c] relative overflow-hidden shadow-[0_30px_60px_-15px_rgba(224,36,36,0.3)] ring-1 ring-white/10"
               >
-                {/* iPhone Notch */}
-                <div className="absolute top-0 inset-x-0 h-7 bg-zinc-800 rounded-b-3xl w-40 mx-auto z-20"></div>
-                <div className="absolute inset-0 bg-gradient-to-b from-[#18181b] to-black"></div>
+                {/* iPhone Dynamic Island */}
+                <div className="absolute top-3 inset-x-0 flex justify-center z-30">
+                  <div className="w-24 h-7 bg-black rounded-full flex justify-between items-center px-2">
+                    <div className="w-2 h-2 rounded-full bg-green-900/40"></div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                  </div>
+                </div>
+
+                {/* Status Bar */}
+                <div className="absolute top-0 inset-x-0 h-12 flex justify-between items-center px-6 z-20 text-[10px] font-bold text-white tracking-widest pt-2 mix-blend-difference">
+                  <span>9:41</span>
+                  <div className="flex items-center gap-1.5 opacity-80">
+                    <span className="text-[8px] mt-0.5">5G</span>
+                    <span className="text-xs">📶</span>
+                    <span>🔋</span>
+                  </div>
+                </div>
+
+                <div className="absolute inset-0 bg-gradient-to-b from-[#18181b] via-[#09090b] to-[#050505]"></div>
 
                 {/* Mock Phone UI */}
-                <div className="relative z-10 p-5 pt-16 flex flex-col gap-4">
-                  <div className="bg-black text-white p-6 rounded-3xl shadow-xl border border-white/10 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-full blur-2xl"></div>
-                    <p className="text-[10px] uppercase tracking-widest opacity-50 mb-2 font-bold m-0">Apple Pay Ready</p>
-                    <h3 className="font-display font-black text-3xl mb-1 m-0 tracking-tight">Suica</h3>
-                    <p className="font-mono text-xs opacity-60 m-0">**** **** 1234 5678</p>
+                <div className="relative z-10 p-5 pt-20 flex flex-col gap-4">
+
+                  {/* Digital Wallet Card */}
+                  <div className="bg-gradient-to-br from-emerald-500 to-green-900 text-white p-6 rounded-3xl shadow-2xl relative overflow-hidden group border border-white/10">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/30 rounded-full blur-3xl transform group-hover:scale-110 transition-transform"></div>
+                    <div className="flex justify-between items-start mb-6 relative z-10">
+                      <p className="text-[10px] uppercase tracking-widest opacity-90 font-bold m-0 flex items-center gap-1.5">
+                        <span className="text-sm">🍏</span> Apple Pay
+                      </p>
+                      <svg width="24" height="16" viewBox="0 0 32 20" fill="none"><path d="M0 10c0-5.5 4.5-10 10-10h12c5.5 0 10 4.5 10 10s-4.5 10-10 10H10C4.5 20 0 15.5 0 10zm4 0c0 3.3 2.7 6 6 6h12c3.3 0 6-2.7 6-6s-2.7-6-6-6H10c-3.3 0-6 2.7-6 6z" fill="white" opacity="0.8" /></svg>
+                    </div>
+                    <h3 className="font-display font-black text-4xl mb-1 m-0 tracking-tight drop-shadow-md relative z-10">Suica</h3>
+                    <p className="font-mono text-sm opacity-90 m-0 tracking-wider relative z-10">¥ 12,450</p>
                   </div>
 
-                  <div className="bg-white/5 p-4 rounded-3xl border border-white/10 mt-2">
-                    <p className="text-[10px] text-white/50 uppercase tracking-widest font-bold mb-3 m-0">Live Converter</p>
-                    <div className="flex justify-between items-center bg-black/50 p-3 rounded-2xl mb-2 border border-white/5">
-                      <span className="text-lg font-black tracking-tight">🇺🇸 10.00</span>
-                      <span className="text-white/30 text-xs font-bold">USD</span>
+                  {/* Tech Grid Background Panel */}
+                  <div className="bg-[#121214]/80 backdrop-blur-md p-4 rounded-3xl border border-white/5 relative overflow-hidden mt-2">
+                    <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
+                    <div className="relative z-10">
+                      <p className="text-[10px] text-white/50 uppercase tracking-widest font-bold mb-3 m-0">Live Converter</p>
+                      <div className="flex justify-between items-center bg-black/50 p-3 rounded-2xl mb-2 border border-white/5">
+                        <span className="text-lg font-black tracking-tight">🇺🇸 10.00</span>
+                        <span className="text-white/30 text-xs font-bold">USD</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-[#E02424]/10 p-3 rounded-2xl border border-[#E02424]/40">
+                        <span className="text-lg font-black text-[#E02424] tracking-tight">🇯🇵 1,485</span>
+                        <span className="text-[#E02424]/60 text-xs font-bold">JPY</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center bg-[#E02424]/10 p-3 rounded-2xl border border-[#E02424]/40">
-                      <span className="text-lg font-black text-[#E02424] tracking-tight">🇯🇵 1,485</span>
-                      <span className="text-[#E02424]/60 text-xs font-bold">JPY</span>
-                    </div>
-                  </div>
 
-                  <div className="mt-2 bg-white/5 p-4 rounded-3xl border border-white/10 flex items-center justify-between">
-                    <div>
-                      <h4 className="font-bold text-sm tracking-tight m-0">7-Eleven ATM</h4>
-                      <span className="text-[10px] text-white/50 font-bold m-0 tracking-widest uppercase">120m away automatically</span>
-                    </div>
-                    <div className="w-10 h-10 rounded-full bg-[#E02424]/20 flex items-center justify-center border border-[#E02424]/50">
-                      📍
+                    <div className="mt-2 bg-[#121214]/80 backdrop-blur-md p-4 rounded-3xl border border-white/5 flex items-center justify-between shadow-lg">
+                      <div>
+                        <h4 className="font-bold text-sm tracking-tight m-0">7-Eleven ATM</h4>
+                        <span className="text-[10px] text-white/50 font-bold m-0 tracking-widest uppercase">120m away automatically</span>
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-[#E02424]/20 flex items-center justify-center border border-[#E02424]/50">
+                        📍
+                      </div>
                     </div>
                   </div>
                 </div>
