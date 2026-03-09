@@ -40,13 +40,13 @@ export default function LandingPage() {
       <div className="bg-black min-h-screen text-white selection:bg-[#E02424] selection:text-white font-sans overflow-x-hidden">
 
         {/* JTRIP-Style Navigation */}
-        <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-8 lg:px-16 w-full mix-blend-difference">
+        <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-8 py-6 sm:py-8 lg:px-16 w-full mix-blend-difference">
           {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center p-1.5">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white flex items-center justify-center p-1 sm:p-1.5">
               <div className="w-full h-full bg-[#E02424] rounded-full"></div>
             </div>
-            <span className="font-display font-black text-white tracking-[0.15em] text-xs uppercase hidden sm:block">OUStudyJapan.</span>
+            <span className="font-display font-black text-white tracking-[0.1em] sm:tracking-[0.15em] text-[10px] sm:text-xs uppercase break-keep whitespace-nowrap">OUStudyJapan.</span>
           </div>
 
           {/* Center Links (Desktop only) */}
@@ -58,7 +58,7 @@ export default function LandingPage() {
           </div>
 
           {/* Right Action */}
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4 sm:gap-8">
             <Link href="/login" className="hidden sm:block text-[10px] font-bold text-white tracking-[0.2em] uppercase hover:text-white/70 transition-colors">
               Sign In
             </Link>
@@ -91,16 +91,16 @@ export default function LandingPage() {
         <section ref={heroRef} className="relative min-h-screen w-full flex items-center overflow-hidden pt-24 pb-16 z-10">
 
           {/* Left Vertical Indicator */}
-          <div className="absolute left-6 lg:left-12 top-1/2 -translate-y-1/2 flex-col items-center gap-6 z-20 mix-blend-difference hidden md:flex">
-            <span className="text-[9px] font-bold text-white tracking-widest">01</span>
-            <div className="w-[1px] h-32 bg-white/20 relative">
+          <div className="absolute left-2 sm:left-6 lg:left-12 top-1/2 -translate-y-1/2 flex flex-col items-center gap-4 sm:gap-6 z-20 mix-blend-difference">
+            <span className="text-[7px] sm:text-[9px] font-bold text-white tracking-widest">01</span>
+            <div className="w-[1px] h-20 sm:h-32 bg-white/20 relative">
               <motion.div style={{ height: useTransform(scrollYProgress, [0, 0.5], ["0%", "100%"]) }} className="absolute top-0 left-0 w-full bg-white"></motion.div>
             </div>
-            <span className="text-[9px] font-bold text-white/50 tracking-widest">03</span>
+            <span className="text-[7px] sm:text-[9px] font-bold text-white/50 tracking-widest">03</span>
           </div>
 
           {/* Bottom Left Socials */}
-          <div className="absolute bottom-10 left-6 lg:left-12 items-center gap-8 z-20 text-[10px] font-bold text-white tracking-widest mix-blend-difference hidden md:flex">
+          <div className="absolute bottom-6 sm:bottom-10 left-10 sm:left-12 lg:left-24 flex items-center gap-4 sm:gap-8 z-20 text-[8px] sm:text-[10px] font-bold text-white tracking-widest mix-blend-difference">
             <a href="#" className="hover:text-white/70 transition-colors">Fb.</a>
             <a href="#" className="hover:text-white/70 transition-colors">Tw.</a>
             <a href="#" className="hover:text-white/70 transition-colors">In.</a>
@@ -111,33 +111,33 @@ export default function LandingPage() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1.2, duration: 1 }}
-            className="absolute bottom-10 right-6 lg:right-16 z-20 w-[340px] bg-[#0c0c0e]/80 backdrop-blur-md p-6 flex items-center gap-5 hidden lg:flex hover:bg-black transition-colors cursor-pointer group shadow-2xl border border-white/5"
+            className="absolute bottom-6 sm:bottom-10 right-4 sm:right-6 lg:right-16 z-20 w-[65vw] max-w-[240px] sm:max-w-none sm:w-[340px] bg-[#0c0c0e]/80 backdrop-blur-md p-3 sm:p-6 flex items-center gap-2 sm:gap-5 hover:bg-black transition-colors cursor-pointer group shadow-2xl border border-white/5"
           >
             <div className="flex-1">
-              <div className="flex gap-1.5 mb-4">
-                <div className="w-4 h-[2px] bg-white"></div>
+              <div className="flex gap-1 sm:gap-1.5 mb-2 sm:mb-4">
+                <div className="w-3 sm:w-4 h-[2px] bg-white"></div>
                 <div className="w-1 h-[2px] bg-white/30"></div>
                 <div className="w-1 h-[2px] bg-white/30"></div>
                 <div className="w-1 h-[2px] bg-white/30"></div>
               </div>
-              <p className="text-sm font-bold text-white leading-snug pr-2 mb-2">5 best places to visit in Japan.</p>
-              <span className="text-[10px] font-bold text-white tracking-widest uppercase flex items-center gap-2 group-hover:gap-3 transition-all">
-                More <span className="text-[#E02424] text-lg leading-none">→</span>
+              <p className="text-[10px] sm:text-sm font-bold text-white leading-snug pr-2 mb-1 sm:mb-2">5 best places in Japan.</p>
+              <span className="text-[7px] sm:text-[10px] font-bold text-white tracking-widest uppercase flex items-center gap-1 sm:gap-2 group-hover:gap-3 transition-all">
+                More <span className="text-[#E02424] text-xs sm:text-lg leading-none">→</span>
               </span>
             </div>
-            <div className="w-28 h-20 bg-white/5 overflow-hidden relative rounded-sm group-hover:scale-105 transition-transform">
+            <div className="w-12 h-10 sm:w-28 sm:h-20 bg-white/5 overflow-hidden relative rounded-sm group-hover:scale-105 transition-transform flex-shrink-0">
               <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover" />
             </div>
           </motion.div>
 
           {/* Main Hero Content (Left Aligned) */}
-          <div className="relative z-10 w-full px-6 md:px-32 lg:px-44">
+          <div className="relative z-10 w-full pl-8 sm:pl-20 md:px-32 lg:px-44">
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.4 }}
-              className="font-display font-medium text-white leading-[1.1] tracking-tight mb-8 text-shadow-xl"
-              style={{ fontSize: 'clamp(3rem, 7vw, 6rem)' }}
+              className="font-display font-medium text-white leading-[1.1] tracking-tight mb-6 sm:mb-8 text-shadow-xl"
+              style={{ fontSize: 'clamp(2.5rem, 6vw, 6rem)' }}
             >
               Capture Your <br className="hidden sm:block" />
               Japan Story.
@@ -147,14 +147,14 @@ export default function LandingPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 0.6 }}
-              className="flex items-center gap-5 mb-12"
+              className="flex items-center gap-3 sm:gap-5 mb-8 sm:mb-12"
             >
-              <button className="w-16 h-16 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-black hover:border-white transition-all group backdrop-blur-sm shadow-xl">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="ml-1.5 group-hover:scale-110 transition-transform"><path d="M5 3l14 9-14 9V3z" /></svg>
+              <button className="w-12 h-12 sm:w-16 sm:h-16 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-black hover:border-white transition-all group backdrop-blur-sm shadow-xl flex-shrink-0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="ml-1 sm:ml-1.5 group-hover:scale-110 transition-transform sm:w-[18px] sm:h-[18px]"><path d="M5 3l14 9-14 9V3z" /></svg>
               </button>
               <div>
-                <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-white/50 mb-1.5">See video</p>
-                <p className="text-xs uppercase font-bold tracking-[0.1em] text-white">OU STUDY ABROAD 2026</p>
+                <p className="text-[8px] sm:text-[10px] uppercase font-bold tracking-[0.2em] text-white/50 mb-1 sm:mb-1.5">See video</p>
+                <p className="text-[9px] sm:text-xs uppercase font-bold tracking-[0.1em] text-white">OU STUDY ABROAD 2026</p>
               </div>
             </motion.div>
 
@@ -163,7 +163,7 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.8 }}
             >
-              <Link href="/sign-up" className="inline-block px-12 py-5 bg-[#E02424] text-white font-bold text-xs tracking-[0.2em] uppercase hover:bg-red-700 transition-colors shadow-xl">
+              <Link href="/sign-up" className="inline-block px-8 py-4 sm:px-12 sm:py-5 bg-[#E02424] text-white font-bold text-[10px] sm:text-xs tracking-[0.2em] uppercase hover:bg-red-700 transition-colors shadow-xl text-center">
                 Explore
               </Link>
             </motion.div>
