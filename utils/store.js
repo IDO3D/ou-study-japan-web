@@ -17,6 +17,16 @@ const useStore = create((set, get) => ({
   },
   setUser: (userData) => set((state) => ({ user: { ...state.user, ...userData } })),
 
+  // ─── Theme ──────────────────────────────
+  theme: 'dark', // dark | japan | ou | business
+  setTheme: (theme) => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+    set({ theme })
+  },
+
+
   // ─── Exchange Rate ───────────────────────
   exchangeRate: 0.0067, // JPY to USD
   setExchangeRate: (rate) => set({ exchangeRate: rate }),
