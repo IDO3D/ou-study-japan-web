@@ -9,7 +9,7 @@ import { useRef } from 'react'
 // Simply upload an unlisted or public 4K video to YouTube and paste its ID below.
 // Example: URL is https://youtube.com/watch?v=dQw4w9WgXcQ -> ID is "dQw4w9WgXcQ"
 // =========================================================================
-const YOUTUBE_BACKGROUND_ID = "F3zks8sLzYI"
+const YOUTUBE_BACKGROUND_ID = "7hvyx_XyyH4"
 
 const FEATURES = [
   { icon: '🗾', title: 'Interactive Route Map', desc: 'Seamlessly navigate through Ibaraki, Kyoto, and Tokyo. Live updates and curated points of interest.' },
