@@ -126,7 +126,7 @@ export default function Dashboard() {
         camera: <CameraView />,
         map: <MapView />,
         quests: <QuestsView />,
-        profile: <ProfileView onSignOut={handleSignOut} />,
+        profile: <ProfileView onSignOut={handleSignOut} onNavigateToMap={navigateInApp} />,
         canvas: <CanvasView />,
         housing: <HousingView onNavigateToMap={navigateInApp} />,
     }
