@@ -12,12 +12,12 @@ import { useRef } from 'react'
 const YOUTUBE_BACKGROUND_ID = "xXiSN8Tftjg"
 
 const FEATURES = [
-  { icon: '🗾', title: 'Interactive Route Map', desc: 'Seamlessly navigate through Ibaraki, Kyoto, and Tokyo. Live updates and curated points of interest.' },
-  { icon: '💳', title: 'Digital Suica Wallet', desc: 'Manage your transit card, convert USD to JPY instantly, and locate the nearest foreign-friendly ATMs.' },
-  { icon: '🏥', title: 'Health & Safety Hub', desc: 'Direct emergency dials, local hospital routes, and translated medical phrasing for instant peace of mind.' },
-  { icon: '🍜', title: 'Curated Food Discover', desc: 'Browse curated convenience store grabs to authentic local izakayas. Read menus before you arrive.' },
-  { icon: '📸', title: 'Cinematic Photo Reel', desc: 'Compile your study abroad journey. Add captions and let the app build an autoplaying cinematic memory.' },
-  { icon: '⭐', title: 'Points & Quests', desc: 'Engage with local culture through gamified challenges and earn rewards while discovering Japan.' },
+  { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 20l-5-3V4l5 3 5-3 5 3v13l-5-3-5 3z" /><path d="M9 4v13" /><path d="M14 7v13" /></svg>, title: 'Interactive Route Map', desc: 'Seamlessly navigate through Ibaraki, Kyoto, and Tokyo. Live updates and curated points of interest.' },
+  { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /></svg>, title: 'Digital Suica Wallet', desc: 'Manage your transit card, convert USD to JPY instantly, and locate the nearest foreign-friendly ATMs.' },
+  { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>, title: 'Health & Safety Hub', desc: 'Direct emergency dials, local hospital routes, and translated medical phrasing for instant peace of mind.' },
+  { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M18 8h1a4 4 0 010 8h-1" /><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" /><path d="M6 1v3" /><path d="M10 1v3" /><path d="M14 1v3" /></svg>, title: 'Curated Food Discover', desc: 'Browse curated convenience store grabs to authentic local izakayas. Read menus before you arrive.' },
+  { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" /></svg>, title: 'Cinematic Photo Reel', desc: 'Compile your study abroad journey. Add captions and let the app build an autoplaying cinematic memory.' },
+  { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>, title: 'Points & Quests', desc: 'Engage with local culture through gamified challenges and earn rewards while discovering Japan.' },
 ]
 
 export default function LandingPage() {
@@ -68,25 +68,27 @@ export default function LandingPage() {
           </div>
         </nav>
 
-        {/* Cinematic Hero Section */}
-        <section ref={heroRef} className="relative min-h-screen w-full flex items-center bg-[#09090b] overflow-hidden pt-24 pb-16">
-          {/* Animated Background Reel */}
-          <motion.div style={{ y, opacity }} className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        {/* Animated Cinematic Background for ENTIRE PAGE */}
+        <div className="fixed inset-0 z-0 bg-black pointer-events-none">
+          <motion.div style={{ opacity }} className="absolute inset-0">
             {/* Mobile Fallback Image / Poster */}
-            <img src="https://images.unsplash.com/photo-1542051842920-84a48ed9c4d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" className="absolute inset-0 w-full h-full object-cover opacity-60 block md:hidden scale-105" />
+            <img src="https://images.unsplash.com/photo-1542051842920-84a48ed9c4d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" className="absolute inset-0 w-full h-full object-cover opacity-20 block md:hidden scale-105" />
 
             {/* YouTube Embed Background */}
             <div className="hidden md:block absolute inset-0 w-[400vw] h-[400vh] -top-[150vh] -left-[150vw] sm:w-[150vw] sm:h-[150vh] sm:-top-[25vh] sm:-left-[25vw]">
               <iframe
                 src={`https://www.youtube.com/embed/${YOUTUBE_BACKGROUND_ID}?autoplay=1&mute=1&controls=0&loop=1&playlist=${YOUTUBE_BACKGROUND_ID}&playsinline=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1`}
                 allow="autoplay; fullscreen; picture-in-picture"
-                className="w-full h-full object-cover opacity-50 pointer-events-none mix-blend-screen scale-110"
+                className="w-full h-full object-cover opacity-30 pointer-events-none mix-blend-screen scale-110"
               />
             </div>
-            {/* Dark moody gradient overlay for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/50"></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
           </motion.div>
+          {/* Global Dark moody gradient overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/95"></div>
+        </div>
+
+        {/* Cinematic Hero Section */}
+        <section ref={heroRef} className="relative min-h-screen w-full flex items-center overflow-hidden pt-24 pb-16 z-10">
 
           {/* Left Vertical Indicator */}
           <div className="absolute left-6 lg:left-12 top-1/2 -translate-y-1/2 flex-col items-center gap-6 z-20 mix-blend-difference hidden md:flex">
@@ -168,15 +170,17 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Cinematic Features Grid */}
-        <section className="relative z-20 bg-[#060608] py-24 sm:py-32 px-6 lg:px-12 border-t border-white/10">
-          <div className="max-w-7xl mx-auto">
-            <div className="mb-16 sm:mb-24 text-center sm:text-left max-w-3xl">
-              <h2 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight mb-6 mt-0">Designed for <br /><span className="bg-clip-text text-transparent bg-gradient-to-r from-[#E02424] to-red-400">Discovery.</span></h2>
-              <p className="text-lg sm:text-xl text-white/50 leading-relaxed font-medium">We stripped away the clutter to give you exactly what you need while standing on the streets of Tokyo, Kyoto, or Ibaraki.</p>
+        {/* Sleek Features Typography */}
+        <section className="relative z-10 py-24 sm:py-32 px-6 lg:px-16">
+          <div className="max-w-7xl mx-auto border-t border-white/20 pt-16">
+            <div className="mb-16 sm:mb-24 flex flex-col sm:flex-row justify-between items-end gap-10">
+              <h2 className="font-display font-medium text-4xl sm:text-5xl lg:text-6xl tracking-tight m-0 text-white max-w-xl">
+                Information without the clutter.
+              </h2>
+              <p className="text-[10px] font-bold tracking-[0.2em] text-white/50 uppercase max-w-xs leading-relaxed m-0">Everything you need while standing on the streets of Tokyo, Kyoto, or Ibaraki.</p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-16">
               {FEATURES.map((f, i) => (
                 <motion.div
                   key={f.title}
@@ -184,12 +188,13 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ duration: 0.6, delay: i * 0.1 }}
-                  className="rounded-3xl p-8 sm:p-10 bg-[#121214] border border-white/5 hover:border-white/20 transition-all hover:-translate-y-2 group relative overflow-hidden shadow-2xl"
+                  className="group relative"
                 >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl group-hover:bg-[#E02424]/20 transition-colors"></div>
-                  <span className="text-5xl block mb-6 filter drop-shadow-md">{f.icon}</span>
-                  <h3 className="font-display font-black text-xl sm:text-2xl mb-4 tracking-tight group-hover:text-[#E02424] transition-colors m-0">{f.title}</h3>
-                  <p className="text-white/50 leading-relaxed text-sm sm:text-base font-medium m-0">{f.desc}</p>
+                  <div className="w-8 h-8 flex items-center justify-center text-white/70 group-hover:text-[#E02424] transition-colors mb-6">
+                    {f.icon}
+                  </div>
+                  <h3 className="font-display font-medium text-xl sm:text-2xl mb-4 tracking-tight text-white m-0 border-b border-white/10 pb-4">{f.title}</h3>
+                  <p className="text-white/50 leading-relaxed text-xs sm:text-sm font-medium m-0 tracking-wide pt-2">{f.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -197,7 +202,7 @@ export default function LandingPage() {
         </section>
 
         {/* Wallet Visual Break-out Section */}
-        <section className="bg-black py-24 px-6 lg:px-12 relative overflow-hidden border-t border-white/5">
+        <section className="relative z-10 py-24 px-6 lg:px-16 overflow-hidden border-t border-white/20">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#E02424]/10 blur-[120px] rounded-full pointer-events-none"></div>
 
           <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-16 relative z-10">
@@ -286,26 +291,24 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Cinematic Photo Reel Outro */}
-        <section className="relative w-full h-[60vh] flex items-center justify-center overflow-hidden border-t border-white/10">
-          <div className="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1542051842920-84a48ed9c4d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" alt="Japan" className="w-full h-full object-cover scale-105 opacity-50 filter grayscale" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/20"></div>
-          </div>
-          <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
-            <h2 className="font-display font-black text-4xl sm:text-6xl tracking-tight mb-6">Build your reel.</h2>
-            <p className="text-lg sm:text-xl text-white/50 leading-relaxed font-medium mb-10">Upload photos, add context, and let the app build a cinematic memory of your semester studying abroad.</p>
-            <Link href="/sign-up" className="inline-flex px-10 py-5 rounded-full bg-white text-black font-bold text-lg hover:scale-105 active:scale-95 transition-transform shadow-2xl">
-              Start Your OU Japan Journey
+        {/* Study Abroad Outro */}
+        <section className="relative z-10 w-full py-32 flex flex-col items-center justify-center text-center px-4 max-w-3xl mx-auto border-t border-white/20">
+          <h2 className="font-display font-medium text-4xl sm:text-6xl tracking-tight mb-12">Study Abroad with OU.</h2>
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+            <Link href="/sign-up" className="inline-flex px-12 py-5 bg-[#E02424] text-white font-bold text-[10px] tracking-[0.2em] uppercase hover:bg-red-700 transition-colors shadow-2xl w-full sm:w-auto overflow-hidden justify-center items-center">
+              Sign Up
+            </Link>
+            <Link href="/login" className="inline-flex px-12 py-5 bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold text-[10px] tracking-[0.2em] uppercase hover:bg-white/20 transition-colors shadow-2xl w-full sm:w-auto justify-center items-center">
+              Sign In
             </Link>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="bg-black py-16 px-6 border-t border-white/10 text-center flex flex-col items-center justify-center">
-          <p className="font-display font-black text-2xl sm:text-3xl text-white mb-3 tracking-tight m-0">OUStudyJapan</p>
-          <div className="w-12 h-1 bg-[#E02424] rounded-full mb-6"></div>
-          <p className="text-white/30 text-sm font-semibold tracking-wide uppercase m-0">© 2026 University of Oklahoma Study Abroad</p>
+        <footer className="relative z-10 py-16 px-6 text-center flex flex-col items-center justify-center border-t border-white/10">
+          <p className="font-display font-black text-2xl sm:text-3xl text-white mb-3 tracking-[0.15em] m-0 uppercase">OUStudyJapan.</p>
+          <div className="w-8 h-[2px] bg-white/30 mb-6"></div>
+          <p className="text-white/30 text-[9px] font-bold tracking-[0.2em] uppercase m-0">© 2026 University of Oklahoma Study Abroad</p>
         </footer>
       </div>
     </>
