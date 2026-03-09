@@ -133,10 +133,17 @@ export default function Dashboard() {
 
     if (!authReady) {
         return (
-            <div className="min-h-screen flex items-center justify-center" style={{ background: '#09090b' }}>
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 rounded-full border-2 border-red-500 border-t-transparent animate-spin" />
-                    <p className="text-sm font-display font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>Loading your dashboard...</p>
+            <div className="min-h-screen flex flex-col items-center justify-center gap-6" style={{ background: 'var(--bg)' }}>
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: '#841617', boxShadow: '0 0 32px rgba(132,22,23,0.5)' }}>
+                    <span className="font-display font-black text-white text-2xl" style={{ fontFamily: 'Georgia, serif' }}>OU</span>
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                    <div className="w-10 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                        <div className="h-full rounded-full animate-pulse" style={{ width: '60%', background: '#841617' }} />
+                    </div>
+                    <p className="text-xs font-display font-bold" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
+                        LOADING
+                    </p>
                 </div>
             </div>
         )
@@ -145,7 +152,7 @@ export default function Dashboard() {
     return (
         <>
             <Head>
-                <title>Dashboard — OUStudyJapan</title>
+                <title>Dashboard — OU Study Japan</title>
                 <meta name="description" content="OU Study Abroad travel assistant for Japan" />
                 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
                 <meta name="theme-color" content="#09090b" />
@@ -154,7 +161,7 @@ export default function Dashboard() {
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
             </Head>
 
-            <div style={{ minHeight: '100svh', background: '#09090b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ minHeight: '100svh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <AppShell currentView={view} onNavigate={setView}>
                     {VIEWS[view] || VIEWS.home}
                 </AppShell>

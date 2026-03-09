@@ -2,21 +2,23 @@
 import { motion } from 'framer-motion'
 import useStore from '../../utils/store'
 import { IcStar } from '../ui/Icons'
+import OULogo, { ToriiIcon } from '../ui/OULogo'
 
 const VIEW_META = {
   home: { title: 'Home', sub: null },
-  discover: { title: 'Discover', sub: 'Restaurants & Halal' },
-  camera: { title: 'Translate', sub: 'Point at any text' },
+  discover: { title: 'Discover', sub: 'Restaurants & Dining' },
+  camera: { title: 'Translate', sub: 'AI Japanese Translator' },
   map: { title: 'Map', sub: 'Ibaraki · Kyoto · Tokyo' },
   quests: { title: 'Quests', sub: 'OU Study Japan' },
-  canvas: { title: 'Canvas', sub: 'OU · Japan Program' },
-  housing: { title: 'Housing', sub: '24 Nights · 3 Cities' },
-  profile: { title: 'Profile', sub: 'Account & Tools' },
+  canvas: { title: 'Canvas', sub: 'University of Oklahoma' },
+  housing: { title: 'Stay', sub: '24 Nights · 3 Cities' },
+  profile: { title: 'Profile', sub: 'Account & Preferences' },
 }
 
 export default function Header({ currentView, onNavigate }) {
   const { user } = useStore()
   const meta = VIEW_META[currentView] || VIEW_META.home
+  const isHome = currentView === 'home'
 
   return (
     <header
@@ -24,67 +26,92 @@ export default function Header({ currentView, onNavigate }) {
       style={{
         paddingTop: 'max(48px, env(safe-area-inset-top))',
         paddingBottom: '14px',
-        background: 'linear-gradient(to bottom, rgba(9,9,11,0.98) 0%, rgba(9,9,11,0.85) 75%, transparent 100%)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
+        background: 'linear-gradient(to bottom, var(--header-bg) 0%, var(--header-bg) 75%, transparent 100%)',
+        backdropFilter: 'blur(24px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
       }}
     >
+      {/* Left: Logo (home) or view title */}
       <motion.div
         key={currentView}
-        initial={{ opacity: 0, x: -10 }}
+        initial={{ opacity: 0, x: -12 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        className="flex items-center gap-2.5"
       >
-        <h1
-          className="font-display font-black text-white leading-none"
-          style={{ fontSize: '1.35rem', letterSpacing: '-0.025em' }}
-        >
-          {meta.title}
-        </h1>
-        {meta.sub && (
-          <p className="font-display font-medium mt-0.5" style={{ fontSize: '10px', color: 'rgba(255,255,255,0.32)', letterSpacing: '0.04em' }}>
-            {meta.sub}
-          </p>
+        {isHome ? (
+          <>
+            <OULogo size={30} variant="mark" />
+            <div>
+              <p className="font-display font-black leading-none" style={{ fontSize: '1.1rem', letterSpacing: '-0.03em', color: 'var(--text)' }}>
+                OU <span style={{ color: 'var(--brand)' }}>Japan</span>
+              </p>
+              <p className="font-display font-semibold" style={{ fontSize: '9px', letterSpacing: '0.08em', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                Study Abroad Program
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            <ToriiIcon size={18} color="var(--brand)" />
+            <div>
+              <h1
+                className="font-display font-black text-white leading-none"
+                style={{ fontSize: '1.25rem', letterSpacing: '-0.025em' }}
+              >
+                {meta.title}
+              </h1>
+              {meta.sub && (
+                <p className="font-display font-medium mt-0.5" style={{ fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '0.04em' }}>
+                  {meta.sub}
+                </p>
+              )}
+            </div>
+          </>
         )}
       </motion.div>
 
-      <div className="flex items-center gap-2.5">
+      {/* Right: Points + Avatar */}
+      <div className="flex items-center gap-2">
         {/* Points badge */}
         <div
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-          style={{ background: 'rgba(224,36,36,0.14)', border: '1px solid rgba(224,36,36,0.22)' }}
+          style={{ background: 'var(--brand-subtle)', border: '1px solid var(--brand-glow)' }}
         >
-          <IcStar size={11} color="#FF6B6B" strokeWidth={2.5} style={{ fill: '#FF6B6B' }} />
-          <span className="font-display font-bold" style={{ fontSize: '11px', color: '#FF8E8E' }}>
-            {user.points.toLocaleString()}
+          <IcStar size={11} color="var(--brand-light)" strokeWidth={2.5} style={{ fill: 'var(--brand-light)' }} />
+          <span className="font-display font-bold" style={{ fontSize: '11px', color: 'var(--brand-light)' }}>
+            {(user.points || 0).toLocaleString()}
           </span>
         </div>
 
         {/* Avatar */}
         <button
-          onClick={() => { if (typeof onNavigate === 'function') onNavigate('profile'); else if (typeof window !== 'undefined' && window.__ouNav) window.__ouNav('profile') }}
+          onClick={() => {
+            if (typeof onNavigate === 'function') onNavigate('profile')
+            else if (typeof window !== 'undefined' && window.__ouNav) window.__ouNav('profile')
+          }}
           className="rounded-full active:scale-90 transition-transform"
           style={{
             padding: '2px',
-            background: 'linear-gradient(135deg, #E02424, #FF8E53)',
-            boxShadow: '0 0 12px rgba(224,36,36,0.35)',
+            background: 'linear-gradient(135deg, var(--brand), #FF8E53)',
+            boxShadow: '0 0 14px var(--brand-glow)',
           }}
         >
           {user.avatarUrl ? (
             <img
               src={user.avatarUrl}
-              alt={user.name}
+              alt={user.name || 'Profile'}
               width={34}
               height={34}
               className="rounded-full block object-cover"
-              style={{ border: '2px solid #09090b' }}
+              style={{ border: '2px solid var(--bg)' }}
             />
           ) : (
             <div
               className="w-[34px] h-[34px] rounded-full flex items-center justify-center font-display font-black text-white text-sm"
-              style={{ border: '2px solid #09090b', background: '#09090b' }}
+              style={{ border: '2px solid var(--bg)', background: 'var(--bg)' }}
             >
-              {user.name ? user.name[0].toUpperCase() : '?'}
+              {user.name ? user.name[0].toUpperCase() : '🎌'}
             </div>
           )}
         </button>
