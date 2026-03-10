@@ -129,7 +129,20 @@ export default function CameraView() {
   }
 
   return (
-    <div className="absolute inset-0 flex flex-col" style={{ background: 'var(--bg)' }}>
+    <div className="absolute inset-0 flex flex-col relative" style={{ background: 'var(--bg)' }}>
+      {/* ── RETURN TO DASHBOARD HUD ─────────────────────────── */}
+      <button
+        onClick={() => { if (typeof window !== 'undefined' && window.__ouNav) window.__ouNav('home') }}
+        style={{
+          position: 'absolute', top: 'max(16px, calc(env(safe-area-inset-top) + 12px))', left: 12, zIndex: 50,
+          background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)',
+          width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.4)', color: 'white', fontSize: 18, paddingRight: 2
+        }}
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+      </button>
+
       {/* Header */}
       <div className="pt-24 px-5 pb-3">
         <p className="text-[10px] font-display font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
