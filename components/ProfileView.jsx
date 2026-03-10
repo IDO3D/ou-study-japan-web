@@ -11,7 +11,13 @@ const IconMoney = () => <span className="text-xl">💴</span>
 const IconPlay = () => <span className="text-xl">▶️</span>
 const IconFlight = () => <span className="text-xl">✈️</span>
 const IconCamera = () => <span className="text-xl">📸</span>
-const IconSettings = () => <span className="text-xl">⚙️</span>
+const IconSettings = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="3" y1="12" x2="21" y2="12"></line>
+    <line x1="3" y1="6" x2="21" y2="6"></line>
+    <line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+)
 
 // ─── SUB-PANELS ─────────────────────────────────────────
 
@@ -470,6 +476,18 @@ export default function ProfileView({ onNavigateToMap, onSignOut }) {
   const [bio, setBio] = useState("Exploring the beautiful streets of Japan. 🇯🇵 Looking for the best Ramen spots!")
   const [hideHours, setHideHours] = useState(true)
   const [hideClassSize, setHideClassSize] = useState(true)
+  const [activeBadges, setActiveBadges] = useState(['🏛️ OU Scholar', '🎨 Art Master'])
+
+  const AVAILABLE_BADGES = [
+    '🏛️ OU Scholar', '🎨 Art Master', '💻 Tech Geek',
+    '🗺️ Explorer', '🍜 Foodie', '📸 Photo Nerd', '🗣️ Polyglot'
+  ]
+
+  const toggleBadge = (b) => {
+    setActiveBadges(prev =>
+      prev.includes(b) ? prev.filter(x => x !== b) : [...prev, b]
+    )
+  }
 
   const SECTIONS = [
     { id: 'wallet', title: 'Wallet & ATM', icon: <IconWallet />, desc: 'Apple Pay, Suica, Cash' },
@@ -565,8 +583,11 @@ export default function ProfileView({ onNavigateToMap, onSignOut }) {
             )}
 
             <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-              <span className="text-[9px] font-bold tracking-widest bg-brand/20 text-brand px-1.5 py-0.5 rounded-md uppercase border border-brand/30">🏛️ OU Scholar</span>
-              <span className="text-[9px] font-bold tracking-widest bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded-md uppercase border border-purple-500/30">🎨 Art Master</span>
+              {activeBadges.map(b => (
+                <span key={b} className="text-[9px] font-bold tracking-widest bg-brand/20 text-brand px-1.5 py-0.5 rounded-md uppercase border border-brand/30">
+                  {b}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -582,6 +603,27 @@ export default function ProfileView({ onNavigateToMap, onSignOut }) {
             <p className="text-sm text-white/90 font-medium leading-relaxed m-0">{bio}</p>
           )}
         </div>
+
+        {/* Badge Selector (Edit Mode Only) */}
+        {isEditing && (
+          <div className="relative z-10 mb-5 border-t border-white/10 pt-4">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-white/40 mb-2 block">Available Badges</span>
+            <div className="flex flex-wrap gap-2">
+              {AVAILABLE_BADGES.map(b => {
+                const isSelected = activeBadges.includes(b)
+                return (
+                  <button
+                    key={b}
+                    onClick={() => toggleBadge(b)}
+                    className={`text-[10px] font-bold tracking-wide px-2 py-1 rounded-md uppercase border transition-colors ${isSelected ? 'bg-brand text-white border-brand' : 'bg-transparent text-white/60 border-white/20 hover:border-white/40'}`}
+                  >
+                    {b}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Private Stats */}
         <div className="grid grid-cols-2 gap-3 relative z-10">

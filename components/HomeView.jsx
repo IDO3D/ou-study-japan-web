@@ -69,6 +69,44 @@ export default function HomeView({ onNavigate }) {
         </h2>
       </motion.div>
 
+      {/* ── Live Utilities ──────────────────── */}
+      <motion.div variants={stagger.item} className="grid grid-cols-2 gap-3 px-1 mt-1 mb-2">
+        {/* Weather Card */}
+        <div className="p-4 rounded-[20px] flex flex-col justify-between relative overflow-hidden shadow-lg"
+          style={{ background: 'linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%)', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <div className="absolute -top-6 -right-6 w-32 h-32 bg-[#60A5FA]/20 rounded-full blur-2xl pointer-events-none"></div>
+          <div className="flex items-center justify-between mb-4 relative z-10">
+            <span className="text-2xl drop-shadow-md">🌤️</span>
+            <div className="flex items-center gap-1.5 bg-black/20 px-2 py-1 rounded-full border border-white/5 backdrop-blur-sm">
+              {userLocation && <div className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_5px_#60A5FA]"></div>}
+              <span className="text-[9px] font-bold uppercase tracking-widest text-white/80">{userLocation ? 'Local' : 'Tokyo'}</span>
+            </div>
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-baseline gap-1.5 mb-0.5">
+              <p className="font-display font-black text-[28px] text-white leading-none tracking-tighter drop-shadow-lg">18°</p>
+              <p className="text-[10px] font-bold text-white/60 uppercase">C</p>
+            </div>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-white/50 drop-shadow-sm">Partly Cloudy</p>
+          </div>
+        </div>
+
+        {/* Currency Card */}
+        <div className="p-4 rounded-[20px] flex flex-col justify-between shadow-lg"
+          style={{ background: 'linear-gradient(135deg, rgba(20,20,24,0.9) 0%, rgba(10,10,12,0.95) 100%)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-8 h-8 rounded-full bg-[#86efac]/10 flex items-center justify-center border border-[#86efac]/20">
+              <IcMoney size={16} color="#86efac" />
+            </div>
+            <span className="text-[8px] font-bold uppercase tracking-widest text-[#86efac] bg-[#86efac]/10 px-2 py-1 rounded-full border border-[#86efac]/20 shadow-sm">Live</span>
+          </div>
+          <div>
+            <p className="font-display font-bold uppercase tracking-widest text-[9px] text-white/40 mb-1.5">Exchange Rate</p>
+            <p className="font-mono font-bold text-[13px] text-white tracking-tight">¥1,000 = ${(1000 * exchangeRate).toFixed(2)}</p>
+          </div>
+        </div>
+      </motion.div>
+
       {/* ── Realistic Suica Digital Wallet ──────────────────────── */}
       <motion.div variants={stagger.item}>
         <div className="relative rounded-[24px] p-6 overflow-hidden shadow-2xl group cursor-pointer border border-white/10"
@@ -251,44 +289,6 @@ export default function HomeView({ onNavigate }) {
             </div>
           </div>
           <span className="text-white/40 text-sm">→</span>
-        </div>
-      </motion.div>
-
-      {/* ── Live Utilities ──────────────────── */}
-      <motion.div variants={stagger.item} className="grid grid-cols-2 gap-3 px-1 pb-4">
-        {/* Currency Card */}
-        <div className="p-4 rounded-[20px] flex flex-col justify-between shadow-lg"
-          style={{ background: 'linear-gradient(135deg, rgba(20,20,24,0.9) 0%, rgba(10,10,12,0.95) 100%)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-8 h-8 rounded-full bg-[#86efac]/10 flex items-center justify-center border border-[#86efac]/20">
-              <IcMoney size={16} color="#86efac" />
-            </div>
-            <span className="text-[8px] font-bold uppercase tracking-widest text-[#86efac] bg-[#86efac]/10 px-2 py-1 rounded-full border border-[#86efac]/20 shadow-sm">Live</span>
-          </div>
-          <div>
-            <p className="font-display font-bold uppercase tracking-widest text-[9px] text-white/40 mb-1.5">Exchange Rate</p>
-            <p className="font-mono font-bold text-[13px] text-white tracking-tight">¥1,000 = ${(1000 * exchangeRate).toFixed(2)}</p>
-          </div>
-        </div>
-
-        {/* Weather Card */}
-        <div className="p-4 rounded-[20px] flex flex-col justify-between relative overflow-hidden shadow-lg"
-          style={{ background: 'linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%)', border: '1px solid rgba(255,255,255,0.1)' }}>
-          <div className="absolute -top-6 -right-6 w-32 h-32 bg-[#60A5FA]/20 rounded-full blur-2xl pointer-events-none"></div>
-          <div className="flex items-center justify-between mb-4 relative z-10">
-            <span className="text-2xl drop-shadow-md">🌤️</span>
-            <div className="flex items-center gap-1.5 bg-black/20 px-2 py-1 rounded-full border border-white/5 backdrop-blur-sm">
-              {userLocation && <div className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_5px_#60A5FA]"></div>}
-              <span className="text-[9px] font-bold uppercase tracking-widest text-white/80">{userLocation ? 'Local' : 'Tokyo'}</span>
-            </div>
-          </div>
-          <div className="relative z-10">
-            <div className="flex items-baseline gap-1.5 mb-0.5">
-              <p className="font-display font-black text-[28px] text-white leading-none tracking-tighter drop-shadow-lg">18°</p>
-              <p className="text-[10px] font-bold text-white/60 uppercase">C</p>
-            </div>
-            <p className="text-[9px] font-bold uppercase tracking-widest text-white/50 drop-shadow-sm">Partly Cloudy</p>
-          </div>
         </div>
       </motion.div>
     </motion.div>

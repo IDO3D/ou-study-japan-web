@@ -286,9 +286,11 @@ export default function DiscoverView({ onNavigateToMap }) {
             <p className="font-body text-gray-500 m-0">No places found matching your scan.</p>
           </div>
         ) : (
-          filtered.map((r) => (
-            <RestaurantCard key={r.id} r={r} selected={selected?.id === r.id} onSelect={setSelected} onNavigateToMap={onNavigateToMap} />
-          ))
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filtered.map((r) => (
+              <RestaurantCard key={r.id} r={r} selected={selected?.id === r.id} onSelect={setSelected} onNavigateToMap={onNavigateToMap} />
+            ))}
+          </div>
         )}
       </div>
 
