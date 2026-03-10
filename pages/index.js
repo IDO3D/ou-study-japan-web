@@ -2,7 +2,7 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 // =========================================================================
 // TO EDIT THE BACKGROUND VIDEO:
@@ -24,7 +24,19 @@ const FEATURES = [
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [videoExpanded, setVideoExpanded] = useState(false)
   const heroRef = useRef(null)
+
+  // Exit immersive video when user scrolls
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50 && videoExpanded) {
+        setVideoExpanded(false)
+      }
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [videoExpanded])
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"]
@@ -92,8 +104,12 @@ export default function LandingPage() {
         )}
 
         {/* Animated Cinematic Background for ENTIRE PAGE */}
-        <div className="fixed inset-0 z-0 bg-black pointer-events-none">
-          <motion.div style={{ opacity }} className="absolute inset-0">
+        <div className={`fixed inset-0 bg-black pointer-events-none transition-all duration-1000 ${videoExpanded ? 'z-50' : 'z-0'}`}>
+          <motion.div
+            style={{ opacity }}
+            className="absolute inset-0 transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            animate={{ scale: videoExpanded ? 1.05 : 1 }}
+          >
             {/* Desktop HTML5 Video Background (16:9) */}
             <video
               src={BACKGROUND_VIDEO_DESKTOP}
@@ -101,7 +117,7 @@ export default function LandingPage() {
               loop
               muted
               playsInline
-              className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none mix-blend-screen hidden md:block"
+              className={`absolute inset-0 w-full h-full object-cover pointer-events-none mix-blend-screen hidden md:block transition-opacity duration-1000 ${videoExpanded ? 'opacity-100 mix-blend-normal' : 'opacity-30'}`}
             />
             {/* Mobile HTML5 Video Background (9:16) */}
             <video
@@ -110,11 +126,16 @@ export default function LandingPage() {
               loop
               muted
               playsInline
-              className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none mix-blend-screen block md:hidden"
+              className={`absolute inset-0 w-full h-full object-cover pointer-events-none mix-blend-screen block md:hidden transition-opacity duration-1000 ${videoExpanded ? 'opacity-100 mix-blend-normal' : 'opacity-30'}`}
             />
           </motion.div>
           {/* Global Dark moody gradient overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/95"></div>
+          <div className={`absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/95 transition-opacity duration-1000 pointer-events-none ${videoExpanded ? 'opacity-0' : 'opacity-100'}`}></div>
+
+          {/* Close Video Hint */}
+          <div className={`absolute bottom-10 left-0 right-0 text-center transition-all duration-1000 pointer-events-none ${videoExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <p className="text-white/70 font-display text-xs tracking-[0.3em] uppercase animate-pulse">Scroll to exit</p>
+          </div>
         </div>
 
         {/* Cinematic Hero Section */}
@@ -179,7 +200,10 @@ export default function LandingPage() {
               transition={{ duration: 1, delay: 0.6 }}
               className="flex items-center gap-3 sm:gap-5 mb-8 sm:mb-12"
             >
-              <button className="w-12 h-12 sm:w-16 sm:h-16 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-black hover:border-white transition-all group backdrop-blur-sm shadow-xl flex-shrink-0">
+              <button
+                onClick={() => setVideoExpanded(true)}
+                className="w-12 h-12 sm:w-16 sm:h-16 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-black hover:border-white transition-all group backdrop-blur-sm shadow-xl flex-shrink-0"
+              >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="ml-1 sm:ml-1.5 group-hover:scale-110 transition-transform sm:w-[18px] sm:h-[18px]"><path d="M5 3l14 9-14 9V3z" /></svg>
               </button>
               <div>
