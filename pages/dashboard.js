@@ -8,9 +8,10 @@ import DiscoverView from '../components/DiscoverView'
 import CameraView from '../components/CameraView'
 import MapView from '../components/MapView'
 import QuestsView from '../components/QuestsView'
-import ProfileView from '../components/ProfileView'
+import ProfilesView from '../components/ProfileView'
 import CanvasView from '../components/CanvasView'
 import HousingView from '../components/HousingView'
+import CommunityView from '../components/CommunityView'
 import LoadingScreen from '../components/LoadingScreen'
 import useStore from '../utils/store'
 import { getCurrentPosition } from '../utils/helpers'
@@ -20,7 +21,6 @@ import toast from 'react-hot-toast'
 export default function Dashboard() {
     const router = useRouter()
     const [view, setView] = useState('home')
-    const [isTransitioning, setIsTransitioning] = useState(false)
     const [authReady, setAuthReady] = useState(false)
     const { setRestaurants, setQuests, setExchangeRate, setUserLocation, setUser, setNavDestination } = useStore()
 
@@ -105,10 +105,22 @@ export default function Dashboard() {
             .catch(() => { })
     }, [authReady])
 
-    // Expose navigate globally
+    // Expose navigate globally and sync local storage
     useEffect(() => {
-        if (typeof window !== 'undefined') window.__ouNav = setView
-    }, [setView])
+        if (typeof window !== 'undefined') {
+            window.__ouNav = handleNav
+            // Load last view
+            const saved = localStorage.getItem('ou_last_view')
+            if (saved && VIEWS[saved]) setView(saved)
+        }
+    }, [])
+
+    const handleNav = (v) => {
+        setView(v)
+        if (v !== 'map') {
+            localStorage.setItem('ou_last_view', v)
+        }
+    }
 
     const handleSignOut = async () => {
         await supabase.auth.signOut()
@@ -119,7 +131,7 @@ export default function Dashboard() {
     // Helper: set destination in store, then switch to map tab
     const navigateInApp = (dest) => {
         setNavDestination(dest)
-        setView('map')
+        handleNav('map')
     }
 
     const VIEWS = {
@@ -128,9 +140,10 @@ export default function Dashboard() {
         camera: <CameraView />,
         map: <MapView />,
         quests: <QuestsView />,
-        profile: <ProfileView onSignOut={handleSignOut} onNavigateToMap={navigateInApp} />,
+        profile: <ProfilesView onSignOut={handleSignOut} onNavigateToMap={navigateInApp} />,
         canvas: <CanvasView />,
         housing: <HousingView onNavigateToMap={navigateInApp} />,
+        community: <CommunityView />,
     }
 
     if (!authReady) {
@@ -166,19 +179,10 @@ export default function Dashboard() {
             <div style={{ minHeight: '100svh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <AppShell
                     currentView={view}
-                    onNavigate={(v) => {
-                        if (v !== view) {
-                            setIsTransitioning(true)
-                            setView(v)
-                        }
-                    }}
+                    onNavigate={handleNav}
                 >
                     {VIEWS[view] || VIEWS.home}
                 </AppShell>
-
-                {isTransitioning && (
-                    <LoadingScreen onComplete={() => setIsTransitioning(false)} />
-                )}
             </div>
         </>
     )

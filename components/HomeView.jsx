@@ -37,7 +37,7 @@ function safeImg(r) {
 }
 
 export default function HomeView({ onNavigate }) {
-  const { user, exchangeRate, quests, restaurants, getTodaySpent } = useStore()
+  const { user, exchangeRate, quests, restaurants, getTodaySpent, userLocation } = useStore()
   const [time, setTime] = useState('')
   const spent = getTodaySpent()
   const remaining = user.dailyBudgetJpy - spent
@@ -233,6 +233,27 @@ export default function HomeView({ onNavigate }) {
         </motion.div>
       )}
 
+      {/* ── Canvas Activities ───────────────────── */}
+      <motion.div variants={stagger.item} className="mt-2">
+        <div className="flex items-center justify-between mb-3 px-1">
+          <h3 className="font-display font-bold text-white" style={{ fontSize: '15px' }}>Canvas Updates</h3>
+          <button onClick={() => onNavigate('canvas')}
+            className="font-display font-bold flex items-center gap-1" style={{ fontSize: '11px', color: '#E02424' }}>
+            Open <IcArrow dir="right" size={11} color="#E02424" strokeWidth={2.5} />
+          </button>
+        </div>
+        <div className="bg-[#0A0A0B] rounded-[20px] p-4 border border-white/5 shadow-md flex items-center justify-between cursor-pointer active:scale-95 transition-transform mx-1" onClick={() => onNavigate('canvas')}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#E02424]/10 border border-[#E02424]/20 flex items-center justify-center text-[16px]">📚</div>
+            <div>
+              <p className="font-bold text-[13px] text-white tracking-wide">JAPN 1225 Reflection</p>
+              <p className="text-[10px] text-[#E02424] font-bold tracking-wider mt-0.5 uppercase">Due Tomorrow</p>
+            </div>
+          </div>
+          <span className="text-white/40 text-sm">→</span>
+        </div>
+      </motion.div>
+
       {/* ── Live Utilities ──────────────────── */}
       <motion.div variants={stagger.item} className="grid grid-cols-2 gap-3 px-1 pb-4">
         {/* Currency Card */}
@@ -256,7 +277,10 @@ export default function HomeView({ onNavigate }) {
           <div className="absolute -top-6 -right-6 w-32 h-32 bg-[#60A5FA]/20 rounded-full blur-2xl pointer-events-none"></div>
           <div className="flex items-center justify-between mb-4 relative z-10">
             <span className="text-2xl drop-shadow-md">🌤️</span>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-white/50 bg-black/20 px-2 py-1 rounded-full border border-white/5 backdrop-blur-sm">Tokyo</span>
+            <div className="flex items-center gap-1.5 bg-black/20 px-2 py-1 rounded-full border border-white/5 backdrop-blur-sm">
+              {userLocation && <div className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_5px_#60A5FA]"></div>}
+              <span className="text-[9px] font-bold uppercase tracking-widest text-white/80">{userLocation ? 'Local' : 'Tokyo'}</span>
+            </div>
           </div>
           <div className="relative z-10">
             <div className="flex items-baseline gap-1.5 mb-0.5">

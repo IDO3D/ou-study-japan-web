@@ -462,6 +462,15 @@ export default function ProfileView({ onNavigateToMap, onSignOut }) {
   const [activeSection, setActiveSection] = useState(null)
   const [questsEnabled, setQuestsEnabled] = useState(false)
 
+  // Customization & Settings State
+  const [showSettings, setShowSettings] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [avatar, setAvatar] = useState("https://i.pravatar.cc/150?img=33")
+  const [username, setUsername] = useState("student_traveler")
+  const [bio, setBio] = useState("Exploring the beautiful streets of Japan. 🇯🇵 Looking for the best Ramen spots!")
+  const [hideHours, setHideHours] = useState(true)
+  const [hideClassSize, setHideClassSize] = useState(true)
+
   const SECTIONS = [
     { id: 'wallet', title: 'Wallet & ATM', icon: <IconWallet />, desc: 'Apple Pay, Suica, Cash' },
     { id: 'finance', title: 'Finance & Tips', icon: <IconMoney />, desc: 'Live rates, Daily budget' },
@@ -470,6 +479,11 @@ export default function ProfileView({ onNavigateToMap, onSignOut }) {
     { id: 'airfare', title: 'Airfare & Travel', icon: <IconFlight />, desc: 'Itinerary, Transport' },
     { id: 'sim', title: 'SIM & Data', icon: <IconSim />, desc: 'Wi-Fi, connectivity' },
   ]
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0]
+    if (file) setAvatar(URL.createObjectURL(file))
+  }
 
   if (activeSection) {
     return (
@@ -488,38 +502,102 @@ export default function ProfileView({ onNavigateToMap, onSignOut }) {
   }
 
   return (
-    <div className="px-5 pb-20 space-y-6">
+    <div className="px-5 pb-20 space-y-6 relative">
 
       {/* Settings Bar */}
-      <div className="flex justify-between items-center pt-2">
-        <h1 className="font-display font-black text-2xl m-0" style={{ color: 'var(--text)' }}>My Profile</h1>
-        <button className="text-xl rotate-0 active:rotate-45 transition-transform"><IconSettings /></button>
+      <div className="flex justify-between items-center pt-2 relative z-50">
+        <h1 className="font-display font-black text-2xl m-0" style={{ color: 'var(--text)' }}>{username}</h1>
+        <button onClick={() => setShowSettings(!showSettings)} className={`text-xl transition-transform ${showSettings ? 'rotate-90' : 'rotate-0'}`}>
+          <IconSettings />
+        </button>
+
+        {/* Settings Dropdown */}
+        <AnimatePresence>
+          {showSettings && (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
+              className="absolute top-12 right-0 w-64 bg-[#121214]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-4 flex flex-col gap-4 z-50">
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">Account Info</span>
+                <div className="flex justify-between text-sm text-white"><span>Email</span><span className="text-white/50">{user?.email || 'student@ou.edu'}</span></div>
+                <div className="flex justify-between text-sm text-white"><span>Status</span><span className="text-brand font-bold">Verified</span></div>
+              </div>
+
+              <div className="flex flex-col gap-2 border-t border-white/10 pt-3">
+                <span className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">Public Privacy</span>
+                <label className="flex items-center justify-between text-sm text-white cursor-pointer">
+                  <span>Hide Course Hours</span>
+                  <input type="checkbox" checked={hideHours} onChange={(e) => setHideHours(e.target.checked)} className="accent-brand" />
+                </label>
+                <label className="flex items-center justify-between text-sm text-white cursor-pointer">
+                  <span>Hide Class Size</span>
+                  <input type="checkbox" checked={hideClassSize} onChange={(e) => setHideClassSize(e.target.checked)} className="accent-brand" />
+                </label>
+              </div>
+
+              <div className="border-t border-white/10 pt-3 flex flex-col gap-2">
+                <button onClick={() => { setIsEditing(!isEditing); setShowSettings(false) }} className="text-left text-sm font-bold text-white hover:text-brand transition-colors">Edit Profile</button>
+                <button onClick={onSignOut} className="text-left text-sm font-bold text-red-500 hover:text-red-400 transition-colors">Log Out</button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Identity Card */}
+      {/* Identity Card (Instagram Style) */}
       <div className="p-5 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border relative overflow-hidden" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-        {/* Abstract BG */}
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-brand/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-brand/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div className="flex items-center gap-4 relative z-10 mb-5">
-          <img src="https://i.pravatar.cc/150?img=33" className="w-16 h-16 rounded-full border-2 border-[var(--surface2)] shadow-md object-cover" />
-          <div>
-            <h2 className="font-display font-black text-xl m-0 leading-tight" style={{ color: 'var(--text)' }}>Student</h2>
-            <p className="font-body text-xs mt-1 font-semibold tracking-wide" style={{ color: 'var(--text-muted)' }}>UNIVERSITY OF OKLAHOMA</p>
+        <div className="flex items-start gap-4 relative z-10 mb-4">
+          <div className="relative">
+            <img src={avatar} className="w-20 h-20 rounded-full border-2 border-[var(--surface2)] shadow-md object-cover" />
+            {isEditing && (
+              <label className="absolute bottom-0 right-0 w-6 h-6 bg-brand rounded-full flex items-center justify-center text-[10px] cursor-pointer text-white shadow-lg border border-white/20">
+                +<input type="file" hidden accept="image/*" onChange={handleAvatarChange} />
+              </label>
+            )}
+          </div>
+
+          <div className="flex-1">
+            {isEditing ? (
+              <input value={username} onChange={e => setUsername(e.target.value)} className="w-full bg-black/40 border border-white/20 rounded-lg px-2 py-1 text-lg font-black text-white outline-none mb-1 focus:border-brand transition-colors" placeholder="Username" />
+            ) : (
+              <h2 className="font-display font-black text-xl m-0 leading-tight" style={{ color: 'var(--text)' }}>@{username}</h2>
+            )}
+
+            <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+              <span className="text-[9px] font-bold tracking-widest bg-brand/20 text-brand px-1.5 py-0.5 rounded-md uppercase border border-brand/30">🏛️ OU Scholar</span>
+              <span className="text-[9px] font-bold tracking-widest bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded-md uppercase border border-purple-500/30">🎨 Art Master</span>
+            </div>
           </div>
         </div>
 
+        {/* Bio */}
+        <div className="relative z-10 mb-5">
+          {isEditing ? (
+            <div className="relative">
+              <textarea maxLength={150} value={bio} onChange={e => setBio(e.target.value)} className="w-full bg-black/40 border border-white/20 rounded-xl p-3 text-sm text-white/90 outline-none focus:border-brand transition-colors resize-none" rows={3}></textarea>
+              <span className="absolute bottom-2 right-2 text-[10px] text-white/40 font-mono">{bio.length}/150</span>
+            </div>
+          ) : (
+            <p className="text-sm text-white/90 font-medium leading-relaxed m-0">{bio}</p>
+          )}
+        </div>
+
+        {/* Private Stats */}
         <div className="grid grid-cols-2 gap-3 relative z-10">
-          <div className="p-3 rounded-2xl border" style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
-            <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Course Hours</span>
-            <p className="font-black text-lg m-0 mt-0.5" style={{ color: 'var(--text)' }}>45 Hrs</p>
-          </div>
-          <div className="p-3 rounded-2xl border" style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
-            <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Class Size</span>
-            <p className="font-black text-lg m-0 mt-0.5" style={{ color: 'var(--text)' }}>25 Pax</p>
-          </div>
-          <div className="bg-brand/10 p-3 rounded-2xl border border-brand/20 col-span-2 flex justify-between items-center">
+          {!hideHours && (
+            <div className="p-3 rounded-2xl border" style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
+              <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Course Hours</span>
+              <p className="font-black text-lg m-0 mt-0.5" style={{ color: 'var(--text)' }}>45 Hrs</p>
+            </div>
+          )}
+          {!hideClassSize && (
+            <div className="p-3 rounded-2xl border" style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
+              <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Class Size</span>
+              <p className="font-black text-lg m-0 mt-0.5" style={{ color: 'var(--text)' }}>25 Pax</p>
+            </div>
+          )}
+          <div className={`bg-brand/10 p-3 rounded-2xl border border-brand/20 flex justify-between items-center ${(hideHours && hideClassSize) ? 'col-span-2' : 'col-span-2'}`}>
             <div>
               <span className="text-[10px] uppercase font-bold text-brand tracking-wider">Return Home Flight</span>
               <p className="font-black text-lg text-brand m-0 mt-0.5">18 Days Left</p>
@@ -527,23 +605,13 @@ export default function ProfileView({ onNavigateToMap, onSignOut }) {
             <span className="text-3xl opacity-80">🛫</span>
           </div>
         </div>
+
+        {isEditing && (
+          <button onClick={() => setIsEditing(false)} className="w-full mt-4 bg-white text-black font-bold py-2.5 rounded-xl active:scale-95 transition-transform text-sm">Save Profile</button>
+        )}
       </div>
 
-      {/* Live Map Widget */}
-      <div className="p-4 rounded-3xl shadow-sm border flex justify-between items-center" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-        <div>
-          <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Current City</span>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-xl">📍</span>
-            <span className="font-display font-black text-xl tracking-tight" style={{ color: 'var(--text)' }}>Tokyo, Japan</span>
-          </div>
-        </div>
-        <button onClick={() => onNavigateToMap?.(null)} className="px-4 py-2 rounded-xl text-xs font-bold active:scale-95 transition-transform" style={{ background: 'var(--surface2)', color: 'var(--text)' }}>
-          Open Map
-        </button>
-      </div>
-
-      {/* Tools Grid */}
+      {/* Essentials Tools Grid */}
       <div>
         <h3 className="font-display font-black text-lg m-0 mb-3 ml-1" style={{ color: 'var(--text)' }}>Essentials</h3>
         <div className="grid grid-cols-2 gap-3">
@@ -558,22 +626,6 @@ export default function ProfileView({ onNavigateToMap, onSignOut }) {
           ))}
         </div>
       </div>
-
-      {/* Gamification Toggle (Hidden by default but viewable) */}
-      <div className="p-4 rounded-3xl border flex justify-between items-center cursor-pointer" onClick={() => setQuestsEnabled(!questsEnabled)} style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
-        <div>
-          <h4 className="font-display font-bold text-sm m-0" style={{ color: 'var(--text)' }}>Points & Quests Mode</h4>
-          <p className="text-[10px] font-medium m-0 mt-0.5 leading-snug" style={{ color: 'var(--text-muted)' }}>Toggle gamification features</p>
-        </div>
-        <div className={`w-12 h-6 rounded-full p-1 transition-colors ${questsEnabled ? 'bg-brand' : ''}`} style={{ background: questsEnabled ? '' : 'var(--text-muted)' }}>
-          <div className={`w-4 h-4 rounded-full shadow-sm transition-transform ${questsEnabled ? 'translate-x-6' : 'translate-x-0'}`} style={{ background: 'var(--bg)' }}></div>
-        </div>
-      </div>
-
-      <button onClick={onSignOut} className="w-full bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400 font-bold py-3.5 rounded-2xl active:scale-95 transition-transform shadow-sm border border-red-100 dark:border-red-500/20">
-        Sign Out
-      </button>
-
     </div>
   )
 }

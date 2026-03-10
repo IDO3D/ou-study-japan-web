@@ -338,10 +338,23 @@ export default function MapView() {
         </div>
       )}
 
+      {/* ── RETURN TO DASHBOARD HUD (Snapchat Style) ─────────────────────────── */}
+      <button
+        onClick={() => { if (typeof window !== 'undefined' && window.__ouNav) window.__ouNav('home') }}
+        style={{
+          position: 'absolute', top: 'max(16px, calc(env(safe-area-inset-top) + 12px))', left: 12, zIndex: 50,
+          background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)',
+          width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.4)', color: 'white', fontSize: 18, paddingRight: 2
+        }}
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+      </button>
+
       {/* ── SEARCH BAR (floating top) ─────────────────────────── */}
       <div style={{
         position: 'absolute',
-        top: 'max(54px, calc(env(safe-area-inset-top) + 42px))',
+        top: 'max(64px, calc(env(safe-area-inset-top) + 64px))',
         left: 12, right: 12,
         zIndex: 20,
         display: 'flex', flexDirection: 'column', gap: 8,

@@ -1,11 +1,12 @@
 // components/layout/Navigation.jsx
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import { IcHome, IcCamera, IcMap, IcStar, IcBook, IcHotel, IcUser } from '../ui/Icons'
+import { IcHome, IcCamera, IcMap, IcStar, IcBook, IcHotel, IcUser, IcGlobe } from '../ui/Icons'
 import ThemeSwitcher from '../ui/ThemeSwitcher'
 
 const NAV_ITEMS = [
   { view: 'home', Icon: IcHome, label: 'Home' },
+  { view: 'community', Icon: IcGlobe, label: 'Feed' },
   { view: 'camera', Icon: IcCamera, label: 'Scan' },
   { view: 'map', Icon: IcMap, label: 'Map' },
   { view: 'quests', Icon: IcStar, label: 'Quests' },
