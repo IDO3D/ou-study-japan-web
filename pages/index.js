@@ -8,8 +8,10 @@ import { useRef, useState } from 'react'
 // TO EDIT THE BACKGROUND VIDEO:
 // Simply paste the direct URL to any .mp4 file. HTML5 <video> tags ensure
 // seamless autoplay on both Desktop and Mobile (unlike YouTube embeds).
+// Provide a 16:9 format video for Desktop and a 9:16 format vertical video for Mobile!
 // =========================================================================
-const BACKGROUND_VIDEO_URL = "https://cdn.coverr.co/videos/coverr-walking-through-a-neon-lit-street-in-japan-2514/1080p.mp4"
+const BACKGROUND_VIDEO_DESKTOP = "https://cdn.coverr.co/videos/coverr-walking-through-a-neon-lit-street-in-japan-2514/1080p.mp4"
+const BACKGROUND_VIDEO_MOBILE = "https://cdn.coverr.co/videos/coverr-a-rainy-night-in-japan-2518/1080p.mp4"
 
 const FEATURES = [
   { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 20l-5-3V4l5 3 5-3 5 3v13l-5-3-5 3z" /><path d="M9 4v13" /><path d="M14 7v13" /></svg>, title: 'Interactive Route Map', desc: 'Seamlessly navigate through Ibaraki, Kyoto, and Tokyo. Live updates and curated points of interest.' },
@@ -92,14 +94,23 @@ export default function LandingPage() {
         {/* Animated Cinematic Background for ENTIRE PAGE */}
         <div className="fixed inset-0 z-0 bg-black pointer-events-none">
           <motion.div style={{ opacity }} className="absolute inset-0">
-            {/* Native HTML5 Video Background - Works on Mobile and Desktop! */}
+            {/* Desktop HTML5 Video Background (16:9) */}
             <video
-              src={BACKGROUND_VIDEO_URL}
+              src={BACKGROUND_VIDEO_DESKTOP}
               autoPlay
               loop
               muted
               playsInline
-              className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none mix-blend-screen"
+              className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none mix-blend-screen hidden md:block"
+            />
+            {/* Mobile HTML5 Video Background (9:16) */}
+            <video
+              src={BACKGROUND_VIDEO_MOBILE}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none mix-blend-screen block md:hidden"
             />
           </motion.div>
           {/* Global Dark moody gradient overlay for text readability */}
