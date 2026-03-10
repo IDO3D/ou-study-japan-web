@@ -5,9 +5,10 @@ import useStore from '../../utils/store'
 
 const THEMES = [
     { id: 'dark', label: 'Dark', icon: '🌑', desc: 'Default dark mode' },
+    { id: 'light', label: 'Light', icon: '☀️', desc: 'Clean Washi Paper' },
     { id: 'japan', label: 'Japan', icon: '🌸', desc: 'Sakura pink & indigo' },
     { id: 'ou', label: 'OU', icon: '⭕', desc: 'OU Crimson official' },
-    { id: 'business', label: 'Business', icon: '💼', desc: 'Slate blue professional' },
+    { id: 'business', label: 'Business', icon: '💼', desc: 'Slate blue' },
 ]
 
 export default function ThemeSwitcher({ onClose }) {

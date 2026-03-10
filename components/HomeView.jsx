@@ -92,7 +92,7 @@ export default function HomeView({ onNavigate }) {
               </div>
             </div>
             <div className="mb-1">
-              <span className="font-display font-black text-white" style={{ fontSize: '3rem', letterSpacing: '-0.04em' }}>
+              <span className="font-display font-black style={{ color: "var(--text)" }}" style={{ fontSize: '3rem', letterSpacing: '-0.04em' }}>
                 {formatJpy(remaining)}
               </span>
             </div>
@@ -128,7 +128,7 @@ export default function HomeView({ onNavigate }) {
       {restaurants.length > 0 && (
         <motion.div variants={stagger.item}>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-display font-bold text-white" style={{ fontSize: '15px' }}>Nearby Eats</h3>
+            <h3 className="font-display font-bold style={{ color: "var(--text)" }}" style={{ fontSize: '15px' }}>Nearby Eats</h3>
             <button onClick={() => onNavigate('discover')}
               className="font-display font-bold flex items-center gap-1" style={{ fontSize: '11px', color: '#E02424' }}>
               See all <IcArrow dir="right" size={11} color="#E02424" strokeWidth={2.5} />
@@ -144,7 +144,7 @@ export default function HomeView({ onNavigate }) {
                     onError={e => { e.target.src = FALLBACK_IMAGES.default }} />
                   <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75), transparent 55%)' }} />
                   <div className="absolute bottom-2 left-2">
-                    <span className="font-display font-black text-white" style={{ fontSize: '11px' }}>{formatJpy(r.price_jpy)}</span>
+                    <span className="font-display font-black style={{ color: "var(--text)" }}" style={{ fontSize: '11px' }}>{formatJpy(r.price_jpy)}</span>
                   </div>
                   {r.is_halal && (
                     <div className="absolute top-2 right-2">
@@ -153,7 +153,7 @@ export default function HomeView({ onNavigate }) {
                   )}
                 </div>
                 <div className="p-2.5" style={{ background: 'rgba(18,18,20,0.97)' }}>
-                  <h4 className="font-display font-bold text-white truncate" style={{ fontSize: '11px' }}>{r.name}</h4>
+                  <h4 className="font-display font-bold style={{ color: "var(--text)" }} truncate" style={{ fontSize: '11px' }}>{r.name}</h4>
                   <p className="mt-0.5 truncate" style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.38)' }}>{r.category}</p>
                 </div>
               </button>
@@ -166,7 +166,7 @@ export default function HomeView({ onNavigate }) {
       {featuredQuest && (
         <motion.div variants={stagger.item}>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-display font-bold text-white" style={{ fontSize: '15px' }}>Featured Quest</h3>
+            <h3 className="font-display font-bold style={{ color: "var(--text)" }}" style={{ fontSize: '15px' }}>Featured Quest</h3>
             <button onClick={() => onNavigate('quests')}
               className="font-display font-bold flex items-center gap-1" style={{ fontSize: '11px', color: '#E02424' }}>
               View all <IcArrow dir="right" size={11} color="#E02424" strokeWidth={2.5} />
@@ -184,7 +184,7 @@ export default function HomeView({ onNavigate }) {
                 </span>
                 <span className="badge badge-sakura" style={{ fontSize: '9px' }}>{featuredQuest.category}</span>
               </div>
-              <h4 className="font-display font-bold text-white leading-tight" style={{ fontSize: '18px' }}>{featuredQuest.title}</h4>
+              <h4 className="font-display font-bold style={{ color: "var(--text)" }} leading-tight" style={{ fontSize: '18px' }}>{featuredQuest.title}</h4>
               {featuredQuest.title_jp && (
                 <p className="font-jp mt-1" style={{ fontSize: '11px', color: 'rgba(255,255,255,0.55)' }}>{featuredQuest.title_jp}</p>
               )}
@@ -201,7 +201,7 @@ export default function HomeView({ onNavigate }) {
             <IcMoney size={18} color="#86efac" />
             <div>
               <p className="font-display font-bold uppercase tracking-widest" style={{ fontSize: '9px', color: 'rgba(255,255,255,0.32)' }}>Live Rate</p>
-              <p className="font-mono font-bold text-white" style={{ fontSize: '14px' }}>¥1,000 = ${(1000 * exchangeRate).toFixed(2)}</p>
+              <p className="font-mono font-bold style={{ color: "var(--text)" }}" style={{ fontSize: '14px' }}>¥1,000 = ${(1000 * exchangeRate).toFixed(2)}</p>
             </div>
           </div>
           <div className="px-3 py-1.5 rounded-xl font-display font-bold"
