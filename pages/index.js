@@ -6,12 +6,9 @@ import { useRef, useState, useEffect } from 'react'
 
 // =========================================================================
 // TO EDIT THE BACKGROUND VIDEO:
-// Simply paste the direct URL to any .mp4 file. HTML5 <video> tags ensure
-// seamless autoplay on both Desktop and Mobile (unlike YouTube embeds).
-// Provide a 16:9 format video for Desktop and a 9:16 format vertical video for Mobile!
+// Simply upload an unlisted or public 4K video to YouTube and paste its ID below.
 // =========================================================================
-const BACKGROUND_VIDEO_DESKTOP = "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
-const BACKGROUND_VIDEO_MOBILE = "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+const YOUTUBE_BACKGROUND_ID = "F3zks8sLzYI"
 
 const FEATURES = [
   { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 20l-5-3V4l5 3 5-3 5 3v13l-5-3-5 3z" /><path d="M9 4v13" /><path d="M14 7v13" /></svg>, title: 'Interactive Route Map', desc: 'Seamlessly navigate through Ibaraki, Kyoto, and Tokyo. Live updates and curated points of interest.' },
@@ -27,15 +24,27 @@ export default function LandingPage() {
   const [videoExpanded, setVideoExpanded] = useState(false)
   const heroRef = useRef(null)
 
-  // Exit immersive video when user scrolls
+  // Exit immersive video when user scrolls or gestures
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 50 && videoExpanded) {
-        setVideoExpanded(false)
-      }
+    const handleExit = () => {
+      if (videoExpanded) setVideoExpanded(false)
     }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    if (videoExpanded) {
+      window.addEventListener('wheel', handleExit, { passive: true })
+      window.addEventListener('touchmove', handleExit, { passive: true })
+      window.addEventListener('keydown', handleExit, { passive: true })
+      window.addEventListener('scroll', handleExit, { passive: true })
+
+      // Allow clicking anywhere to also exit, delayed so the play button doesn't trigger it
+      setTimeout(() => window.addEventListener('click', handleExit, { passive: true }), 100)
+    }
+    return () => {
+      window.removeEventListener('wheel', handleExit)
+      window.removeEventListener('touchmove', handleExit)
+      window.removeEventListener('keydown', handleExit)
+      window.removeEventListener('scroll', handleExit)
+      window.removeEventListener('click', handleExit)
+    }
   }, [videoExpanded])
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -110,24 +119,14 @@ export default function LandingPage() {
             className="absolute inset-0 transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]"
             animate={{ scale: videoExpanded ? 1.05 : 1 }}
           >
-            {/* Desktop HTML5 Video Background (16:9) */}
-            <video
-              src={BACKGROUND_VIDEO_DESKTOP}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className={`absolute inset-0 w-full h-full object-cover pointer-events-none mix-blend-screen hidden md:block transition-opacity duration-1000 ${videoExpanded ? 'opacity-100 mix-blend-normal' : 'opacity-30'}`}
-            />
-            {/* Mobile HTML5 Video Background (9:16) */}
-            <video
-              src={BACKGROUND_VIDEO_MOBILE}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className={`absolute inset-0 w-full h-full object-cover pointer-events-none mix-blend-screen block md:hidden transition-opacity duration-1000 ${videoExpanded ? 'opacity-100 mix-blend-normal' : 'opacity-30'}`}
-            />
+            {/* YouTube Embed Background - Resized massively to simulate "object-cover" crop on mobile/desktop */}
+            <div className={`absolute w-[400vw] h-[400vh] -top-[150vh] -left-[150vw] sm:w-[150vw] sm:h-[150vh] sm:-top-[25vh] sm:-left-[25vw] pointer-events-none transition-opacity duration-1000 ${videoExpanded ? 'opacity-100 mix-blend-normal' : 'opacity-40 mix-blend-screen'}`}>
+              <iframe
+                src={`https://www.youtube.com/embed/${YOUTUBE_BACKGROUND_ID}?autoplay=1&mute=1&controls=0&loop=1&playlist=${YOUTUBE_BACKGROUND_ID}&playsinline=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1`}
+                allow="autoplay; fullscreen; picture-in-picture"
+                className="w-full h-full object-cover scale-110 pointer-events-none"
+              />
+            </div>
           </motion.div>
           {/* Global Dark moody gradient overlay for text readability */}
           <div className={`absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/95 transition-opacity duration-1000 pointer-events-none ${videoExpanded ? 'opacity-0' : 'opacity-100'}`}></div>
