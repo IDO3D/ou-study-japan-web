@@ -113,7 +113,7 @@
 /* Apply theme bg to html/body */
 html {
   background: var(--bg);
-  overflow-x: clip;
+  overflow-x: hidden;
 }
 
 body {
@@ -125,7 +125,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
   width: 100%;
-  overflow-x: clip;
+  overflow-x: hidden;
 }
 
 /* ============================================
