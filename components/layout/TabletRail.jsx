@@ -1,6 +1,6 @@
 // components/layout/TabletRail.jsx — Left icon rail for tablet (768–1023px)
 import { motion } from 'framer-motion'
-import { IcHome, IcCamera, IcMap, IcStar, IcBook, IcHotel, IcUser } from '../ui/Icons'
+import { IcHome, IcCamera, IcMap, IcStar, IcBook, IcHotel, IcUser, IcGlobe } from '../ui/Icons'
 import OULogo from '../ui/OULogo'
 import ThemeSwitcher from '../ui/ThemeSwitcher'
 import { useState } from 'react'
@@ -8,6 +8,7 @@ import { AnimatePresence } from 'framer-motion'
 
 const NAV = [
     { view: 'home', Icon: IcHome, label: 'Home' },
+    { view: 'community', Icon: IcGlobe, label: 'Feed' },
     { view: 'discover', Icon: IcCamera, label: 'Discover' },
     { view: 'camera', Icon: IcCamera, label: 'Translate' },
     { view: 'map', Icon: IcMap, label: 'Map' },

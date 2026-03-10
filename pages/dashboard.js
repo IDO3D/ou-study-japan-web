@@ -136,6 +136,7 @@ export default function Dashboard() {
 
     const VIEWS = {
         home: <HomeView onNavigate={setView} />,
+        community: <CommunityView />,
         discover: <DiscoverView onNavigateToMap={navigateInApp} />,
         camera: <CameraView />,
         map: <MapView />,

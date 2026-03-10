@@ -1,7 +1,7 @@
 // components/layout/DesktopSidebar.jsx — Full sidebar for desktop (1024px+)
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import { IcHome, IcCamera, IcMap, IcStar, IcBook, IcHotel, IcUser } from '../ui/Icons'
+import { IcHome, IcCamera, IcMap, IcStar, IcBook, IcHotel, IcUser, IcGlobe } from '../ui/Icons'
 import OULogo from '../ui/OULogo'
 import ThemeSwitcher from '../ui/ThemeSwitcher'
 import useStore from '../../utils/store'
@@ -11,6 +11,7 @@ const NAV_GROUPS = [
         label: 'Main',
         items: [
             { view: 'home', Icon: IcHome, label: 'Home', desc: 'Dashboard overview' },
+            { view: 'community', Icon: IcGlobe, label: 'Feed', desc: 'Community updates' },
             { view: 'discover', Icon: IcStar, label: 'Discover', desc: 'Food & dining' },
             { view: 'map', Icon: IcMap, label: 'Map', desc: 'Navigation & places' },
             { view: 'quests', Icon: IcStar, label: 'Quests', desc: 'Activities & points' },
