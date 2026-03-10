@@ -23,8 +23,18 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [videoExpanded, setVideoExpanded] = useState(false)
   const [isMuted, setIsMuted] = useState(true)
+  const [isScrolled, setIsScrolled] = useState(false)
   const heroRef = useRef(null)
   const iframeRef = useRef(null)
+
+  // Track scroll for sticky header
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const toggleMute = (e) => {
     if (e) e.stopPropagation()
@@ -99,7 +109,7 @@ export default function LandingPage() {
       <div className="bg-black min-h-screen text-white selection:bg-[#E02424] selection:text-white font-sans overflow-x-hidden">
 
         {/* JTRIP-Style Navigation */}
-        <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-8 py-6 sm:py-8 lg:px-16 w-full mix-blend-difference">
+        <nav className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-8 lg:px-16 w-full transition-all duration-500 max-w-[100vw] ${isScrolled ? 'bg-[#050505]/95 backdrop-blur-md border-b border-white/10 py-4 sm:py-5 shadow-2xl' : 'py-6 sm:py-8 mix-blend-difference'}`}>
           {/* Logo */}
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white flex items-center justify-center p-1 sm:p-1.5">

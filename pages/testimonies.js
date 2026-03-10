@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 const TESTIMONIES = [
     {
@@ -41,6 +41,15 @@ const TESTIMONIES = [
 
 export default function TestimoniesPage() {
     const containerRef = useRef(null)
+    const [isScrolled, setIsScrolled] = useState(false)
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 30)
+        }
+        window.addEventListener('scroll', handleScroll, { passive: true })
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
 
     return (
         <>
@@ -52,7 +61,7 @@ export default function TestimoniesPage() {
             <div className="bg-[#050505] min-h-screen text-white font-sans overflow-x-hidden selection:bg-[#E02424] selection:text-white" ref={containerRef}>
 
                 {/* Navigation - Identical to Landing */}
-                <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-8 py-6 sm:py-8 lg:px-16 w-full backdrop-blur-md bg-black/40 border-b border-white/5">
+                <nav className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-8 lg:px-16 w-full transition-all duration-500 max-w-[100vw] ${isScrolled ? 'bg-[#050505]/95 backdrop-blur-xl border-b border-white/10 py-4 sm:py-5 shadow-2xl' : 'backdrop-blur-md bg-black/30 border-b border-white/5 py-6 sm:py-8'}`}>
                     <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
                         <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white flex items-center justify-center p-1 sm:p-1.5 transition-transform group-hover:scale-105">
                             <div className="w-full h-full bg-[#E02424] rounded-full"></div>
