@@ -47,6 +47,10 @@ export default function Dashboard() {
                     .single()
 
                 if (profile) {
+                    if (profile.tutorial_completed === false) {
+                        router.push('/tutorial')
+                        return
+                    }
                     name = profile.name || name
                     university = profile.university || university
                     major = profile.major || major
