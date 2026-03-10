@@ -10,8 +10,8 @@ import { useRef, useState } from 'react'
 // seamless autoplay on both Desktop and Mobile (unlike YouTube embeds).
 // Provide a 16:9 format video for Desktop and a 9:16 format vertical video for Mobile!
 // =========================================================================
-const BACKGROUND_VIDEO_DESKTOP = "https://cdn.coverr.co/videos/coverr-walking-through-a-neon-lit-street-in-japan-2514/1080p.mp4"
-const BACKGROUND_VIDEO_MOBILE = "https://cdn.coverr.co/videos/coverr-a-rainy-night-in-japan-2518/1080p.mp4"
+const BACKGROUND_VIDEO_DESKTOP = "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+const BACKGROUND_VIDEO_MOBILE = "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
 
 const FEATURES = [
   { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 20l-5-3V4l5 3 5-3 5 3v13l-5-3-5 3z" /><path d="M9 4v13" /><path d="M14 7v13" /></svg>, title: 'Interactive Route Map', desc: 'Seamlessly navigate through Ibaraki, Kyoto, and Tokyo. Live updates and curated points of interest.' },
