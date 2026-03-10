@@ -8,7 +8,7 @@ import { useRef, useState, useEffect } from 'react'
 // TO EDIT THE BACKGROUND VIDEO:
 // Simply upload an unlisted or public 4K video to YouTube and paste its ID below.
 // =========================================================================
-const YOUTUBE_BACKGROUND_ID = "F3zks8sLzYI"
+const YOUTUBE_BACKGROUND_ID = "aNC3UOYOejI"
 
 const FEATURES = [
   { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 20l-5-3V4l5 3 5-3 5 3v13l-5-3-5 3z" /><path d="M9 4v13" /><path d="M14 7v13" /></svg>, title: 'Interactive Route Map', desc: 'Seamlessly navigate through Ibaraki, Kyoto, and Tokyo. Live updates and curated points of interest.' },
@@ -22,30 +22,65 @@ const FEATURES = [
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [videoExpanded, setVideoExpanded] = useState(false)
+  const [isMuted, setIsMuted] = useState(true)
   const heroRef = useRef(null)
+  const iframeRef = useRef(null)
 
-  // Exit immersive video when user scrolls or gestures
-  useEffect(() => {
-    const handleExit = () => {
-      if (videoExpanded) setVideoExpanded(false)
+  const toggleMute = (e) => {
+    if (e) e.stopPropagation()
+    const iframe = iframeRef.current
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage(JSON.stringify({
+        event: 'command',
+        func: isMuted ? 'unMute' : 'mute',
+        args: []
+      }), '*')
+      setIsMuted(!isMuted)
     }
-    if (videoExpanded) {
-      window.addEventListener('wheel', handleExit, { passive: true })
-      window.addEventListener('touchmove', handleExit, { passive: true })
-      window.addEventListener('keydown', handleExit, { passive: true })
-      window.addEventListener('scroll', handleExit, { passive: true })
+  }
 
-      // Allow clicking anywhere to also exit, delayed so the play button doesn't trigger it
-      setTimeout(() => window.addEventListener('click', handleExit, { passive: true }), 100)
+  // Graceful exit handler supporting wheel thresholds and swipe logic
+  useEffect(() => {
+    let touchStartY = 0
+    let accumulatedDelta = 0
+
+    const exitVideo = () => {
+      setVideoExpanded(false)
+      if (!isMuted) toggleMute() // auto-mute when returning to background
+    }
+
+    const handleWheel = (e) => {
+      accumulatedDelta += Math.abs(e.deltaY)
+      if (accumulatedDelta > 60 && videoExpanded) exitVideo()
+    }
+
+    const handleTouchStart = (e) => {
+      touchStartY = e.touches[0].clientY
+    }
+
+    const handleTouchMove = (e) => {
+      const touchY = e.touches[0].clientY
+      if (Math.abs(touchStartY - touchY) > 60 && videoExpanded) exitVideo()
+    }
+
+    const handleKey = (e) => {
+      if (e.key === 'Escape' && videoExpanded) exitVideo()
+    }
+
+    if (videoExpanded) {
+      accumulatedDelta = 0 // reset on entry
+      window.addEventListener('wheel', handleWheel, { passive: true })
+      window.addEventListener('touchstart', handleTouchStart, { passive: true })
+      window.addEventListener('touchmove', handleTouchMove, { passive: true })
+      window.addEventListener('keydown', handleKey, { passive: true })
     }
     return () => {
-      window.removeEventListener('wheel', handleExit)
-      window.removeEventListener('touchmove', handleExit)
-      window.removeEventListener('keydown', handleExit)
-      window.removeEventListener('scroll', handleExit)
-      window.removeEventListener('click', handleExit)
+      window.removeEventListener('wheel', handleWheel)
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('keydown', handleKey)
     }
-  }, [videoExpanded])
+  }, [videoExpanded, isMuted])
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"]
@@ -122,7 +157,8 @@ export default function LandingPage() {
             {/* YouTube Embed Background - Resized massively to simulate "object-cover" crop on mobile/desktop */}
             <div className={`absolute w-[400vw] h-[400vh] -top-[150vh] -left-[150vw] sm:w-[150vw] sm:h-[150vh] sm:-top-[25vh] sm:-left-[25vw] pointer-events-none transition-opacity duration-1000 ${videoExpanded ? 'opacity-100 mix-blend-normal' : 'opacity-40 mix-blend-screen'}`}>
               <iframe
-                src={`https://www.youtube.com/embed/${YOUTUBE_BACKGROUND_ID}?autoplay=1&mute=1&controls=0&loop=1&playlist=${YOUTUBE_BACKGROUND_ID}&playsinline=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1`}
+                ref={iframeRef}
+                src={`https://www.youtube.com/embed/${YOUTUBE_BACKGROUND_ID}?autoplay=1&mute=1&controls=0&loop=1&playlist=${YOUTUBE_BACKGROUND_ID}&playsinline=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&enablejsapi=1`}
                 allow="autoplay; fullscreen; picture-in-picture"
                 className="w-full h-full object-cover scale-110 pointer-events-none"
               />
@@ -131,9 +167,23 @@ export default function LandingPage() {
           {/* Global Dark moody gradient overlay for text readability */}
           <div className={`absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/95 transition-opacity duration-1000 pointer-events-none ${videoExpanded ? 'opacity-0' : 'opacity-100'}`}></div>
 
-          {/* Close Video Hint */}
-          <div className={`absolute bottom-10 left-0 right-0 text-center transition-all duration-1000 pointer-events-none ${videoExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <p className="text-white/70 font-display text-xs tracking-[0.3em] uppercase animate-pulse">Scroll to exit</p>
+          {/* Mute Button and Close Video Hint */}
+          <div className={`absolute bottom-10 left-0 right-0 flex flex-col items-center gap-6 transition-all duration-1000 ${videoExpanded ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
+
+            <button
+              onClick={toggleMute}
+              className="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center text-white bg-black/50 backdrop-blur-md hover:bg-white hover:text-black transition-all shadow-xl"
+            >
+              {isMuted ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+              )}
+            </button>
+
+            <p className="text-white/70 font-display text-xs tracking-[0.3em] uppercase animate-pulse shrink-0">
+              Scroll to exit
+            </p>
           </div>
         </div>
 
