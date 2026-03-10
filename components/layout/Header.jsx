@@ -41,14 +41,18 @@ export default function Header({ currentView, onNavigate }) {
       >
         {isHome ? (
           <>
-            <OULogo size={30} variant="mark" />
-            <div>
-              <p className="font-display font-black leading-none" style={{ fontSize: '1.1rem', letterSpacing: '-0.03em', color: 'var(--text)' }}>
-                OU <span style={{ color: 'var(--brand)' }}>Japan</span>
-              </p>
-              <p className="font-display font-semibold" style={{ fontSize: '9px', letterSpacing: '0.08em', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                Study Abroad Program
-              </p>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center p-1.5 shadow-sm border border-gray-100" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+                <div className="w-full h-full bg-[#E02424] rounded-full"></div>
+              </div>
+              <div>
+                <span className="font-display font-black text-[12px] uppercase tracking-[0.15em]" style={{ color: 'var(--text)' }}>
+                  OUStudyJapan.
+                </span>
+                <p className="font-display font-medium leading-none" style={{ fontSize: '9px', letterSpacing: '0.08em', color: 'var(--text-muted)' }}>
+                  JAPAN PROGRAM 2026
+                </p>
+              </div>
             </div>
           </>
         ) : (

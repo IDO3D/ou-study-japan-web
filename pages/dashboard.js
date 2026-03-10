@@ -11,6 +11,7 @@ import QuestsView from '../components/QuestsView'
 import ProfileView from '../components/ProfileView'
 import CanvasView from '../components/CanvasView'
 import HousingView from '../components/HousingView'
+import LoadingScreen from '../components/LoadingScreen'
 import useStore from '../utils/store'
 import { getCurrentPosition } from '../utils/helpers'
 import { supabase } from '../utils/supabase'
@@ -19,6 +20,7 @@ import toast from 'react-hot-toast'
 export default function Dashboard() {
     const router = useRouter()
     const [view, setView] = useState('home')
+    const [isTransitioning, setIsTransitioning] = useState(false)
     const [authReady, setAuthReady] = useState(false)
     const { setRestaurants, setQuests, setExchangeRate, setUserLocation, setUser, setNavDestination } = useStore()
 
@@ -139,7 +141,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex flex-col items-center gap-2">
                     <div className="w-10 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                        <div className="h-full rounded-full animate-pulse" style={{ width: '60%', background: '#841617' }} />
+                        <div className="h-full rounded-full animate-pulse" style={{ width: '60%', background: '#E02424' }} />
                     </div>
                     <p className="text-xs font-display font-bold" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
                         LOADING
@@ -162,9 +164,21 @@ export default function Dashboard() {
             </Head>
 
             <div style={{ minHeight: '100svh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <AppShell currentView={view} onNavigate={setView}>
+                <AppShell
+                    currentView={view}
+                    onNavigate={(v) => {
+                        if (v !== view) {
+                            setIsTransitioning(true)
+                            setView(v)
+                        }
+                    }}
+                >
                     {VIEWS[view] || VIEWS.home}
                 </AppShell>
+
+                {isTransitioning && (
+                    <LoadingScreen onComplete={() => setIsTransitioning(false)} />
+                )}
             </div>
         </>
     )

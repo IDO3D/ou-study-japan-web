@@ -123,9 +123,9 @@ const RESTAURANTS = [
 
 function RestaurantCard({ r, onSelect, selected, onNavigateToMap }) {
   return (
-    <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer transition-transform hover:scale-[1.02]" onClick={() => onSelect(selected ? null : r)} style={{ background: 'var(--surface)' }}>
+    <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer transition-transform hover:scale-[1.02] relative" onClick={() => onSelect(selected ? null : r)} style={{ background: 'var(--surface)' }}>
       {/* Image */}
-      <div className="relative h-44 w-full">
+      <div className="relative aspect-[4/3] w-full">
         <img src={r.image} alt={r.name} className="w-full h-full object-cover" />
         <div className="absolute top-3 left-3 flex gap-1.5 flex-wrap">
           {r.halal && <span className="px-2 py-1 rounded-full text-[10px] font-display font-bold bg-green-500 text-white shadow-md">☪️ HALAL</span>}
@@ -161,8 +161,19 @@ function RestaurantCard({ r, onSelect, selected, onNavigateToMap }) {
 
       <AnimatePresence>
         {selected && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="border-t border-gray-100" style={{ borderColor: 'var(--border)' }}>
-            <div className="p-4 space-y-4">
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="border-t border-gray-100 relative" style={{ borderColor: 'var(--border)' }}>
+
+            <div className="absolute top-4 right-4 z-10">
+              <button
+                onClick={(e) => { e.stopPropagation(); onSelect(null); }}
+                className="w-8 h-8 rounded-full flex items-center justify-center bg-black/10 hover:bg-black/20 text-gray-500"
+                style={{ background: 'var(--surface2)', color: 'var(--text-muted)' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-4 space-y-4 pt-10">
               <p className="text-sm text-gray-600 leading-relaxed font-body m-0" style={{ color: 'var(--text-muted)' }}>{r.description}</p>
 
               {/* Menu Section */}
@@ -187,21 +198,21 @@ function RestaurantCard({ r, onSelect, selected, onNavigateToMap }) {
                 </div>
               </div>
 
-              {/* Actions */}
-              <div className="flex gap-2 mt-2">
+              <div className="flex gap-2 mt-5 mb-2">
                 <button
                   onClick={(e) => { e.stopPropagation(); onNavigateToMap({ name: r.name, lat: r.lat, lng: r.lng, icon: r.category === 'convenience' ? '🏪' : '🍽️' }) }}
-                  className="flex-1 py-3 px-4 rounded-xl font-display font-bold text-sm text-white text-center bg-brand shadow-sm active:scale-95 transition-transform"
+                  className="flex-[2] py-3.5 px-4 rounded-xl font-display font-bold text-[13px] text-white text-center shadow-lg active:scale-95 transition-transform"
+                  style={{ background: 'var(--brand)' }}
                 >
-                  📍 Route me
+                  📍 Route Me
                 </button>
                 {r.menuUrl && (
                   <button
                     onClick={(e) => { e.stopPropagation(); window.open(r.menuUrl, '_blank') }}
-                    className="flex-1 py-3 px-4 rounded-xl font-display font-bold text-sm text-gray-700 text-center bg-gray-100 border border-gray-200 active:scale-95 transition-transform"
-                    style={{ background: 'var(--surface2)', color: 'var(--text)', borderColor: 'var(--border)' }}
+                    className="flex-[1] py-3.5 px-4 rounded-xl font-display font-bold text-[13px] text-center border active:scale-95 transition-transform"
+                    style={{ background: 'var(--surface)', color: 'var(--text)', borderColor: 'var(--border)' }}
                   >
-                    📋 Full Menu
+                    📋 Menu
                   </button>
                 )}
               </div>

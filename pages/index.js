@@ -6,10 +6,10 @@ import { useRef } from 'react'
 
 // =========================================================================
 // TO EDIT THE BACKGROUND VIDEO:
-// Simply upload an unlisted or public 4K video to YouTube and paste its ID below.
-// Example: URL is https://youtube.com/watch?v=dQw4w9WgXcQ -> ID is "dQw4w9WgXcQ"
+// Simply paste the direct URL to any .mp4 file. HTML5 <video> tags ensure
+// seamless autoplay on both Desktop and Mobile (unlike YouTube embeds).
 // =========================================================================
-const YOUTUBE_BACKGROUND_ID = "xXiSN8Tftjg"
+const BACKGROUND_VIDEO_URL = "https://cdn.coverr.co/videos/coverr-walking-through-a-neon-lit-street-in-japan-2514/1080p.mp4"
 
 const FEATURES = [
   { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 20l-5-3V4l5 3 5-3 5 3v13l-5-3-5 3z" /><path d="M9 4v13" /><path d="M14 7v13" /></svg>, title: 'Interactive Route Map', desc: 'Seamlessly navigate through Ibaraki, Kyoto, and Tokyo. Live updates and curated points of interest.' },
@@ -21,6 +21,7 @@ const FEATURES = [
 ]
 
 export default function LandingPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const heroRef = useRef(null)
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -57,31 +58,49 @@ export default function LandingPage() {
             <Link href="#food" className="hover:text-white transition-colors">Food</Link>
           </div>
 
-          {/* Right Action */}
+          {/* Right Action & Mobile Toggle */}
           <div className="flex items-center gap-4 sm:gap-8">
             <Link href="/login" className="hidden sm:block text-[10px] font-bold text-white tracking-[0.2em] uppercase hover:text-white/70 transition-colors">
               Sign In
             </Link>
-            <Link href="/sign-up" className="text-white hover:text-white/70 transition-colors">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <Link href="/sign-up" className="text-white hover:text-white/70 transition-colors hidden sm:block">
+              <div className="border border-white/30 px-6 py-2.5 rounded-full text-[10px] tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-colors backdrop-blur-sm">
+                Apply Now
+              </div>
             </Link>
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="block md:hidden text-white p-2">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d={mobileMenuOpen ? "M18 6L6 18M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} /></svg>
+            </button>
           </div>
         </nav>
+
+        {/* Mobile Menu Overlay */}
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-40 bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center gap-8 md:hidden text-lg font-display uppercase tracking-widest text-white/80">
+            <Link href="#features" onClick={() => setMobileMenuOpen(false)} className="hover:text-white active:scale-95 transition-all">Features</Link>
+            <Link href="#wallet" onClick={() => setMobileMenuOpen(false)} className="hover:text-white active:scale-95 transition-all">Wallet</Link>
+            <Link href="#safety" onClick={() => setMobileMenuOpen(false)} className="hover:text-white active:scale-95 transition-all">Safety & Travel</Link>
+            <Link href="#food" onClick={() => setMobileMenuOpen(false)} className="hover:text-white active:scale-95 transition-all">Food</Link>
+            <div className="w-12 h-px bg-white/20 my-4" />
+            <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="hover:text-white active:scale-95 transition-all text-sm">Sign In</Link>
+            <Link href="/sign-up" onClick={() => setMobileMenuOpen(false)} className="px-8 py-3 bg-white text-black font-bold text-sm rounded-full active:scale-95 transition-all">
+              Apply Now
+            </Link>
+          </div>
+        )}
 
         {/* Animated Cinematic Background for ENTIRE PAGE */}
         <div className="fixed inset-0 z-0 bg-black pointer-events-none">
           <motion.div style={{ opacity }} className="absolute inset-0">
-            {/* Mobile Fallback Image / Poster */}
-            <img src="https://images.unsplash.com/photo-1542051842920-84a48ed9c4d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" className="absolute inset-0 w-full h-full object-cover opacity-20 block md:hidden scale-105" />
-
-            {/* YouTube Embed Background */}
-            <div className="hidden md:block absolute inset-0 w-[400vw] h-[400vh] -top-[150vh] -left-[150vw] sm:w-[150vw] sm:h-[150vh] sm:-top-[25vh] sm:-left-[25vw]">
-              <iframe
-                src={`https://www.youtube.com/embed/${YOUTUBE_BACKGROUND_ID}?autoplay=1&mute=1&controls=0&loop=1&playlist=${YOUTUBE_BACKGROUND_ID}&playsinline=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1`}
-                allow="autoplay; fullscreen; picture-in-picture"
-                className="w-full h-full object-cover opacity-30 pointer-events-none mix-blend-screen scale-110"
-              />
-            </div>
+            {/* Native HTML5 Video Background - Works on Mobile and Desktop! */}
+            <video
+              src={BACKGROUND_VIDEO_URL}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none mix-blend-screen"
+            />
           </motion.div>
           {/* Global Dark moody gradient overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/95"></div>
