@@ -1,12 +1,10 @@
-// pages/index.js — Cinematic Landing Page (Restored & Fixed)
+// pages/index.js — Cinematic Landing Page (Requested Version Restoration)
 import Head from 'next/head'
 import Link from 'next/link'
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '../utils/supabase'
-
-const YOUTUBE_BACKGROUND_ID = "F3zks8sLzYI" // Specific YouTube ID from the requested version
 
 const FEATURES = [
   { icon: '🗾', title: 'Interactive Route Map', desc: 'Seamlessly navigate through Ibaraki, Kyoto, and Tokyo. Live updates and curated points of interest.' },
@@ -23,7 +21,8 @@ export default function LandingPage() {
   const heroRef = useRef(null)
 
   useEffect(() => {
-    // Auth check: if logged in, skip landing page
+    // Auth logic: Keep user on landing page if they JUST signed out, 
+    // but redirect to dashboard if they have a valid persistent session.
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
@@ -34,7 +33,6 @@ export default function LandingPage() {
     }
     checkAuth()
 
-    // Listen for auth changes to handle external sign-outs
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         router.push('/dashboard')
@@ -66,7 +64,7 @@ export default function LandingPage() {
     <>
       <Head>
         <title>OUStudyJapan — Cinematic Experience</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </Head>
 
       <div className="bg-black min-h-screen text-white selection:bg-[#E02424] selection:text-white font-sans overflow-x-hidden">
@@ -83,10 +81,10 @@ export default function LandingPage() {
 
           {/* Center Links (Desktop only) */}
           <div className="hidden md:flex items-center gap-12 font-medium text-[10px] uppercase tracking-[0.2em] text-white/70">
-            <a href="#features" className="hover:text-white transition-colors">Features</a>
-            <a href="#wallet" className="hover:text-white transition-colors">Wallet</a>
-            <a href="#safety" className="hover:text-white transition-colors">Safety</a>
-            <a href="#food" className="hover:text-white transition-colors">Food</a>
+            <Link href="#features" className="hover:text-white transition-colors">Features</Link>
+            <Link href="#wallet" className="hover:text-white transition-colors">Wallet</Link>
+            <Link href="#safety" className="hover:text-white transition-colors">Safety</Link>
+            <Link href="#food" className="hover:text-white transition-colors">Food</Link>
           </div>
 
           {/* Right Action */}
@@ -107,7 +105,7 @@ export default function LandingPage() {
             <img src="https://images.unsplash.com/photo-1542051842920-84a48ed9c4d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" className="absolute inset-0 w-full h-full object-cover opacity-60 block md:hidden scale-105" />
             <div className="hidden md:block absolute inset-0 w-[400vw] h-[400vh] -top-[150vh] -left-[150vw] sm:w-[150vw] sm:h-[150vh] sm:-top-[25vh] sm:-left-[25vw]">
               <iframe
-                src={`https://www.youtube.com/embed/${YOUTUBE_BACKGROUND_ID}?autoplay=1&mute=1&controls=0&loop=1&playlist=${YOUTUBE_BACKGROUND_ID}&playsinline=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1`}
+                src="https://www.youtube.com/embed/F3zks8sLzYI?autoplay=1&mute=1&controls=0&loop=1&playlist=F3zks8sLzYI&playsinline=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1"
                 allow="autoplay; fullscreen; picture-in-picture"
                 className="w-full h-full object-cover opacity-50 pointer-events-none mix-blend-screen scale-110"
               />

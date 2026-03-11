@@ -102,6 +102,14 @@ body {
   background-clip: text;
 }
 
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.text-shadow-xl {
+  text-shadow: 0 10px 40px rgba(0,0,0,0.8);
+}
+
 /* ============================================
    LANDING HERO
    ============================================ */
