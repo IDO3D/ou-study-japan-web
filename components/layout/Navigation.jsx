@@ -1,17 +1,18 @@
 // components/layout/Navigation.jsx — v5 Theme-aware navigation
 import { motion } from 'framer-motion'
-import { IcHome, IcCamera, IcMap, IcStar, IcBook, IcHotel, IcUser } from '../ui/Icons'
+import { IcHome, IcCamera, IcMap, IcStar, IcBook, IcHotel, IcUser, IcGlobe } from '../ui/Icons'
 import useStore from '../../utils/store'
 import { getTheme } from '../../utils/themes'
 
 const NAV_ITEMS = [
-  { view: 'home',    Icon: IcHome,   label: 'Home'    },
-  { view: 'camera',  Icon: IcCamera, label: 'Scan'    },
-  { view: 'map',     Icon: IcMap,    label: 'Map'     },
-  { view: 'quests',  Icon: IcStar,   label: 'Quests'  },
-  { view: 'canvas',  Icon: IcBook,   label: 'Canvas'  },
-  { view: 'housing', Icon: IcHotel,  label: 'Stay'    },
-  { view: 'profile', Icon: IcUser,   label: 'Profile' },
+  { view: 'home', Icon: IcHome, label: 'Home' },
+  { view: 'community', Icon: IcGlobe, label: 'Feed' },
+  { view: 'camera', Icon: IcCamera, label: 'Scan' },
+  { view: 'map', Icon: IcMap, label: 'Map' },
+  { view: 'quests', Icon: IcStar, label: 'Quests' },
+  { view: 'canvas', Icon: IcBook, label: 'Canvas' },
+  { view: 'housing', Icon: IcHotel, label: 'Stay' },
+  { view: 'profile', Icon: IcUser, label: 'Profile' },
 ]
 
 export default function Navigation({ currentView, onNavigate }) {
