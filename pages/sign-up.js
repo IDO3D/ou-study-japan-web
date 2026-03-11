@@ -99,13 +99,11 @@ export default function SignUpPage() {
 
                     {/* Logo */}
                     <div className="text-center mb-8 relative z-10">
-                        <Link href="/">
-                            <div className="flex items-center justify-center gap-2 sm:gap-3 mb-6 mx-auto w-max cursor-pointer">
-                                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white flex items-center justify-center p-1 font-bold">
-                                    <div className="w-full h-full bg-[#E02424] rounded-full"></div>
-                                </div>
-                                <span className="font-display font-black text-white tracking-[0.1em] text-[9px] uppercase">OUStudyJapan.</span>
+                        <Link href="/" className="flex items-center justify-center gap-2 sm:gap-3 mb-6 mx-auto w-max cursor-pointer">
+                            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white flex items-center justify-center p-1 font-bold">
+                                <div className="w-full h-full bg-[#E02424] rounded-full"></div>
                             </div>
+                            <span className="font-display font-black text-white tracking-[0.1em] text-[9px] uppercase">OUStudyJapan.</span>
                         </Link>
                         <h1 className="text-3xl font-display font-medium text-white tracking-tight mb-2">
                             {step === 1 ? 'Create account.' : 'Academic info.'}

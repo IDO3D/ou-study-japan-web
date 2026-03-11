@@ -1,5 +1,6 @@
 // pages/_app.js
 import '../styles/globals.css'
+import 'mapbox-gl/dist/mapbox-gl.css'
 import { Toaster } from 'react-hot-toast'
 
 export default function App({ Component, pageProps }) {

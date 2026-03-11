@@ -73,10 +73,8 @@ export default function TestimoniesPage() {
                         <Link href="/" className="text-[10px] font-bold text-white tracking-[0.2em] uppercase hover:text-white/70 transition-colors">
                             <span className="hidden sm:inline">Back to </span>Home
                         </Link>
-                        <Link href="/sign-up" className="text-white hover:text-white/70 transition-colors">
-                            <div className="border border-[#E02424]/50 bg-[#E02424]/10 px-6 py-2.5 rounded-full text-[10px] tracking-[0.2em] uppercase hover:bg-[#E02424] hover:text-white transition-colors backdrop-blur-sm">
-                                Apply Now
-                            </div>
+                        <Link href="/sign-up" className="border border-[#E02424]/50 bg-[#E02424]/10 px-6 py-2.5 rounded-full text-[10px] tracking-[0.2em] uppercase hover:bg-[#E02424] hover:text-white transition-colors backdrop-blur-sm">
+                            Apply Now
                         </Link>
                     </div>
                 </nav>

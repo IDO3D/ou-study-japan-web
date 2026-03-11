@@ -11,13 +11,12 @@ export default function AppShell({ children, currentView, onNavigate }) {
   return (
     <div
       id="app-shell"
-      className="relative flex flex-col"
+      className="relative flex flex-col mx-auto overflow-hidden"
       style={{
-        width: '100%',
-        maxWidth: '430px',
-        height: '100dvh',
-        overflow: 'hidden',
         background: t.bgGradient,
+        height: '100svh',
+        width: '100%',
+        maxWidth: '500px',
       }}
     >
       <Header currentView={currentView} onNavigate={onNavigate} />

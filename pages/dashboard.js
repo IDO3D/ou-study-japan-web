@@ -22,7 +22,7 @@ export default function Dashboard() {
     const router = useRouter()
     const [view, setView] = useState('home')
     const [authReady, setAuthReady] = useState(false)
-    const { setRestaurants, setQuests, setExchangeRate, setUserLocation, setUser, setNavDestination } = useStore()
+    const { setRestaurants, setQuests, setExchangeRate, setUserLocation, setUser, setNaviMode } = useStore()
 
     // Auth guard + load user profile
     useEffect(() => {
@@ -127,19 +127,24 @@ export default function Dashboard() {
     }
 
     const handleSignOut = async () => {
-        await supabase.auth.signOut()
+        const { error } = await supabase.auth.signOut()
+        if (error) {
+            toast.error('Error signing out')
+            console.error(error)
+        }
         toast.success('Signed out. Safe travels! 🎌')
-        router.push('/')
+        // Use hard redirect to ensure session is wiped from state
+        window.location.replace('/')
     }
 
     // Helper: set destination in store, then switch to map tab
     const navigateInApp = (dest) => {
-        setNavDestination(dest)
+        setNaviMode(true, dest)
         handleNav('map')
     }
 
     const VIEWS = {
-        home: <HomeView onNavigate={setView} />,
+        home: <HomeView onNavigate={handleNav} />,
         community: <CommunityView />,
         discover: <DiscoverView onNavigateToMap={navigateInApp} />,
         camera: <CameraView />,
@@ -148,7 +153,6 @@ export default function Dashboard() {
         profile: <ProfilesView onSignOut={handleSignOut} onNavigateToMap={navigateInApp} />,
         canvas: <CanvasView />,
         housing: <HousingView onNavigateToMap={navigateInApp} />,
-        community: <CommunityView />,
     }
 
     if (!authReady) {

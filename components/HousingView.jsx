@@ -150,7 +150,6 @@ function MapboxMap({ lat, lng, color }) {
     const init = async () => {
       try {
         const mapboxgl = (await import('mapbox-gl')).default
-        await import('mapbox-gl/dist/mapbox-gl.css')
         mapboxgl.accessToken = token
         map = new mapboxgl.Map({
           container: ref.current,

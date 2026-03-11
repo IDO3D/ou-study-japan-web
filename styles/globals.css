@@ -54,11 +54,36 @@ body {
   display: flex;
   flex-direction: column;
   background: #09090b;
+  transition: max-width 0.5s cubic-bezier(0.22, 1, 0.36, 1), border-radius 0.5s;
 }
 
-/* Full-bleed on phones */
-@media (max-width: 430px) {
-  #app-shell { max-width: 100%; border-radius: 0; }
+/* On Web/Desktop, provide a more generous but constrained view */
+@media (min-width: 768px) {
+  #app-shell {
+    max-width: 480px; /* Bit wider on tablets */
+    border-radius: 2rem;
+    height: 92svh;
+    margin-top: 4svh;
+    margin-bottom: 4svh;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05);
+    background: #000;
+  }
+}
+
+@media (min-width: 1200px) {
+  #app-shell {
+    max-width: 500px; /* Even wider on large monitors */
+  }
+}
+
+/* Full-bleed on small phones */
+@media (max-width: 480px) {
+  #app-shell { 
+    max-width: 100%; 
+    height: 100svh;
+    margin: 0;
+    border-radius: 0; 
+  }
   body { background: #09090b; }
 }
 
@@ -76,6 +101,28 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* ============================================
+   LANDING HERO
+   ============================================ */
+#landing-hero {
+  background: black;
+  color: white;
+}
+
+#landing-hero h1 {
+  text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.glow-card {
+  position: relative;
+  background: rgba(18,18,20,0.9);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 1.5rem;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+.glow-card:hover { border-color: rgba(224,36,36,0.3); }
 
 /* ============================================
    GLASS MORPHISM

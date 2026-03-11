@@ -25,10 +25,17 @@ export default async function handler(req, res) {
   }
 
   try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 3000)
+
     const response = await fetch(
       `https://v6.exchangerate-api.com/v6/${apiKey}/pair/JPY/USD`,
-      { headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(3000) }
+      { 
+        headers: { 'Accept': 'application/json' }, 
+        signal: controller.signal 
+      }
     )
+    clearTimeout(timeoutId)
     if (!response.ok) throw new Error(`API ${response.status}`)
     const data = await response.json()
     const rate = data.conversion_rate || FALLBACK
