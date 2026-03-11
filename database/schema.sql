@@ -106,3 +106,40 @@ INSERT INTO quests (title, title_jp, description, category, points, image_url, l
   ('Mount Takao Hike', '高尾山ハイキング', 'Complete the Takao-san hiking trail and reach the summit', 'Adventure', 800, 'https://images.unsplash.com/photo-1503220317375-aaad61436b1b?auto=format&fit=crop&q=80&w=800', 35.6257, 139.2431, 'hard'),
   ('Convenience Store Gourmet', 'コンビニグルメ', 'Try 5 different convenience store hot foods in one day', 'Food', 250, 'https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&q=80&w=800', 35.6762, 139.6503, 'easy')
 ON CONFLICT DO NOTHING;
+
+-- ============================================
+-- v5 MIGRATIONS — Run these in Supabase SQL Editor
+-- ============================================
+
+-- Add missing columns to users
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS tutorial_completed BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS theme VARCHAR(20) DEFAULT 'dark',
+  ADD COLUMN IF NOT EXISTS major VARCHAR(100) DEFAULT 'Business',
+  ADD COLUMN IF NOT EXISTS year VARCHAR(20) DEFAULT 'Junior';
+
+-- Add halal and deal columns to restaurants
+ALTER TABLE restaurants
+  ADD COLUMN IF NOT EXISTS is_halal BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS halal_cert TEXT,
+  ADD COLUMN IF NOT EXISTS deal_active BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS deal_text TEXT,
+  ADD COLUMN IF NOT EXISTS menu_url TEXT,
+  ADD COLUMN IF NOT EXISTS phone VARCHAR(30),
+  ADD COLUMN IF NOT EXISTS hours VARCHAR(100),
+  ADD COLUMN IF NOT EXISTS walk_time_minutes INTEGER DEFAULT 10;
+
+-- Add more quest fields
+ALTER TABLE quests
+  ADD COLUMN IF NOT EXISTS is_program BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS is_nearby BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS is_top50 BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS walk_time_minutes INTEGER,
+  ADD COLUMN IF NOT EXISTS tip TEXT,
+  ADD COLUMN IF NOT EXISTS city VARCHAR(100) DEFAULT 'Ibaraki';
+
+-- Row Level Security (add in Supabase for production)
+-- ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+-- CREATE POLICY "Users own row" ON users USING (auth.uid() = id);
+-- ALTER TABLE user_quests ENABLE ROW LEVEL SECURITY;
+-- CREATE POLICY "Users own quests" ON user_quests USING (auth.uid()::text = user_id::text);

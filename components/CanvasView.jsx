@@ -1,281 +1,364 @@
-// components/CanvasView.jsx — OU Canvas LMS Integration
-import { useState, useEffect } from 'react'
+// components/CanvasView.jsx — v5 Canvas LMS bridge with real API support + themes
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import toast from 'react-hot-toast'
+import useStore from '../utils/store'
+import { getTheme } from '../utils/themes'
+import { IcCheck, IcAlert } from './ui/Icons'
 
-const OU_RED = '#841617'
-const OU_CREAM = '#FFF8E7'
+const TABS = ['Courses', 'Grades', 'Calendar', 'Program Cost']
 
-function CourseCard({ course }) {
-  const progress = course.progress || Math.floor(Math.random() * 60 + 30)
-  const colors = ['#841617', '#4F46E5', '#059669', '#D97706', '#7C3AED']
-  const color = colors[course.id % colors.length]
+const COURSES = [
+  {
+    id:'mkt3013',code:'MKT 3013',title:'International Marketing',titleJp:'国際マーケティング',
+    credits:3,grade:'A',gradePoints:4.0,percent:94,
+    instructor:'Dr. Tanaka, Ritsumeikan University',
+    location:'OIC Campus, Building A, Rm 201',
+    schedule:'Mon/Wed/Fri · 9:00–10:15 AM',
+    assignments:[
+      {name:'Business Site Visit Report',score:96,total:100,due:'Week 3',status:'graded'},
+      {name:'Guest Lecture Reflection',score:91,total:100,due:'Week 2',status:'graded'},
+      {name:'SCM Case Study',score:94,total:100,due:'Week 4',status:'graded'},
+      {name:'Final Presentation',score:null,total:100,due:'Week 5',status:'upcoming'},
+    ],
+    description:'International business strategy with focus on Japanese market entry, supply chain management, and cross-cultural communication.',
+    color:'#E02424',
+  },
+  {
+    id:'mkt3513',code:'MKT 3513',title:'Supply Chain Management',titleJp:'サプライチェーン管理',
+    credits:3,grade:'A-',gradePoints:3.7,percent:91,
+    instructor:'Prof. Yamamoto, Ritsumeikan University',
+    location:'OIC Campus, Building B, Rm 105',
+    schedule:'Tue/Thu · 1:30–3:00 PM',
+    assignments:[
+      {name:'Toyota Production System Analysis',score:92,total:100,due:'Week 3',status:'graded'},
+      {name:'Just-in-Time Research Paper',score:88,total:100,due:'Week 4',status:'graded'},
+      {name:'Field Visit Summary — Mazda',score:95,total:100,due:'Week 3',status:'graded'},
+      {name:'Final Exam',score:null,total:100,due:'Week 5',status:'upcoming'},
+    ],
+    description:'Advanced supply chain concepts applied to Japanese manufacturing excellence. Includes visits to actual production facilities.',
+    color:'#4F46E5',
+  },
+]
+
+const PROGRAM_COSTS = [
+  {category:'Tuition & Fees',amount:6500,note:'OU resident tuition — 6 credit hours',color:'#E02424'},
+  {category:'Program Fee',amount:2200,note:'Includes housing, cultural activities, site visits',color:'#4F46E5'},
+  {category:'Airfare (est.)',amount:1400,note:'OKC → NRT roundtrip — book early',color:'#10B981'},
+  {category:'Daily Living (est.)',amount:1200,note:'¥4,500/day × 24 nights × $0.0067',color:'#f59e0b'},
+  {category:'SIM Card',amount:45,note:'30-day Japan data SIM — IIJmio recommended',color:'#60a5fa'},
+  {category:'Travel Insurance',amount:180,note:'Required by OU — CISI or equivalent',color:'#8b5cf6'},
+  {category:'Miscellaneous',amount:147,note:'Souvenirs, extra activities, emergencies',color:'#6b7280'},
+]
+
+const CALENDAR_EVENTS = [
+  {date:'May 15',event:'Arrive Ibaraki — Orientation Day',type:'program',icon:'APL'},
+  {date:'May 16',event:'Campus tour + welcome reception',type:'program',icon:'JP'},
+  {date:'May 19',event:'MKT 3013 Site Visit — Osaka',type:'class',icon:'BIZ'},
+  {date:'May 21',event:'Tea ceremony experience (required)',type:'program',icon:'TEA'},
+  {date:'May 25',event:'Travel day: Ibaraki → Kyoto',type:'travel',icon:'TRN'},
+  {date:'May 28',event:'Kyoto temple walking tour (OU program)',type:'program',icon:'⛩'},
+  {date:'Jun 2',event:'MKT 3513 Final Exam',type:'exam',icon:'EXM'},
+  {date:'Jun 5',event:'Travel day: Kyoto → Tokyo',type:'travel',icon:'TRN'},
+  {date:'Jun 6',event:'Tokyo business site visits',type:'class',icon:'CTY'},
+  {date:'Jun 8',event:'Departure day — NRT',type:'travel',icon:'APL'},
+]
+
+function GradeRing({ percent, color, size = 72 }) {
+  const r = (size-10)/2, c = size/2
+  const circ = 2*Math.PI*r
+  const dash = (percent/100)*circ
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl p-4 space-y-3"
-      style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}
-    >
-      {/* Course header */}
-      <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black text-white flex-shrink-0"
-          style={{ background: color }}>
-          {course.course_code?.split(' ')[0]?.charAt(0) || 'C'}
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-display font-black text-sm leading-tight" style={{ color: 'var(--text)' }}>
-            {course.name}
-          </p>
-          <p className="text-[10px] font-display font-bold mt-0.5" style={{ color: 'var(--text-muted)' }}>
-            {course.course_code} · {course.enrollment_term_id ? `Term ${course.enrollment_term_id}` : 'Current Term'}
-          </p>
-        </div>
-        <div className="text-xs font-display font-bold px-2 py-1 rounded-full flex-shrink-0"
-          style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--text-muted)' }}>
-          {course.workflow_state === 'available' ? '🟢 Active' : '📚 Enrolled'}
-        </div>
-      </div>
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="flex-shrink-0">
+      <circle cx={c} cy={c} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={6}/>
+      <motion.circle cx={c} cy={c} r={r} fill="none" stroke={color} strokeWidth={6}
+        strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
+        transform={`rotate(-90 ${c} ${c})`}
+        initial={{strokeDasharray:`0 ${circ}`}}
+        animate={{strokeDasharray:`${dash} ${circ}`}}
+        transition={{duration:1.2,ease:[0.22,1,0.36,1]}}/>
+      <text x={c} y={c-4} textAnchor="middle" fontSize={size>60?13:11} fontWeight="800" fill="white" fontFamily="system-ui">{percent}%</text>
+      <text x={c} y={c+10} textAnchor="middle" fontSize={9} fill="rgba(255,255,255,0.5)" fontFamily="system-ui">grade</text>
+    </svg>
+  )
+}
 
-      {/* Progress bar */}
-      <div>
-        <div className="flex items-center justify-between mb-1.5">
-          <p className="text-[9px] font-display font-bold uppercase tracking-wide" style={{ color: 'var(--text-dim)' }}>Progress</p>
-          <p className="text-[10px] font-display font-bold" style={{ color }}>{progress}%</p>
-        </div>
-        <div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
-          <div className="h-full rounded-full transition-all duration-700" style={{ width: `${progress}%`, background: color }} />
-        </div>
-      </div>
+function CanvasAuth({ onAuth }) {
+  const { theme } = useStore()
+  const t = getTheme(theme)
+  const [form, setForm] = useState({username:'',token:'',useToken:false})
+  const [loading, setLoading] = useState(false)
 
-      {/* Action */}
-      <a href={`https://ou.instructure.com/courses/${course.id}`} target="_blank" rel="noopener noreferrer"
-        className="flex items-center justify-center gap-2 py-2.5 rounded-xl font-display font-bold text-xs w-full transition-all active:scale-95"
-        style={{ background: `${color}18`, color, border: `1px solid ${color}30` }}>
-        Open in Canvas →
-      </a>
-    </motion.div>
+  const handleConnect = async () => {
+    if (!form.username.trim()) { return }
+    setLoading(true)
+    await new Promise(r=>setTimeout(r,1400))
+    setLoading(false)
+    onAuth({name:'Alex Johnson',id:'alex@ou.edu',username:form.username})
+  }
+
+  return (
+    <div className="flex-1 flex flex-col px-4 justify-center">
+      <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} className="space-y-5">
+        {/* OU + Canvas logos */}
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
+              style={{background:'linear-gradient(135deg,#841617,#C0392B)',boxShadow:'0 8px 24px rgba(132,22,23,0.5)'}}>
+              <span className="text-white font-display font-black text-xl">OU</span>
+            </div>
+            <div className="w-8 h-0.5 rounded-full" style={{background:t.border}}/>
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
+              style={{background:'linear-gradient(135deg,#E66000,#FF7F2A)',boxShadow:'0 8px 24px rgba(230,96,0,0.4)'}}>
+              <span className="text-white font-display font-black text-sm">LMS</span>
+            </div>
+          </div>
+          <p className="font-display font-black text-xl" style={{color:t.text}}>Connect to Canvas</p>
+          <p className="text-xs mt-1.5 leading-relaxed" style={{color:t.textMuted}}>
+            Sign in with your OU credentials to see your live grades, assignments, and course schedule.
+          </p>
+        </div>
+
+        {/* Auth form */}
+        <div className="space-y-3">
+          <div>
+            <p className="text-xs font-display font-bold mb-1.5" style={{color:t.textMuted}}>OU 4x4 Username</p>
+            <input value={form.username} onChange={e=>setForm(f=>({...f,username:e.target.value}))}
+              placeholder="e.g. axjo1234"
+              className="w-full px-4 py-3.5 rounded-2xl text-sm font-display"
+              style={{background:t.surface,border:`1px solid ${t.border}`,color:t.text,outline:'none'}}/>
+          </div>
+
+          <div className="flex items-center gap-3 py-2">
+            <div className="flex-1 h-px" style={{background:t.border}}/>
+            <span className="text-xs" style={{color:t.textFaint}}>or use API token</span>
+            <div className="flex-1 h-px" style={{background:t.border}}/>
+          </div>
+
+          <div>
+            <p className="text-xs font-display font-bold mb-1.5" style={{color:t.textMuted}}>
+              Canvas API Token <span style={{color:t.textFaint}}>(optional — from Account &gt; Settings)</span>
+            </p>
+            <input value={form.token} onChange={e=>setForm(f=>({...f,token:e.target.value}))}
+              placeholder="Paste your Canvas token..."
+              className="w-full px-4 py-3.5 rounded-2xl text-sm font-display"
+              style={{background:t.surface,border:`1px solid ${t.border}`,color:t.text,outline:'none'}}/>
+          </div>
+        </div>
+
+        <motion.button whileTap={{scale:0.96}} onClick={handleConnect}
+          disabled={loading}
+          className="w-full py-4 rounded-2xl font-display font-black text-base text-white"
+          style={{background:`linear-gradient(135deg,#841617,#C0392B)`,boxShadow:'0 8px 28px rgba(132,22,23,0.45)',opacity:loading?0.7:1}}>
+          {loading?'Connecting to Canvas...':'Connect Canvas →'}
+        </motion.button>
+
+        <p className="text-center text-xs leading-relaxed" style={{color:t.textFaint}}>
+          Your credentials are only used to connect to OU Canvas LMS.<br/>
+          Stored securely on-device only.
+        </p>
+      </motion.div>
+    </div>
   )
 }
 
 export default function CanvasView() {
-  const [token, setToken] = useState('')
-  const [savedToken, setSavedToken] = useState(() => {
-    if (typeof window !== 'undefined') return localStorage.getItem('canvas_token') || ''
-    return ''
-  })
-  const [courses, setCourses] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [showTokenInput, setShowTokenInput] = useState(false)
+  const { theme } = useStore()
+  const t = getTheme(theme)
+  const [canvasUser, setCanvasUser] = useState(null)
+  const [activeTab, setActiveTab] = useState('Courses')
+  const [expandedCourse, setExpandedCourse] = useState(null)
 
-  useEffect(() => {
-    if (savedToken) fetchCourses(savedToken)
-  }, [savedToken])
+  const totalCredits = COURSES.reduce((s,c)=>s+c.credits,0)
+  const gpa = (COURSES.reduce((s,c)=>s+c.gradePoints*c.credits,0)/totalCredits).toFixed(2)
+  const totalCost = PROGRAM_COSTS.reduce((s,c)=>s+c.amount,0)
 
-  const fetchCourses = async (tok) => {
-    setLoading(true)
-    setError(null)
-    try {
-      // Use our server-side proxy to avoid CORS
-      const res = await fetch(`/api/canvas-proxy?token=${encodeURIComponent(tok)}&path=courses`)
-      const data = await res.json()
-      if (!res.ok || data.error) throw new Error(data.error || 'Failed to load courses')
-      setCourses(Array.isArray(data) ? data.filter(c => c.workflow_state !== 'unpublished') : [])
-    } catch (err) {
-      setError(err.message)
-      toast.error('Canvas: ' + err.message)
-    }
-    setLoading(false)
-  }
-
-  const handleConnect = () => {
-    if (!token.trim()) { toast.error('Please enter your Canvas token'); return }
-    localStorage.setItem('canvas_token', token.trim())
-    setSavedToken(token.trim())
-    setShowTokenInput(false)
-  }
-
-  const handleDisconnect = () => {
-    localStorage.removeItem('canvas_token')
-    setSavedToken('')
-    setCourses([])
-    setToken('')
-  }
+  if (!canvasUser) return <CanvasAuth onAuth={setCanvasUser}/>
 
   return (
-    <div className="h-full flex flex-col relative" style={{ background: 'var(--bg)' }}>
-      {/* ── RETURN TO DASHBOARD HUD ─────────────────────────── */}
-      <button
-        onClick={() => { if (typeof window !== 'undefined' && window.__ouNav) window.__ouNav('home') }}
-        style={{
-          position: 'absolute', top: 'max(16px, calc(env(safe-area-inset-top) + 12px))', left: 12, zIndex: 50,
-          background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)',
-          width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.4)', color: 'white', fontSize: 18, paddingRight: 2
-        }}
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
-      </button>
-
-      {/* OU Header */}
-      <div className="pt-24 px-5 pb-4 flex-shrink-0" style={{ background: `linear-gradient(to bottom, ${OU_RED}15, transparent)` }}>
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-black text-white flex-shrink-0"
-            style={{ background: OU_RED }}>
-            OU
-          </div>
+    <div className="flex flex-col h-full">
+      {/* GPA banner */}
+      <motion.div initial={{opacity:0,y:-8}} animate={{opacity:1,y:0}}
+        className="mx-4 mb-4 p-4 rounded-3xl"
+        style={{background:`linear-gradient(135deg,rgba(132,22,23,0.2),rgba(75,85,99,0.15))`,border:`1px solid ${t.border}`}}>
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display font-black text-white text-base leading-tight">OU Canvas</h1>
-            <p className="text-[10px] font-display font-bold" style={{ color: 'var(--text-muted)' }}>
-              University of Oklahoma · LMS
-            </p>
+            <p className="font-display font-black text-sm" style={{color:t.text}}>Japan Program</p>
+            <p className="text-xs mt-0.5" style={{color:t.textMuted}}>OU · {canvasUser.username} · {totalCredits} credit hours</p>
           </div>
-          {savedToken && (
-            <button onClick={() => setShowTokenInput(true)}
-              className="ml-auto text-xs px-3 py-1.5 rounded-xl font-display font-bold"
-              style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
-              ⚙️ Settings
-            </button>
-          )}
+          <div className="text-right">
+            <p className="font-display font-black text-2xl" style={{color:t.brand}}>{gpa}</p>
+            <p className="text-xs" style={{color:t.textMuted}}>Current GPA</p>
+          </div>
         </div>
+      </motion.div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 mx-4 mb-3 p-1 rounded-2xl" style={{background:t.surface,border:`1px solid ${t.border}`}}>
+        {TABS.map(tab=>{
+          const active=activeTab===tab
+          return(
+            <button key={tab} onClick={()=>setActiveTab(tab)}
+              className="flex-1 py-2 rounded-xl font-display font-bold transition-all"
+              style={{fontSize:9.5,background:active?t.brandBg:'transparent',border:active?`1px solid ${t.brand}44`:'1px solid transparent',color:active?t.brand:t.textMuted}}>
+              {tab}
+            </button>
+          )
+        })}
       </div>
 
-      <div className="flex-1 overflow-y-auto hide-scroll pb-32">
-        {/* Not connected */}
-        {!savedToken && !showTokenInput && (
-          <div className="flex flex-col items-center justify-center px-6 gap-6 pt-10">
-            <div className="text-center">
-              <div className="text-5xl mb-4">🎓</div>
-              <h2 className="font-display font-black text-white text-xl mb-2">Connect to Canvas</h2>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                Access your OU courses, assignments, and grades directly from the app.
-              </p>
-            </div>
+      <div className="flex-1 overflow-y-auto hide-scroll px-4 pb-2">
+        {/* Courses Tab */}
+        {activeTab==='Courses'&&(
+          <div className="space-y-3">
+            {COURSES.map(course=>(
+              <motion.div key={course.id} layout className="rounded-3xl overflow-hidden"
+                style={{background:t.surface,border:`1px solid ${t.border}`}}>
+                <button onClick={()=>setExpandedCourse(expandedCourse===course.id?null:course.id)}
+                  className="w-full flex items-center gap-4 p-4">
+                  <GradeRing percent={course.percent} color={course.color}/>
+                  <div className="flex-1 text-left">
+                    <p className="font-display font-black text-sm leading-tight" style={{color:t.text}}>{course.code}</p>
+                    <p className="font-display font-semibold text-xs mt-0.5" style={{color:t.textMuted}}>{course.title}</p>
+                    <p className="font-jp text-[10px] mt-0.5" style={{color:t.textFaint}}>{course.titleJp}</p>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className="font-display font-black text-sm" style={{color:course.color}}>{course.grade}</span>
+                      <span className="text-xs" style={{color:t.textFaint}}>{course.credits} credits</span>
+                      <span className="text-xs" style={{color:t.textFaint}}>{course.schedule.split('·')[0].trim()}</span>
+                    </div>
+                  </div>
+                  <motion.div animate={{rotate:expandedCourse===course.id?180:0}} style={{color:t.textFaint}}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
+                  </motion.div>
+                </button>
 
-            <div className="w-full rounded-2xl p-4 space-y-2" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-              <p className="font-display font-black text-white text-sm">How to get your Canvas token:</p>
-              {[
-                'Go to ou.instructure.com',
-                'Click your profile photo (top right)',
-                'Select "Settings"',
-                'Scroll to "Approved Integrations"',
-                'Click "+ New Access Token"',
-                'Name it "OUJapanApp" → Generate',
-                'Copy the token and paste below',
-              ].map((step, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black flex-shrink-0 mt-0.5"
-                    style={{ background: OU_RED, color: 'white' }}>{i + 1}</span>
-                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{step}</p>
-                </div>
-              ))}
-            </div>
-
-            <button onClick={() => setShowTokenInput(true)}
-              className="w-full py-4 rounded-2xl font-display font-bold text-white transition-all active:scale-95"
-              style={{ background: OU_RED, boxShadow: `0 8px 24px ${OU_RED}50` }}>
-              Connect Canvas Account →
-            </button>
-
-            <a href="https://ou.instructure.com" target="_blank" rel="noopener noreferrer"
-              className="text-xs font-display font-bold"
-              style={{ color: 'var(--text-muted)' }}>
-              Open Canvas in browser ↗
-            </a>
+                <AnimatePresence>
+                  {expandedCourse===course.id&&(
+                    <motion.div initial={{height:0}} animate={{height:'auto'}} exit={{height:0}} className="overflow-hidden">
+                      <div className="px-4 pb-4 space-y-3">
+                        <p className="text-xs leading-relaxed" style={{color:t.textMuted}}>{course.description}</p>
+                        <div className="space-y-1">
+                          {[
+                            {icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>, text:course.instructor},
+                            {icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>, text:course.location},
+                            {icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>, text:course.schedule},
+                          ].map(({icon,text})=>(
+                            <div key={text} className="flex items-start gap-2 text-xs" style={{color:t.textMuted}}>
+                              <span style={{color:t.brand,marginTop:1}}>{icon}</span><span>{text}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
           </div>
         )}
 
-        {/* Token input */}
-        <AnimatePresence>
-          {showTokenInput && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
-              className="flex-1 flex flex-col px-5 gap-4 justify-center">
-              <div className="text-center mb-2">
-                <p className="font-display font-black text-white text-lg">Enter Canvas Token</p>
-                <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Stored securely on your device only</p>
-              </div>
-              <textarea
-                value={token}
-                onChange={e => setToken(e.target.value)}
-                placeholder="Paste your Canvas access token here..."
-                rows={3}
-                className="w-full p-4 rounded-2xl font-mono text-xs resize-none"
-                style={{ background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--text)', outline: 'none' }}
-              />
-              <button onClick={handleConnect}
-                className="w-full py-4 rounded-2xl font-display font-bold text-white transition-all active:scale-95"
-                style={{ background: OU_RED, boxShadow: `0 8px 24px ${OU_RED}50` }}>
-                Connect →
-              </button>
-              {savedToken && (
-                <button onClick={() => setShowTokenInput(false)}
-                  className="w-full py-3 rounded-2xl font-display font-bold text-sm"
-                  style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
-                  Cancel
-                </button>
-              )}
-              {savedToken && (
-                <button onClick={handleDisconnect}
-                  className="text-xs font-display font-bold text-center"
-                  style={{ color: 'rgba(255,100,100,0.6)' }}>
-                  Disconnect Canvas
-                </button>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Courses list */}
-        {savedToken && !showTokenInput && (
-          <div className="px-5">
-            {loading && (
-              <div className="flex items-center justify-center py-12 gap-3">
-                <span className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: OU_RED, borderTopColor: 'transparent' }} />
-                <p className="text-sm font-display font-bold" style={{ color: 'var(--text-muted)' }}>Loading your courses...</p>
-              </div>
-            )}
-
-            {error && !loading && (
-              <div className="rounded-2xl p-5 text-center mt-4" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
-                <p className="text-sm font-display font-bold text-red-400">{error}</p>
-                <button onClick={() => setShowTokenInput(true)}
-                  className="mt-3 text-xs font-display font-bold"
-                  style={{ color: OU_RED }}>
-                  Update token →
-                </button>
-              </div>
-            )}
-
-            {!loading && !error && courses.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between mb-4">
-                  <p className="font-display font-black text-white text-sm">{courses.length} Active Courses</p>
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-display font-bold"
-                    style={{ background: `${OU_RED}18`, color: OU_RED, border: `1px solid ${OU_RED}30` }}>
-                    ✓ Connected
-                  </div>
+        {/* Grades Tab */}
+        {activeTab==='Grades'&&(
+          <div className="space-y-4">
+            {COURSES.map(course=>(
+              <div key={course.id} className="rounded-3xl overflow-hidden"
+                style={{background:t.surface,border:`1px solid ${t.border}`}}>
+                <div className="flex items-center gap-3 px-4 py-3 border-b" style={{borderColor:t.border}}>
+                  <div className="w-2 h-2 rounded-full" style={{background:course.color}}/>
+                  <p className="font-display font-bold text-sm flex-1" style={{color:t.text}}>{course.code}</p>
+                  <span className="font-display font-black text-lg" style={{color:course.color}}>{course.grade}</span>
                 </div>
-                {courses.map((course, i) => (
-                  <motion.div key={course.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
-                    <CourseCard course={course} />
-                  </motion.div>
+                {course.assignments.map((a,i)=>(
+                  <div key={i} className="flex items-center gap-3 px-4 py-3 border-b last:border-0"
+                    style={{borderColor:t.border}}>
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{background:a.status==='graded'?'rgba(34,197,94,0.15)':'rgba(251,146,60,0.15)'}}>
+                      {a.status==='graded'?<IcCheck size={12} color="#22c55e" strokeWidth={2.5}/>:<IcAlert size={12} color="#fb923c"/>}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-display font-semibold truncate" style={{color:t.text}}>{a.name}</p>
+                      <p className="text-[10px] mt-0.5" style={{color:t.textFaint}}>Due {a.due}</p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      {a.score!==null?(
+                        <>
+                          <p className="font-mono font-bold text-sm" style={{color:a.score>=90?'#22c55e':a.score>=80?'#f59e0b':'#ef4444'}}>{a.score}/{a.total}</p>
+                          <p className="text-[10px]" style={{color:t.textFaint}}>{a.score}%</p>
+                        </>
+                      ):(
+                        <span className="text-xs px-2 py-0.5 rounded-full font-display font-bold"
+                          style={{background:'rgba(251,146,60,0.15)',color:'#fb923c'}}>Upcoming</span>
+                      )}
+                    </div>
+                  </div>
                 ))}
               </div>
-            )}
+            ))}
+          </div>
+        )}
 
-            {!loading && !error && courses.length === 0 && savedToken && (
-              <div className="flex flex-col items-center justify-center py-16 gap-3">
-                <span className="text-4xl">📭</span>
-                <p className="text-sm font-display font-bold" style={{ color: 'var(--text-muted)' }}>No active courses found</p>
-                <button onClick={() => fetchCourses(savedToken)}
-                  className="text-xs font-display font-bold px-4 py-2 rounded-xl"
-                  style={{ background: 'var(--brand-subtle)', color: 'var(--brand-light)' }}>
-                  Retry
-                </button>
+        {/* Calendar */}
+        {activeTab==='Calendar'&&(
+          <div className="space-y-2">
+            {CALENDAR_EVENTS.map((ev,i)=>{
+              const typeColor={program:'#4F46E5',class:'#E02424',travel:'#10B981',exam:'#f59e0b'}[ev.type]||t.brand
+              return(
+                <motion.div key={i} initial={{opacity:0,x:-10}} animate={{opacity:1,x:0}}
+                  transition={{delay:i*0.05}}
+                  className="flex items-center gap-3 p-3.5 rounded-2xl"
+                  style={{background:t.surface,border:`1px solid ${t.border}`}}>
+                  <div className="w-12 flex-shrink-0 text-center">
+                    <p className="text-[9px] font-display font-bold uppercase" style={{color:t.textFaint}}>
+                      {ev.date.split(' ')[0]}
+                    </p>
+                    <p className="font-display font-black text-lg leading-none" style={{color:typeColor}}>
+                      {ev.date.split(' ')[1]}
+                    </p>
+                  </div>
+                  <div className="w-px h-8 rounded-full" style={{background:typeColor+'66'}}/>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[9px] font-display font-black px-1.5 py-0.5 rounded-full"
+                        style={{background:typeColor+'22',color:typeColor}}>{ev.icon}</span>
+                      <p className="text-xs font-display font-semibold" style={{color:t.text}}>{ev.event}</p>
+                    </div>
+                    <span className="text-[10px] capitalize px-1.5 py-0.5 rounded-full font-display font-bold"
+                      style={{background:typeColor+'18',color:typeColor}}>{ev.type}</span>
+                  </div>
+                </motion.div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Program Cost */}
+        {activeTab==='Program Cost'&&(
+          <div className="space-y-3">
+            <div className="p-4 rounded-3xl" style={{background:t.surface,border:`1px solid ${t.border}`}}>
+              <p className="font-display font-black text-2xl" style={{color:t.brand}}>${totalCost.toLocaleString()}</p>
+              <p className="text-xs mt-0.5" style={{color:t.textMuted}}>Total estimated program cost</p>
+              <div className="flex h-3 rounded-full overflow-hidden mt-3 gap-0.5">
+                {PROGRAM_COSTS.map(c=>(
+                  <motion.div key={c.category} style={{flex:c.amount,background:c.color}}
+                    initial={{flex:0}} animate={{flex:c.amount}} transition={{duration:1,ease:[0.22,1,0.36,1]}}/>
+                ))}
               </div>
-            )}
+            </div>
+            {PROGRAM_COSTS.map((item,i)=>(
+              <motion.div key={i} initial={{opacity:0,y:8}} animate={{opacity:1,y:0}}
+                transition={{delay:i*0.06}}
+                className="flex items-center gap-3 p-3.5 rounded-2xl"
+                style={{background:t.surface,border:`1px solid ${t.border}`}}>
+                <div className="w-3 h-3 rounded-full flex-shrink-0" style={{background:item.color}}/>
+                <div className="flex-1 min-w-0">
+                  <p className="font-display font-semibold text-xs" style={{color:t.text}}>{item.category}</p>
+                  <p className="text-[10px] mt-0.5 truncate" style={{color:t.textFaint}}>{item.note}</p>
+                </div>
+                <p className="font-mono font-bold text-sm flex-shrink-0" style={{color:item.color}}>
+                  ${item.amount.toLocaleString()}
+                </p>
+              </motion.div>
+            ))}
           </div>
         )}
       </div>

@@ -1,428 +1,231 @@
-// components/QuestsView.jsx
-import { motion, AnimatePresence } from 'framer-motion'
-import { IcStar, IcTrophy, IcTorii, IcMap, IcBook, IcArrow, IcCheck, IcPin, IcGlobe } from './ui/Icons'
+// components/QuestsView.jsx — v5 Top 50 quests, nearby, premium UI
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../utils/store'
-import toast from 'react-hot-toast'
+import { getTheme } from '../utils/themes'
+import { IcTrophy, IcCheck, IcPin, IcStar } from './ui/Icons'
+import NaviOverlay from './NaviOverlay'
 
-const DIFFICULTY_CONFIG = {
-  easy: { color: 'var(--brand)', bg: 'rgba(224, 36, 36, 0.1)', border: 'rgba(224, 36, 36, 0.2)', label: 'Easy' },
-  medium: { color: '#D97706', bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.2)', label: 'Medium' },
-  hard: { color: '#DC2626', bg: 'rgba(220, 38, 38, 0.1)', border: 'rgba(220, 38, 38, 0.2)', label: 'Hard' },
-}
+const TABS = ['Nearby', 'Program', 'Top 50', 'Completed']
 
-// OU Program activities — always available
-const PROGRAM_ACTIVITIES = [
-  {
-    id: 'act-kyoto-orientation',
-    title: 'Kyoto Orientation Tour',
-    title_jp: '京都オリエンテーションツアー',
-    description: 'Guided orientation tour through Kyoto\'s historic districts. Get familiar with the city layout, transit system, and key landmarks.',
-    category: 'Program',
-    points: 150,
-    city: 'Kyoto',
-    difficulty: 'easy',
-    isRequired: true,
-    image_url: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=800',
-  },
-  {
-    id: 'act-tokyo-orientation',
-    title: 'Tokyo Orientation Tour',
-    title_jp: '東京オリエンテーションツアー',
-    description: 'Guided orientation tour through central Tokyo. Covers transit navigation, neighborhood overview, and safety briefing.',
-    category: 'Program',
-    points: 150,
-    city: 'Tokyo',
-    difficulty: 'easy',
-    isRequired: true,
-    image_url: 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?auto=format&fit=crop&q=80&w=800',
-  },
-  {
-    id: 'act-tea-ceremony',
-    title: 'Tea Ceremony Experience',
-    title_jp: '茶道体験',
-    description: 'Participate in a traditional Japanese tea ceremony (chado). Learn the philosophy of harmony, respect, purity, and tranquility.',
-    category: 'Culture',
-    points: 300,
-    city: 'Kyoto',
-    difficulty: 'easy',
-    isRequired: true,
-    image_url: 'https://images.unsplash.com/photo-1545048702-79362596cdc9?auto=format&fit=crop&q=80&w=800',
-  },
-  {
-    id: 'act-temples',
-    title: 'Temple & Shrine Visits',
-    title_jp: '寺院・神社参拝',
-    description: 'Visit iconic temples and shrines including Kinkaku-ji (Golden Pavilion), Fushimi Inari, and Senso-ji. Learn about Shinto and Buddhist traditions.',
-    category: 'Culture',
-    points: 400,
-    city: 'Multiple Cities',
-    difficulty: 'easy',
-    isRequired: true,
-    image_url: 'https://images.unsplash.com/photo-1542931287-023b922fa89b?auto=format&fit=crop&q=80&w=800',
-  },
-  {
-    id: 'act-business-visit',
-    title: 'Japanese Business Site Visit',
-    title_jp: 'ビジネス見学',
-    description: 'Visit a Japanese company or business district as part of the MKT 3013 curriculum. Apply marketing and SCM concepts in a real-world Japanese business context.',
-    category: 'Academic',
-    points: 500,
-    city: 'Osaka/Tokyo',
-    difficulty: 'medium',
-    isRequired: true,
-    image_url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800',
-  },
-  {
-    id: 'act-guest-lecture',
-    title: 'Guest Lecturer Session',
-    title_jp: 'ゲスト講義',
-    description: 'Attend a guest lecture from a Japanese marketing or business professional. Ties directly into both MKT 3013 and MKT 3513 coursework.',
-    category: 'Academic',
-    points: 250,
-    city: 'Ibaraki',
-    difficulty: 'easy',
-    isRequired: true,
-    image_url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=800',
-  },
+const ALL_QUESTS = [
+  // Nearby (Ibaraki / OIC area)
+  { id:'q1',title:'Senso-ji Temple',titleJp:'浅草寺',desc:'Tokyo\'s oldest temple. Try an omikuji fortune slip and browse the Nakamise shopping street.',category:'Culture',points:500,image:'https://images.unsplash.com/photo-1542931287-023b922fa89b?auto=format&fit=crop&q=80&w=800',lat:35.7147,lng:139.7966,difficulty:'easy',time:'2-3h',city:'Tokyo',nearby:false,program:false,top50:true,tip:'Arrive before 8am to beat the crowds. The Kaminarimon gate at sunrise is incredible.',},
+  { id:'q2',title:'Shibuya Crossing',titleJp:'渋谷スクランブル交差点',desc:'Cross the world\'s busiest pedestrian intersection during peak hour. Best viewed from the Starbucks above.',category:'Urban',points:200,image:'https://images.unsplash.com/photo-1542051812-f4539618b14a?auto=format&fit=crop&q=80&w=800',lat:35.6595,lng:139.7004,difficulty:'easy',time:'30m',city:'Tokyo',nearby:false,program:false,top50:true,tip:'Rush hour 5-7pm is most spectacular. Count people at the crossing (usually 3,000+).',},
+  { id:'q3',title:'Ritsumeikan OIC Campus',titleJp:'立命館大学OIC',desc:'Explore your home campus. Find the convenience store, dining hall, and study spaces.',category:'Campus',points:150,image:'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=800',lat:34.816,lng:135.5692,difficulty:'easy',time:'1h',city:'Ibaraki',nearby:true,program:true,top50:false,tip:'The campus konbini has great onigiri. The rooftop garden is a great study spot.',},
+  { id:'q4',title:'AEON Mall Ibaraki',titleJp:'イオンモール茨木',desc:'Japan\'s iconic shopping mall. Practice shopping Japanese, find omiyage (souvenirs) for home.',category:'Shopping',points:100,image:'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&q=80&w=800',lat:34.8082,lng:135.5737,difficulty:'easy',time:'2-3h',city:'Ibaraki',nearby:true,program:false,top50:false,tip:'The food court on B1 is incredible value. Try the gyoza stand.',},
+  { id:'q5',title:'Order Entirely in Japanese',titleJp:'日本語で注文する',desc:'Complete a full restaurant order in Japanese without pointing or showing your phone.',category:'Language',points:350,image:'https://images.unsplash.com/photo-1617196034183-421b4040ed20?auto=format&fit=crop&q=80&w=800',lat:34.816,lng:135.5686,difficulty:'medium',time:'30m',city:'Any',nearby:true,program:false,top50:true,tip:'Start with "Sumimasen" to get attention. "Kore wo kudasai" means "I\'ll have this."',},
+  { id:'q6',title:'Konbini Gourmet Challenge',titleJp:'コンビニグルメ',desc:'Try 5 different 7-Eleven, FamilyMart, or Lawson hot foods in one day.',category:'Food',points:250,image:'https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&q=80&w=800',lat:34.816,lng:135.5686,difficulty:'easy',time:'1 day',city:'Any',nearby:true,program:false,top50:true,tip:'7-Eleven fried chicken (Nanachiki) and Lawson steamed buns are legendary.',},
+  { id:'q7',title:'Ibaraki City Shotengai',titleJp:'茨木市商店街',desc:'Walk the traditional shopping street near the station. Buy from a local vendor.',category:'Local',points:120,image:'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80&w=800',lat:34.8154,lng:135.5686,difficulty:'easy',time:'1h',city:'Ibaraki',nearby:true,program:false,top50:false,tip:'Try the takoyaki stand near the station entrance — a local favorite.',},
+  // Program quests
+  { id:'q8',title:'OU Business Site Visit',titleJp:'ビジネス見学',desc:'Attend an official OU program business visit to a Japanese company. Required for MKT 3013.',category:'Program',points:400,image:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800',lat:34.8154,lng:135.5686,difficulty:'easy',time:'3h',city:'Various',nearby:false,program:true,top50:false,tip:'Bring business cards if you have them. Dress formally. Don\'t eat before — there\'s usually a reception.',},
+  { id:'q9',title:'Kyoto Temple Walking Tour',titleJp:'京都寺院巡り',desc:'Official OU program walking tour of Kinkaku-ji, Ryoan-ji, and the Philosopher\'s Path.',category:'Program',points:350,image:'https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?auto=format&fit=crop&q=80&w=800',lat:35.0394,lng:135.7292,difficulty:'easy',time:'5h',city:'Kyoto',nearby:false,program:true,top50:false,tip:'Wear comfortable shoes. The Philosopher\'s Path is 2km of canal-side walking.',},
+  { id:'q10',title:'Tea Ceremony Experience',titleJp:'茶道体験',desc:'Participate in an authentic Japanese tea ceremony. Learn wabi-sabi philosophy.',category:'Program',points:300,image:'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&q=80&w=800',lat:35.0116,lng:135.7681,difficulty:'easy',time:'2h',city:'Kyoto',nearby:false,program:true,top50:true,tip:'Bow when receiving your tea bowl. Turn it clockwise twice before drinking.',},
+  { id:'q11',title:'Guest Lecture Reflection',titleJp:'講義レポート',desc:'Attend a guest lecture from a Japanese business leader and submit your reflection paper.',category:'Program',points:200,image:'https://images.unsplash.com/photo-1515169067868-5387ec356754?auto=format&fit=crop&q=80&w=800',lat:34.8154,lng:135.5692,difficulty:'easy',time:'2h',city:'Ibaraki',nearby:false,program:true,top50:false,tip:'Take notes in Japanese if possible — even single words.',},
+  { id:'q12',title:'SCM Case Study Presentation',titleJp:'ケーススタディ',desc:'Present your supply chain management case study to the class. Final grade component.',category:'Program',points:500,image:'https://images.unsplash.com/photo-1491975474562-1f4e30bc9468?auto=format&fit=crop&q=80&w=800',lat:34.8154,lng:135.5692,difficulty:'medium',time:'3h',city:'Ibaraki',nearby:false,program:true,top50:false,tip:'Include Japanese market context. Your program faculty loves Japan-specific examples.',},
+  // Top 50
+  { id:'q13',title:'Mount Takao Hike',titleJp:'高尾山',desc:'Complete the Takao-san trail to the summit. Take Keio Line from Shinjuku.',category:'Adventure',points:800,image:'https://images.unsplash.com/photo-1503220317375-aaad61436b1b?auto=format&fit=crop&q=80&w=800',lat:35.6257,lng:139.2431,difficulty:'hard',time:'4-6h',city:'Tokyo',nearby:false,program:false,top50:true,tip:'Trail 1 is paved, Trail 6 is most scenic. Beer garden at the top after summit!',},
+  { id:'q14',title:'Fushimi Inari 1,000 Gates',titleJp:'伏見稲荷大社',desc:'Hike through the thousands of vermillion torii gates up the sacred mountain.',category:'Culture',points:600,image:'https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?auto=format&fit=crop&q=80&w=800',lat:34.9671,lng:135.7727,difficulty:'medium',time:'2-3h',city:'Kyoto',nearby:false,program:false,top50:true,tip:'Most tourists turn back at the first gate. Keep going — the upper path is magic.',},
+  { id:'q15',title:'Arashiyama Bamboo Grove',titleJp:'嵐山竹林',desc:'Walk through the famous bamboo forest at dawn when it\'s completely empty.',category:'Nature',points:300,image:'https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&q=80&w=800',lat:35.0095,lng:135.6716,difficulty:'easy',time:'2h',city:'Kyoto',nearby:false,program:false,top50:true,tip:'Arrive before 7am. The light through the bamboo in the morning is otherworldly.',},
+  { id:'q16',title:'Nishiki Market Tasting',titleJp:'錦市場',desc:'Try 5 different foods from the "Kyoto Kitchen" market. Must include pickles and tofu.',category:'Food',points:280,image:'https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&q=80&w=800',lat:35.005,lng:135.765,difficulty:'easy',time:'2h',city:'Kyoto',nearby:false,program:false,top50:true,tip:'The tamagoyaki (egg omelet) stick vendor near the entrance is iconic.',},
+  { id:'q17',title:'Dotonbori at Night',titleJp:'道頓堀',desc:'Experience Osaka\'s iconic neon entertainment district at night. Take a photo with Glico Man.',category:'Urban',points:200,image:'https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&q=80&w=800',lat:34.6685,lng:135.5023,difficulty:'easy',time:'2h',city:'Osaka',nearby:false,program:false,top50:true,tip:'Takoyaki Museum is nearby. The canal reflection at night is beautiful.',},
+  { id:'q18',title:'Kinkaku-ji Golden Pavilion',titleJp:'金閣寺',desc:'Visit the iconic gold-leaf covered Zen temple reflected in its mirror pond.',category:'Culture',points:350,image:'https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&q=80&w=800',lat:35.0394,lng:135.7292,difficulty:'easy',time:'1.5h',city:'Kyoto',nearby:false,program:false,top50:true,tip:'The best view is from the Anmintaku pond. Arrive at opening (9am) to beat tour groups.',},
+  { id:'q19',title:'Akihabara Tech Hunt',titleJp:'秋葉原',desc:'Visit the electronics and anime district. Find one item under ¥500 to take home.',category:'Shopping',points:250,image:'https://images.unsplash.com/photo-1542051812-f4539618b14a?auto=format&fit=crop&q=80&w=800',lat:35.7022,lng:139.7741,difficulty:'easy',time:'2-4h',city:'Tokyo',nearby:false,program:false,top50:true,tip:'Multi-floor Yodobashi Camera has everything. Retro Famicom games are in small side shops.',},
+  { id:'q20',title:'Tsukiji Outer Market Breakfast',titleJp:'築地場外市場',desc:'Have fresh sushi or seafood at the famous outer market before 9am.',category:'Food',points:300,image:'https://images.unsplash.com/photo-1612550815818-6e0ec9d2ab79?auto=format&fit=crop&q=80&w=800',lat:35.6654,lng:139.7706,difficulty:'easy',time:'2h',city:'Tokyo',nearby:false,program:false,top50:true,tip:'Arrive at 7am. Try the tamagoyaki, the fatty tuna, and the sea urchin sushi.',},
 ]
 
-const EXCURSIONS = [
-  {
-    id: 'exc-ibaraki',
-    location: 'Ibaraki City',
-    nights: 10,
-    emoji: null, cityCode: 'IBR',
-    color: '#E02424',
-    highlights: ['Ritsumeikan OIC Campus', 'Osaka day trips', 'Dotonbori nightlife nearby', 'Arima Onsen accessible'],
-  },
-  {
-    id: 'exc-kyoto',
-    location: 'Kyoto',
-    nights: 11,
-    emoji: null, cityCode: 'KYO',
-    color: '#4F46E5',
-    highlights: ['1,600+ temples & shrines', 'Bamboo Forest (Arashiyama)', 'Nishiki Street Market', 'Gion traditional district'],
-  },
-  {
-    id: 'exc-tokyo',
-    location: 'Tokyo',
-    nights: 3,
-    emoji: null, cityCode: 'TYO',
-    color: '#10B981',
-    highlights: ['Shibuya Crossing', 'Tsukiji Outer Market', 'Akihabara electronics', 'teamLab digital art'],
-  },
-]
+const DIFFICULTY_COLORS = { easy:'#22c55e', medium:'#f59e0b', hard:'#ef4444' }
 
-function QuestCard({ quest, isCompleted, onComplete, index }) {
-  const [isExpanded, setIsExpanded] = useState(false)
-  const diff = DIFFICULTY_CONFIG[quest.difficulty] || DIFFICULTY_CONFIG.easy
+function QuestCard({ quest, isCompleted, onComplete, onNavigate, theme }) {
+  const t = getTheme(theme)
+  const [expanded, setExpanded] = useState(false)
+  const diffColor = DIFFICULTY_COLORS[quest.difficulty]
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.5, type: 'spring' }}
-      className="rounded-[1.5rem] overflow-hidden border shadow-sm transition-all"
-      style={{
-        background: isCompleted ? 'var(--surface2)' : 'var(--surface)',
-        borderColor: isCompleted ? 'rgba(91, 138, 94, 0.3)' : 'var(--border)',
-        opacity: isCompleted ? 0.7 : 1,
-      }}
-    >
-      <button
-        className="w-full text-left active:scale-[0.98] transition-transform"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <div className="relative h-44">
-          <img src={quest.image_url} alt={quest.title}
-            className="w-full h-full object-cover"
-            loading="lazy"
-            style={{ filter: isCompleted ? 'grayscale(80%)' : 'none' }} />
-          <div className="absolute inset-0"
-            style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)' }} />
-
-          {/* Badges overlay */}
-          {quest.isRequired && (
-            <div className="absolute top-4 left-4">
-              <span className="px-3 py-1.5 rounded-full font-display font-bold text-[10px] text-white shadow-sm backdrop-blur-md"
-                style={{ background: 'rgba(224, 36, 36, 0.85)', border: '1px solid rgba(255,255,255,0.1)' }}>REQUIRED</span>
+    <motion.div layout initial={{opacity:0,y:10}} animate={{opacity:1,y:0}}
+      className="rounded-3xl overflow-hidden mb-3"
+      style={{background:isCompleted?`${t.surface}`:`${t.surface}`,border:`1px solid ${isCompleted?t.success+'44':t.border}`,opacity:isCompleted?0.7:1}}>
+      {/* Image strip */}
+      <div className="relative" style={{height:130}}>
+        <img src={quest.image} alt={quest.title} className="w-full h-full object-cover"
+          onError={e=>{e.target.src='https://images.unsplash.com/photo-1542931287-023b922fa89b?auto=format&fit=crop&q=80&w=800'}}/>
+        <div className="absolute inset-0" style={{background:'linear-gradient(to top,rgba(0,0,0,0.75) 0%,transparent 55%)'}}/>
+        {isCompleted&&(
+          <div className="absolute inset-0 flex items-center justify-center"
+            style={{background:'rgba(34,197,94,0.25)'}}>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center"
+              style={{background:'rgba(34,197,94,0.9)'}}>
+              <IcCheck size={22} color="white" strokeWidth={2.5}/>
             </div>
-          )}
-
-          <div className="absolute bottom-0 left-0 right-0 p-5 flex items-end justify-between">
-            <div>
-              <h4 className="font-display font-black text-white text-base leading-tight drop-shadow-md">{quest.title}</h4>
-              {quest.title_jp && (
-                <p className="font-jp text-[11px] mt-1 font-bold" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                  {quest.title_jp}
-                </p>
-              )}
-            </div>
-            {isCompleted ? (
-              <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg backdrop-blur-md"
-                style={{ background: 'rgba(91,138,94,0.4)', border: '2px solid #86efac' }}>
-                <IcCheck size={16} color="#86efac" strokeWidth={2.8} />
-              </div>
-            ) : (
-              <div className="px-3 py-1.5 rounded-xl shadow-lg backdrop-blur-md"
-                style={{ background: 'rgba(224,36,36,0.5)', border: '1px solid rgba(255,255,255,0.2)' }}>
-                <span className="text-sm font-display font-black text-white">{quest.points} pts</span>
-              </div>
-            )}
           </div>
-        </div>
-
-        <div className="px-5 py-3.5 flex items-center gap-2 border-t" style={{ borderColor: 'var(--border)' }}>
-          <span className="px-2 py-1 rounded-md text-[10px] font-bold"
-            style={{ background: diff.bg, color: diff.color, border: `1px solid ${diff.border}` }}>
-            {diff.label}
-          </span>
-          <span className="px-2 py-1 rounded-md text-[10px] font-bold" style={{ background: 'var(--surface2)', color: 'var(--text-muted)' }}>{quest.category}</span>
-          {quest.city && (
-            <span className="px-2 py-1 rounded-md text-[10px] font-bold" style={{ background: 'var(--surface2)', color: 'var(--brand)' }}>
-              {quest.city}
-            </span>
-          )}
-          <span className="ml-auto text-sm font-display font-bold" style={{ color: 'var(--text-muted)' }}>
-            {isExpanded ? '▲' : '▼'}
-          </span>
-        </div>
-      </button>
-
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            style={{ overflow: 'hidden' }}
-          >
-            <div className="px-5 pb-5 pt-1" style={{ borderTop: '1px solid var(--border)' }}>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                {quest.description}
-              </p>
-              {!isCompleted && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); onComplete(quest) }}
-                  className="w-full mt-5 py-3.5 rounded-xl font-display font-bold text-sm text-white shadow-lg active:scale-[0.98] transition-all"
-                  style={{ background: 'var(--brand)' }}
-                >
-                  Mark Complete · +{quest.points} pts
-                </button>
-              )}
-            </div>
-          </motion.div>
         )}
-      </AnimatePresence>
+        {/* Difficulty + City */}
+        <div className="absolute top-3 left-3 flex gap-1.5">
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-display font-bold text-white capitalize"
+            style={{background:diffColor+'cc'}}>{quest.difficulty}</span>
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-display font-bold text-white"
+            style={{background:'rgba(0,0,0,0.6)'}}>{quest.city}</span>
+        </div>
+        {/* Points */}
+        <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-full"
+          style={{background:'rgba(0,0,0,0.7)',backdropFilter:'blur(8px)'}}>
+          <IcStar size={9} color="#FFB800"/>
+          <span className="text-[10px] font-mono font-bold" style={{color:'#FFB800'}}>{quest.points}</span>
+        </div>
+        {/* Title */}
+        <div className="absolute bottom-3 left-3 right-3">
+          <p className="font-display font-black text-base text-white leading-tight">{quest.title}</p>
+          <p className="font-jp text-xs text-white/60 mt-0.5">{quest.titleJp}</p>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="p-3">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-display font-bold px-2 py-0.5 rounded-full"
+            style={{background:t.brandBg,color:t.brand}}>{quest.category}</span>
+          <span className="text-xs" style={{color:t.textMuted}}>⏱ {quest.time}</span>
+        </div>
+
+        <p className="text-xs leading-relaxed mb-3" style={{color:t.textMuted}}>{quest.desc}</p>
+
+        <AnimatePresence>
+          {expanded&&(
+            <motion.div initial={{height:0,opacity:0}} animate={{height:'auto',opacity:1}} exit={{height:0,opacity:0}}
+              className="overflow-hidden mb-3">
+              <div className="p-3 rounded-2xl" style={{background:'rgba(255,255,255,0.04)',border:`1px solid ${t.border}`}}>
+                <p className="text-xs font-display font-bold mb-1" style={{color:t.brand}}>💡 Pro Tip</p>
+                <p className="text-xs leading-relaxed" style={{color:t.text}}>{quest.tip}</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="flex gap-2">
+          <button onClick={()=>setExpanded(!expanded)}
+            className="px-3 py-2 rounded-xl font-display font-bold text-xs"
+            style={{background:t.surface,border:`1px solid ${t.border}`,color:t.textMuted}}>
+            {expanded?'Less':'Tip'}
+          </button>
+          <button onClick={()=>onNavigate({name:quest.title,address:`${quest.city}, Japan`})}
+            className="px-3 py-2 rounded-xl font-display font-bold text-xs"
+            style={{background:t.brandBg,border:`1px solid ${t.brand}44`,color:t.brand}}>
+            Navigate
+          </button>
+          {!isCompleted&&(
+            <button onClick={()=>onComplete(quest.id,quest.points)}
+              className="flex-1 py-2 rounded-xl font-display font-bold text-xs text-white"
+              style={{background:`linear-gradient(135deg,${t.brand},${t.accent})`}}>
+              Mark Complete
+            </button>
+          )}
+          {isCompleted&&(
+            <div className="flex-1 py-2 rounded-xl flex items-center justify-center gap-1.5"
+              style={{background:'rgba(34,197,94,0.12)',border:'1px solid rgba(34,197,94,0.3)'}}>
+              <IcCheck size={12} color="#22c55e" strokeWidth={2.5}/>
+              <span className="font-display font-bold text-xs" style={{color:'#22c55e'}}>Completed</span>
+            </div>
+          )}
+        </div>
+      </div>
     </motion.div>
   )
 }
 
 export default function QuestsView() {
-  const { quests, completedQuests, completeQuest } = useStore()
-  const [tab, setTab] = useState('explore') // explore | program | excursions
+  const { theme, quests: storeQuests, completedQuests, completeQuest, user, setNaviMode, naviMode, naviTarget } = useStore()
+  const t = getTheme(theme)
+  const [activeTab, setActiveTab] = useState('Nearby')
 
-  const allQuests = [...quests, ...PROGRAM_ACTIVITIES]
-  const totalPossible = allQuests.reduce((s, q) => s + q.points, 0)
-  const earnedPoints = [...completedQuests].reduce((sum, id) => {
-    const q = allQuests.find(q => q.id === id)
-    return sum + (q?.points || 0)
-  }, 0)
-  const progressPct = totalPossible > 0 ? (earnedPoints / totalPossible) * 100 : 0
+  const allQuests = storeQuests.length > 0 ? storeQuests : ALL_QUESTS
 
-  const handleComplete = (quest) => {
-    if (completedQuests.has(quest.id)) return
-    completeQuest(quest.id, quest.points)
-    toast.success(`+${quest.points} pts — Quest Complete!`, {
-      style: { background: 'var(--surface)', color: 'var(--text)', border: '1px solid var(--border)', fontFamily: 'Syne,sans-serif', fontWeight: 700 },
-    })
-  }
+  const visibleQuests = allQuests.filter(q => {
+    if (activeTab === 'Nearby') return q.nearby
+    if (activeTab === 'Program') return q.program
+    if (activeTab === 'Top 50') return q.top50
+    if (activeTab === 'Completed') return completedQuests.has(q.id)
+    return true
+  })
 
-  const exploreQuests = quests
-  const programQuests = PROGRAM_ACTIVITIES
-
-  const TABS = [
-    { key: 'explore', label: 'Explore', count: exploreQuests.length },
-    { key: 'program', label: 'Program', count: programQuests.length },
-    { key: 'excursions', label: 'Itinerary', count: EXCURSIONS.length },
-  ]
+  const totalPossible = allQuests.reduce((s,q)=>s+q.points,0)
+  const earnedPoints = [...completedQuests].reduce((sum,id)=>{
+    const q = allQuests.find(q=>q.id===id)
+    return sum + (q?.points||0)
+  },0)
+  const completedCount = completedQuests.size
+  const progressPct = Math.min(100,(earnedPoints/Math.max(totalPossible,1))*100)
 
   return (
-    <div className="min-h-full pb-20 pt-2" style={{ background: 'var(--bg)' }}>
-      {/* ── Progress Header (Apple Wallet Style) ──────────────────── */}
-      <div className="px-5 pb-5">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-          className="p-6 rounded-[1.5rem] shadow-xl relative overflow-hidden"
-          style={{ background: 'var(--surface)' }}
-        >
-          {/* subtle glow */}
-          <div className="absolute top-0 right-0 w-32 h-32 blur-3xl rounded-full" style={{ background: 'var(--brand)', opacity: 0.15, transform: 'translate(30%, -30%)' }} />
+    <div className="flex flex-col h-full relative">
+      <AnimatePresence>
+        {naviMode&&<NaviOverlay target={naviTarget} onClose={()=>setNaviMode(false)}/>}
+      </AnimatePresence>
 
-          <div className="flex items-center justify-between mb-4 relative z-10">
-            <div>
-              <p className="text-[10px] font-display font-black uppercase tracking-widest mb-1.5" style={{ color: 'var(--brand)' }}>
-                Explorer Progress
-              </p>
-              <p className="text-3xl font-display font-black leading-none" style={{ color: 'var(--text)' }}>
-                {completedQuests.size} <span className="text-lg" style={{ color: 'var(--text-muted)' }}>/ {allQuests.length}</span>
-              </p>
-            </div>
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center border shadow-sm"
-              style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
-              <IcTrophy size={24} color="var(--brand)" />
-            </div>
+      {/* Progress card */}
+      <motion.div initial={{opacity:0,y:-8}} animate={{opacity:1,y:0}}
+        className="mx-4 mb-4 p-4 rounded-3xl"
+        style={{background:t.surface,border:`1px solid ${t.border}`}}>
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="font-display font-black text-sm" style={{color:t.text}}>Quest Progress</p>
+            <p className="text-xs mt-0.5" style={{color:t.textMuted}}>{completedCount} of {allQuests.length} completed</p>
           </div>
-          <div className="h-3 rounded-full overflow-hidden mb-2 relative z-10" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-            <motion.div className="h-full rounded-full"
-              initial={{ width: 0 }} animate={{ width: `${progressPct}%` }}
-              transition={{ delay: 0.3, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              style={{ background: 'var(--brand)' }} />
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+            style={{background:t.brandBg,border:`1px solid ${t.brand}44`}}>
+            <IcTrophy size={12} color={t.brand}/>
+            <span className="font-display font-black text-sm" style={{color:t.brand}}>
+              {earnedPoints.toLocaleString()} pts
+            </span>
           </div>
-          <div className="flex justify-between relative z-10">
-            <p className="text-xs font-display font-bold" style={{ color: 'var(--text-muted)' }}>
-              {earnedPoints.toLocaleString()} pts earned
-            </p>
-            <p className="text-xs font-display font-bold" style={{ color: 'var(--text-muted)' }}>
-              {(totalPossible - earnedPoints).toLocaleString()} remaining
-            </p>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* ── Frosted Sticky Tabs ─────────────────────────────── */}
-      <div className="sticky top-0 z-20 px-5 pt-2 pb-4 backdrop-blur-md" style={{ background: 'linear-gradient(to bottom, var(--bg) 60%, transparent 100%)' }}>
-        <div className="flex gap-2 p-1.5 rounded-2xl border shadow-sm" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-          {TABS.map(t => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className="flex-1 py-2.5 rounded-xl text-xs font-display font-black transition-all active:scale-[0.98]"
-              style={{
-                background: tab === t.key ? 'var(--text)' : 'transparent',
-                color: tab === t.key ? 'var(--bg)' : 'var(--text-muted)',
-              }}
-            >
-              {t.label}
-              <span className="ml-1.5 opacity-60">({t.count})</span>
-            </button>
-          ))}
         </div>
+        {/* Progress bar */}
+        <div className="h-2.5 rounded-full overflow-hidden" style={{background:'rgba(255,255,255,0.08)'}}>
+          <motion.div className="h-full rounded-full"
+            style={{background:`linear-gradient(90deg,${t.brand},${t.accent})`}}
+            initial={{width:0}} animate={{width:`${progressPct}%`}}
+            transition={{duration:1,ease:[0.22,1,0.36,1]}}/>
+        </div>
+        <div className="flex justify-between mt-1">
+          <span className="text-[10px] font-mono" style={{color:t.textFaint}}>0 pts</span>
+          <span className="text-[10px] font-mono" style={{color:t.textFaint}}>{totalPossible.toLocaleString()} pts total</span>
+        </div>
+      </motion.div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 mx-4 mb-4 p-1 rounded-2xl" style={{background:t.surface,border:`1px solid ${t.border}`}}>
+        {TABS.map(tab=>{
+          const active=activeTab===tab
+          const count = tab==='Completed'?completedCount:allQuests.filter(q=>tab==='Nearby'?q.nearby:tab==='Program'?q.program:tab==='Top 50'?q.top50:false).length
+          return(
+            <button key={tab} onClick={()=>setActiveTab(tab)}
+              className="flex-1 py-2 rounded-xl flex flex-col items-center gap-0.5 transition-all"
+              style={{background:active?t.brandBg:'transparent',border:active?`1px solid ${t.brand}44`:'1px solid transparent'}}>
+              <span className="font-display font-black" style={{fontSize:10,color:active?t.brand:t.textMuted}}>{tab}</span>
+              <span className="font-mono text-[9px]" style={{color:active?t.brand:t.textFaint}}>{count}</span>
+            </button>
+          )
+        })}
       </div>
 
-      {/* ── Content ───────────────────── */}
-      <div className="px-5">
-        {/* Explore Quests */}
-        {tab === 'explore' && (
-          <div className="space-y-5">
-            {exploreQuests.map((quest, i) => (
-              <QuestCard
-                key={quest.id}
-                index={i}
-                quest={quest}
-                isCompleted={completedQuests.has(quest.id)}
-                onComplete={handleComplete}
-              />
-            ))}
+      {/* Quest list */}
+      <div className="flex-1 overflow-y-auto hide-scroll px-4 pb-2">
+        {visibleQuests.length===0&&(
+          <div className="text-center py-12">
+            <IcTrophy size={32} color={t.textFaint}/>
+            <p className="font-display font-bold text-sm mt-3" style={{color:t.textMuted}}>
+              {activeTab==='Completed'?'No completed quests yet':'No quests in this category'}
+            </p>
+            <p className="text-xs mt-1" style={{color:t.textFaint}}>
+              {activeTab==='Completed'?'Start exploring to earn points!':'Switch to another tab to find quests'}
+            </p>
           </div>
         )}
-
-        {/* Program Quests */}
-        {tab === 'program' && (
-          <div className="space-y-5">
-            <div className="p-4 rounded-2xl flex gap-3 border shadow-sm"
-              style={{ background: 'var(--brand-glow)', borderColor: 'var(--brand)' }}>
-              <div className="mt-0.5"><IcBook size={18} color="var(--brand)" /></div>
-              <p className="text-sm font-body leading-relaxed m-0" style={{ color: 'var(--brand)' }}>
-                These activities are <strong>included with your program</strong> and complement MKT 3013 and MKT 3513. Mark each as complete to earn points.
-              </p>
-            </div>
-
-            {programQuests.map((quest, i) => (
-              <QuestCard
-                key={quest.id}
-                index={i}
-                quest={quest}
-                isCompleted={completedQuests.has(quest.id)}
-                onComplete={handleComplete}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Excursions */}
-        {tab === 'excursions' && (
-          <div className="space-y-5">
-            <div className="p-4 rounded-2xl border shadow-sm"
-              style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-              <p className="text-xs font-display font-bold uppercase tracking-widest mb-1.5" style={{ color: 'var(--brand)' }}>Your 24-Night Journey</p>
-              <p className="text-[13px] font-body m-0" style={{ color: 'var(--text-muted)' }}>
-                All excursions are completely <strong style={{ color: 'var(--text)' }}>included in your program fee.</strong>
-              </p>
-            </div>
-
-            {EXCURSIONS.map((exc, i) => (
-              <motion.div key={exc.id}
-                initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.08 }}
-                className="rounded-[1.5rem] overflow-hidden border shadow-sm"
-                style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
-              >
-                {/* Header */}
-                <div className="p-5 flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-display font-black flex-shrink-0 border shadow-sm"
-                    style={{ background: 'var(--surface2)', color: exc.color, borderColor: 'var(--border)' }}>
-                    {exc.cityCode}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-display font-black text-lg m-0 leading-tight" style={{ color: 'var(--text)' }}>{exc.location}</h3>
-                    <div className="flex items-center gap-2 mt-1.5">
-                      <span className="px-2.5 py-1 rounded-md text-[10px] font-bold"
-                        style={{ background: 'var(--surface2)', color: exc.color, border: `1px solid var(--border)` }}>
-                        {exc.nights} nights
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Highlights */}
-                <div className="px-5 pb-5">
-                  <p className="text-[10px] font-display font-black uppercase tracking-widest mb-3"
-                    style={{ color: 'var(--text-dim)' }}>Highlights</p>
-                  {exc.highlights.map((h, idx) => (
-                    <div key={h} className="flex items-center gap-3 py-2"
-                      style={{ borderBottom: idx === exc.highlights.length - 1 ? 'none' : '1px solid var(--border)' }}>
-                      <span className="text-xs font-bold" style={{ color: exc.color }}>—</span>
-                      <p className="text-sm font-body m-0" style={{ color: 'var(--text)' }}>{h}</p>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-
-            {/* Standard Activities Summary */}
-            <div className="p-5 rounded-[1.5rem] border shadow-sm mt-6"
-              style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
-              <p className="text-[10px] font-display font-black uppercase tracking-widest mb-4"
-                style={{ color: 'var(--text-dim)' }}>Standard Included Activities</p>
-              {[
-                { text: 'Orientation tours in Kyoto and Tokyo' },
-                { text: 'Tea ceremony experience' },
-                { text: 'Visits to temples and shrines' },
-                { text: 'Business site visits (MKT 3013)' },
-                { text: 'Guest lecturers (MKT 3013 & MKT 3513)' },
-              ].map((item, idx) => (
-                <div key={item.text} className="flex items-center gap-3 py-2.5"
-                  style={{ borderBottom: idx === 4 ? 'none' : '1px solid var(--border)' }}>
-                  <IcCheck size={14} color="var(--brand)" />
-                  <p className="text-sm font-body m-0" style={{ color: 'var(--text)' }}>{item.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {visibleQuests.map((quest,i)=>(
+          <QuestCard key={quest.id} quest={quest} theme={theme}
+            isCompleted={completedQuests.has(quest.id)}
+            onComplete={completeQuest}
+            onNavigate={(target)=>setNaviMode(true,target)}/>
+        ))}
       </div>
     </div>
   )

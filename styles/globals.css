@@ -1,135 +1,47 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+JP:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ============================================
-   THEME SYSTEM — 4 Themes
+   CSS RESET & ROOT VARS
    ============================================ */
+*, *::before, *::after { box-sizing: border-box; }
 
-/* DEFAULT: Dark Theme */
-:root,
-[data-theme="dark"] {
-  --brand: #E02424;
-  --brand-light: #FF6B6B;
-  --brand-glow: rgba(224, 36, 36, 0.28);
-  --brand-subtle: rgba(224, 36, 36, 0.12);
-  --bg: #09090b;
-  --bg2: #0f0f11;
-  --surface: rgba(18, 18, 20, 0.92);
-  --surface2: rgba(24, 24, 27, 0.95);
-  --border: rgba(255, 255, 255, 0.08);
-  --text: #fafaf9;
-  --text-muted: rgba(255, 255, 255, 0.38);
-  --text-dim: rgba(255, 255, 255, 0.18);
-  --halal: #22c55e;
-  --halal-bg: rgba(34, 197, 94, 0.12);
-  --halal-border: rgba(34, 197, 94, 0.28);
-  --nav-bg: rgba(12, 12, 14, 0.98);
-  --header-bg: rgba(9, 9, 11, 0.97);
-  --paper-texture: none;
-  /* Dark mode has the noise texture already */
+:root {
+  --brand:        #E02424;
+  --brand-glow:   rgba(224,36,36,0.28);
+  --surface:      rgba(18,18,20,0.92);
+  --border:       rgba(255,255,255,0.08);
+  --text-muted:   rgba(255,255,255,0.38);
+  --halal:        #22c55e;
+  --halal-bg:     rgba(34,197,94,0.12);
+  --halal-border: rgba(34,197,94,0.28);
 }
 
-/* Light Theme (Washi Paper Aesthetic) */
-[data-theme="light"] {
-  --brand: #E02424;
-  --brand-light: #FF6B6B;
-  --brand-glow: rgba(224, 36, 36, 0.15);
-  --brand-subtle: rgba(224, 36, 36, 0.08);
-  --bg: #fcfcf9;
-  /* Subtle warm white like Japanese paper */
-  --bg2: #f5f5f0;
-  --surface: rgba(255, 255, 255, 0.85);
-  /* Frosty white glass */
-  --surface2: rgba(250, 250, 248, 0.9);
-  --border: rgba(0, 0, 0, 0.06);
-  --text: #1a1a1a;
-  --text-muted: rgba(0, 0, 0, 0.5);
-  --text-dim: rgba(0, 0, 0, 0.25);
-  --halal: #16a34a;
-  --halal-bg: rgba(22, 163, 74, 0.1);
-  --halal-border: rgba(22, 163, 74, 0.2);
-  --nav-bg: rgba(252, 252, 249, 0.95);
-  --header-bg: rgba(252, 252, 249, 0.95);
-  --paper-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)' opacity='0.04'/%3E%3C/svg%3E");
-}
-
-/* Japan Theme — sakura pink + indigo */
-[data-theme="japan"] {
-  --brand: #d4456b;
-  --brand-light: #FFB7C5;
-  --brand-glow: rgba(212, 69, 107, 0.3);
-  --brand-subtle: rgba(212, 69, 107, 0.1);
-  --bg: #0a0812;
-  --bg2: #120f1a;
-  --surface: rgba(25, 18, 35, 0.95);
-  --surface2: rgba(30, 22, 42, 0.97);
-  --border: rgba(212, 69, 107, 0.15);
-  --text: #fdf4f7;
-  --text-muted: rgba(255, 183, 197, 0.5);
-  --text-dim: rgba(255, 183, 197, 0.25);
-  --nav-bg: rgba(12, 8, 18, 0.98);
-  --header-bg: rgba(10, 8, 18, 0.97);
-}
-
-/* OU Crimson Theme */
-[data-theme="ou"] {
-  --brand: #841617;
-  --brand-light: #CC2124;
-  --brand-glow: rgba(132, 22, 23, 0.35);
-  --brand-subtle: rgba(132, 22, 23, 0.12);
-  --bg: #0a0404;
-  --bg2: #130808;
-  --surface: rgba(20, 8, 8, 0.95);
-  --surface2: rgba(26, 10, 10, 0.97);
-  --border: rgba(132, 22, 23, 0.2);
-  --text: #fff8f8;
-  --text-muted: rgba(255, 200, 200, 0.45);
-  --text-dim: rgba(255, 150, 150, 0.2);
-  --nav-bg: rgba(10, 4, 4, 0.98);
-  --header-bg: rgba(8, 2, 2, 0.98);
-}
-
-/* Business Theme — slate/blue professional */
-[data-theme="business"] {
-  --brand: #3B82F6;
-  --brand-light: #60A5FA;
-  --brand-glow: rgba(59, 130, 246, 0.3);
-  --brand-subtle: rgba(59, 130, 246, 0.1);
-  --bg: #060b14;
-  --bg2: #0c1523;
-  --surface: rgba(12, 21, 35, 0.95);
-  --surface2: rgba(16, 28, 48, 0.97);
-  --border: rgba(59, 130, 246, 0.12);
-  --text: #f0f6ff;
-  --text-muted: rgba(147, 197, 253, 0.5);
-  --text-dim: rgba(147, 197, 253, 0.22);
-  --nav-bg: rgba(6, 11, 20, 0.98);
-  --header-bg: rgba(6, 11, 20, 0.98);
-}
-
-/* Apply theme bg to html/body */
 html {
-  background: var(--bg);
-  overflow-x: clip;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
-  color: var(--text);
+  background: #09090b;
+  color: #fafaf9;
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  margin: 0;
-  width: 100%;
-  overflow-x: clip;
 }
 
 /* ============================================
-   APP SHELL — FULLY RESPONSIVE
+   SCROLLBAR HIDING
+   ============================================ */
+.hide-scroll::-webkit-scrollbar { display: none; }
+.hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ============================================
+   APP SHELL — MOBILE FIRST
    ============================================ */
 #app-shell {
   width: 100%;
@@ -141,95 +53,29 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
+  background: #09090b;
 }
 
 /* Full-bleed on phones */
-/* ─── Phone (all sizes up to 767px) — full screen, no frame */
-@media (max-width: 767px) {
-  #app-shell {
-    max-width: 100% !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    width: 100vw !important;
-  }
-
-  body {
-    font-size: 15px;
-  }
-}
-
-/* ─── Tablet & Desktop: shells are full-viewport flex layouts */
-/* No max-width constraint needed — AppShell handles layout */
-@media (min-width: 768px) {
-  body {
-    background: var(--bg);
-  }
-}
-
-
-/* ============================================
-   NOISE TEXTURE OVERLAY (premium feel)
-   ============================================ */
-#app-shell::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  border-radius: inherit;
-}
-
-[data-theme="light"] #app-shell::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image: var(--paper-texture);
-  border-radius: inherit;
-  mix-blend-mode: multiply;
+@media (max-width: 430px) {
+  #app-shell { max-width: 100%; border-radius: 0; }
+  body { background: #09090b; }
 }
 
 /* ============================================
-   TYPOGRAPHY — Premium Stack
+   TYPOGRAPHY
    ============================================ */
-.font-display {
-  font-family: 'Syne', 'Inter', system-ui, sans-serif;
-}
-
-.font-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-.font-serif {
-  font-family: 'Playfair Display', Georgia, serif;
-}
-
-.font-jp {
-  font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
-}
-
-.font-mono {
-  font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
-}
+.font-display { font-family: 'Syne', sans-serif; }
+.font-body    { font-family: 'DM Sans', sans-serif; }
+.font-jp      { font-family: 'Noto Sans JP', sans-serif; }
+.font-mono    { font-family: 'JetBrains Mono', monospace; }
 
 .text-gradient {
-  background: linear-gradient(135deg, var(--brand-light) 0%, var(--brand) 50%, #FF8E53 100%);
+  background: linear-gradient(135deg, #FF6B6B 0%, #E02424 50%, #FF8E53 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-
-.text-gradient-japan {
-  background: linear-gradient(135deg, #FFB7C5 0%, #d4456b 60%, #7c3aed 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 
 /* ============================================
    GLASS MORPHISM
@@ -247,8 +93,8 @@ body {
 .card {
   border-radius: 1.5rem;
   overflow: hidden;
-  background: rgba(18, 18, 20, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(18,18,20,0.9);
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 /* ============================================
@@ -269,10 +115,7 @@ body {
   -webkit-tap-highlight-color: transparent;
   cursor: pointer;
 }
-
-.btn-primary:active {
-  transform: scale(0.95);
-}
+.btn-primary:active { transform: scale(0.95); }
 
 .btn-ghost {
   display: inline-flex;
@@ -283,15 +126,12 @@ body {
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
   transition: transform 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
-
-.btn-ghost:active {
-  transform: scale(0.95);
-}
+.btn-ghost:active { transform: scale(0.95); }
 
 /* ============================================
    INPUT FIELDS
@@ -302,27 +142,20 @@ body {
   border-radius: 1rem;
   font-family: 'DM Sans', sans-serif;
   font-size: 0.875rem;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
   color: white;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
   -webkit-appearance: none;
   appearance: none;
 }
-
 .input-field:focus {
-  border-color: rgba(224, 36, 36, 0.45);
-  box-shadow: 0 0 0 3px rgba(224, 36, 36, 0.1);
+  border-color: rgba(224,36,36,0.45);
+  box-shadow: 0 0 0 3px rgba(224,36,36,0.1);
 }
-
-.input-field::placeholder {
-  color: rgba(255, 255, 255, 0.28);
-}
-
-select.input-field option {
-  background: #1c1c1e;
-}
+.input-field::placeholder { color: rgba(255,255,255,0.28); }
+select.input-field option { background: #1c1c1e; }
 
 /* ============================================
    PROGRESS BAR
@@ -330,15 +163,14 @@ select.input-field option {
 .progress-bar {
   height: 4px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255,255,255,0.08);
   overflow: hidden;
 }
-
 .progress-fill {
   height: 100%;
   border-radius: 2px;
   background: linear-gradient(90deg, #E02424, #FF8E53);
-  transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: width 0.7s cubic-bezier(0.22,1,0.36,1);
 }
 
 /* ============================================
@@ -355,36 +187,11 @@ select.input-field option {
   font-size: 10px;
   white-space: nowrap;
 }
-
-.badge-brand {
-  background: rgba(224, 36, 36, 0.14);
-  color: #FF8E8E;
-  border: 1px solid rgba(224, 36, 36, 0.24);
-}
-
-.badge-green {
-  background: rgba(91, 138, 94, 0.14);
-  color: #86efac;
-  border: 1px solid rgba(91, 138, 94, 0.24);
-}
-
-.badge-blue {
-  background: rgba(79, 70, 229, 0.14);
-  color: #818CF8;
-  border: 1px solid rgba(79, 70, 229, 0.24);
-}
-
-.badge-sakura {
-  background: rgba(255, 183, 197, 0.12);
-  color: #FFB7C5;
-  border: 1px solid rgba(255, 183, 197, 0.2);
-}
-
-.badge-halal {
-  background: var(--halal-bg);
-  color: var(--halal);
-  border: 1px solid var(--halal-border);
-}
+.badge-brand  { background: rgba(224,36,36,0.14);  color: #FF8E8E;  border: 1px solid rgba(224,36,36,0.24); }
+.badge-green  { background: rgba(91,138,94,0.14);  color: #86efac;  border: 1px solid rgba(91,138,94,0.24); }
+.badge-blue   { background: rgba(79,70,229,0.14);  color: #818CF8;  border: 1px solid rgba(79,70,229,0.24); }
+.badge-sakura { background: rgba(255,183,197,0.12); color: #FFB7C5; border: 1px solid rgba(255,183,197,0.2); }
+.badge-halal  { background: var(--halal-bg);        color: var(--halal); border: 1px solid var(--halal-border); }
 
 /* ============================================
    CAMERA SCANNER
@@ -396,96 +203,44 @@ select.input-field option {
   border-color: #E02424;
   border-style: solid;
 }
-
-.scanner-corner.tl {
-  top: 0;
-  left: 0;
-  border-width: 3px 0 0 3px;
-  border-radius: 4px 0 0 0;
-}
-
-.scanner-corner.tr {
-  top: 0;
-  right: 0;
-  border-width: 3px 3px 0 0;
-  border-radius: 0 4px 0 0;
-}
-
-.scanner-corner.bl {
-  bottom: 0;
-  left: 0;
-  border-width: 0 0 3px 3px;
-  border-radius: 0 0 0 4px;
-}
-
-.scanner-corner.br {
-  bottom: 0;
-  right: 0;
-  border-width: 0 3px 3px 0;
-  border-radius: 0 0 4px 0;
-}
+.scanner-corner.tl { top: 0; left: 0; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+.scanner-corner.tr { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+.scanner-corner.bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+.scanner-corner.br { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
 
 .scan-line {
   position: absolute;
-  left: 4px;
-  right: 4px;
+  left: 4px; right: 4px;
   height: 2px;
   background: linear-gradient(to right, transparent, #E02424, transparent);
   animation: scanLine 2s ease-in-out infinite;
   border-radius: 1px;
 }
-
 @keyframes scanLine {
-  0% {
-    top: 4px;
-    opacity: 1;
-  }
-
-  50% {
-    top: calc(100% - 6px);
-    opacity: 0.7;
-  }
-
-  100% {
-    top: 4px;
-    opacity: 1;
-  }
+  0%   { top: 4px; opacity: 1; }
+  50%  { top: calc(100% - 6px); opacity: 0.7; }
+  100% { top: 4px; opacity: 1; }
 }
 
 /* ============================================
    MAP STYLES
    ============================================ */
-.mapboxgl-map {
-  border-radius: 1.5rem;
-}
-
+.mapboxgl-map { border-radius: 1.5rem; }
 .mapboxgl-ctrl-bottom-left,
 .mapboxgl-ctrl-bottom-right,
 .mapboxgl-ctrl-top-left,
-.mapboxgl-ctrl-top-right {
-  display: none !important;
-}
+.mapboxgl-ctrl-top-right { display: none !important; }
 
 .map-marker-pulse {
-  width: 14px;
-  height: 14px;
+  width: 14px; height: 14px;
   border-radius: 50%;
   background: #E02424;
   animation: pulse 2s infinite;
 }
-
 @keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(224, 36, 36, 0.6);
-  }
-
-  70% {
-    box-shadow: 0 0 0 10px rgba(224, 36, 36, 0);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0 rgba(224, 36, 36, 0);
-  }
+  0%   { box-shadow: 0 0 0 0 rgba(224,36,36,0.6); }
+  70%  { box-shadow: 0 0 0 10px rgba(224,36,36,0); }
+  100% { box-shadow: 0 0 0 0 rgba(224,36,36,0); }
 }
 
 /* ============================================
@@ -493,52 +248,32 @@ select.input-field option {
    ============================================ */
 .skeleton {
   background: linear-gradient(90deg,
-      rgba(255, 255, 255, 0.04) 25%,
-      rgba(255, 255, 255, 0.08) 50%,
-      rgba(255, 255, 255, 0.04) 75%);
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.6s infinite;
 }
-
 @keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-
-  100% {
-    background-position: -200% 0;
-  }
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* ============================================
    SPRING ENTRANCE
    ============================================ */
 @keyframes springIn {
-  from {
-    opacity: 0;
-    transform: translateY(18px) scale(0.97);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
 }
-
-.spring-in {
-  animation: springIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
+.spring-in { animation: springIn 0.45s cubic-bezier(0.22,1,0.36,1) forwards; }
 
 /* ============================================
    SAFE AREA — iOS HOME BAR
    ============================================ */
-.safe-bottom {
-  padding-bottom: max(16px, env(safe-area-inset-bottom));
-}
-
-.safe-top {
-  padding-top: max(20px, env(safe-area-inset-top));
-}
+.safe-bottom { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+.safe-top    { padding-top:    max(20px, env(safe-area-inset-top)); }
 
 /* ============================================
    IMAGE RENDERING
@@ -551,22 +286,6 @@ img {
 }
 
 /* ============================================
-   HIDE SCROLLBAR
-   ============================================ */
-.hide-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.hide-scroll {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
-}
-
-/* ============================================
    TOAST
    ============================================ */
-#__next {
-  height: 100%;
-}
+#__next { height: 100%; }

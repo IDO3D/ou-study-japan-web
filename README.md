@@ -1,83 +1,64 @@
-# OUStudyJapan — Production Deployment Guide
+# OUStudyJapan v5
 
-## Live site: https://oujapanapp.us/
+Production-ready travel companion app for OU Study Abroad Japan program.
 
-## Stack
-- Next.js 14 · React 18 · Tailwind CSS 3
-- Framer Motion · Zustand · react-hot-toast
-- Tesseract.js (OCR) · Mapbox GL JS
-- Custom SVG icon system (no emoji)
+## Quick Start
 
-## Local Dev
 ```bash
 npm install
-npm run dev
-# → http://localhost:3000
+cp .env.example .env.local   # fill in your API keys
+npm run dev                   # → http://localhost:3000
 ```
 
-## Production Build
+## Deploy to Vercel
+
 ```bash
-npm run build
-npm start
+npm run build && npm start    # test production build
+npx vercel --prod             # deploy
 ```
 
-## Environment Variables (.env.local)
-```
-NEXT_PUBLIC_MAPBOX_TOKEN=pk.your_mapbox_token
-NEXT_PUBLIC_DEEPL_API_KEY=your_deepl_key
-NEXT_PUBLIC_EXCHANGE_API_KEY=your_exchangerate_key
-DATABASE_URL=postgresql://user:pass@host:5432/oustudyjapan
-```
-All features work without API keys (mock data fallbacks active).
+## Environment Variables
 
-## Deploy to oujapanapp.us (Vercel / Node server)
+Set these in Vercel → Settings → Environment Variables:
 
-### Vercel (recommended)
-```bash
-npm i -g vercel
-vercel --prod
-```
-Set env vars in Vercel dashboard → Settings → Environment Variables.
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | CRITICAL | Supabase pooler URI (not localhost!) |
+| `NEXT_PUBLIC_SUPABASE_URL` | CRITICAL | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | CRITICAL | Public anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | CRITICAL | Server-only service key |
+| `NEXT_PUBLIC_MAPBOX_TOKEN` | HIGH | Mapbox `pk.*` token for 3D maps |
+| `DEEPL_API_KEY` | MEDIUM | DeepL API for translations |
+| `EXCHANGE_RATE_API_KEY` | LOW | ExchangeRate-API.com key |
 
-### Manual Node server
-```bash
-npm run build
-PORT=3000 npm start
-```
-Use nginx as reverse proxy:
-```nginx
-server {
-    listen 443 ssl;
-    server_name oujapanapp.us;
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
+## Features (v5)
 
-## Features (v3)
-- 7-tab navigation: Home, Scan, Map, Quests, Canvas, Stay, Profile
-- Custom SVG icon system — zero emojis
-- Halal food filter with certified restaurant database
-- Wallet: Suica IC card, Apple/Google Pay, ATM locator
-- Health & Safety: hospitals, allergies, emergency phrases
-- SIM Card comparison: IIJmio, Sakura Mobile, Mobal, Airalo
-- Finance: live JPY/USD converter, daily budget template
-- Photo Reel: cinematic slideshow of trip photos
-- Auth: sign in / sign up / sign out
-- Full PWA: works offline, adds to home screen
-- Mobile-first: safe-area-inset, iOS status bar support
+- **Navigation Mode** — Apple Maps-style with Walk/Bike/Transit/Drive/Taxi
+- **AI Translate** — Camera OCR, Voice AI Agent (JLPT N1), Live AR overlay
+- **Discover** — Full restaurant profiles with menus, deals, ratings, navi
+- **Quests** — Top 50 things to do, Nearby, OU Program (50 total)
+- **Stay** — Airbnb-quality property pages with 3D Mapbox + area info
+- **Canvas Bridge** — OU Canvas LMS integration with grades and calendar
+- **4 Themes** — Midnight Dark, Sakura Japan, OU Crimson, Carbon Business
+- **Mobile-First** — iOS/Android safe-area, dvh viewport, no scale bugs
 
-## Halal Restaurants
-Includes 6 halal-certified spots across Tokyo/Kyoto/Osaka:
-- Naritaya Halal Ramen (Japan Halal Association certified)
-- Gyukatsu Saku Halal (Muslim Pro Verified)
-- Magal Korean BBQ Halal (Japan Islamic Trust)
-- Curry House CoCo Halal (CoCo certified branch)
-- Marugame Seimen Halal (Halal Media Japan)
-- Yakitori Halal Ginza (JHFA Certified)
+## v5 Fixes Applied
+
+- [x] `isLoggedIn = false` — auth no longer bypassed on first load
+- [x] `swcMinify` removed — no more Next 14 build warning
+- [x] `favicon.ico` created — no more 404 on every page load
+- [x] `manifest.json` added — PWA installable
+- [x] Font `@import` moved to `_document.js` — no render-blocking CSS
+- [x] DB pool serverless-optimized — connection timeout + max 2 in prod
+- [x] Exchange rate API hardened — AbortSignal timeout, proper fallback
+- [x] All POI map icons are SVG — no blank emoji
+- [x] All UI icons are SVG — zero platform emoji dependency
+- [x] Schema migrations for tutorial_completed, halal, deals, theme
+- [x] `viewport-fit=cover` + `maximum-scale=1` — no iOS zoom on input
+
+## Database Setup (Supabase)
+
+1. Create project at supabase.com
+2. Go to SQL Editor → paste `database/schema.sql` → Run
+3. Copy **Supabase URL** and **Anon Key** to Vercel env vars
+4. Copy **Pooler Connection String** as `DATABASE_URL`
