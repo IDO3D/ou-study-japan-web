@@ -139,12 +139,8 @@ export default function CommunityView() {
 
     return (
         <div className="pb-24 pt-4 bg-black min-h-screen">
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 mb-2 sticky top-0 bg-black/80 backdrop-blur-xl z-20 py-3 border-b border-white/10">
-                <div className="flex items-center gap-2">
-                    <OULogo size={20} variant="mark" />
-                    <h1 className="font-display font-black text-white text-xl tracking-tighter shadow-sm">OU Study Japan</h1>
-                </div>
+            {/* V5 AppShell Header handles title, but we need space for top padding */}
+            <div className="flex items-center justify-end px-5 mb-2 py-1">
                 <div className="flex items-center gap-3">
                     <button onClick={() => setShowUploadModal(true)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/20 hover:bg-white/20 transition-colors active:scale-95">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>

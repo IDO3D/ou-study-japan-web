@@ -7,25 +7,26 @@ import { getTheme } from '../../utils/themes'
 import ThemeSwitcher from '../ui/ThemeSwitcher'
 
 const VIEW_META = {
-  home:     { title: 'Home',          sub: null },
-  discover: { title: 'Discover',      sub: 'Food & Dining' },
-  camera:   { title: 'Translate',     sub: 'Camera · Voice · Live AR' },
-  map:      { title: 'Map',           sub: 'Ibaraki · Kyoto · Tokyo' },
-  quests:   { title: 'Quests',        sub: 'Top 50 · Program · Nearby' },
-  canvas:   { title: 'Canvas',        sub: 'OU Japan Program' },
-  housing:  { title: 'Stay',          sub: '24 Nights · 3 Cities' },
-  profile:  { title: 'Profile',       sub: 'Account & Tools' },
+  home: { title: 'Home', sub: null },
+  community: { title: 'Feed', sub: 'Student Network' },
+  discover: { title: 'Discover', sub: 'Food & Dining' },
+  camera: { title: 'Translate', sub: 'Camera · Voice · Live AR' },
+  map: { title: 'Map', sub: 'Ibaraki · Kyoto · Tokyo' },
+  quests: { title: 'Quests', sub: 'Top 50 · Program · Nearby' },
+  canvas: { title: 'Canvas', sub: 'OU Japan Program' },
+  housing: { title: 'Stay', sub: '24 Nights · 3 Cities' },
+  profile: { title: 'Profile', sub: 'Account & Tools' },
 }
 
 function ThemeOrb({ theme, onClick }) {
   const t = getTheme(theme)
-  const colors = { dark:'#E02424', japan:'#FF4D7D', ou:'#841617', business:'#6366f1' }
+  const colors = { dark: '#E02424', japan: '#FF4D7D', ou: '#841617', business: '#6366f1' }
   const color = colors[theme] || '#E02424'
   return (
     <button onClick={onClick}
       className="w-8 h-8 rounded-full flex items-center justify-center relative"
       style={{ background: `${color}22`, border: `1.5px solid ${color}55` }}>
-      <div className="w-3 h-3 rounded-full" style={{ background: color }}/>
+      <div className="w-3 h-3 rounded-full" style={{ background: color }} />
     </button>
   )
 }
@@ -64,12 +65,12 @@ export default function Header({ currentView, onNavigate }) {
 
         <div className="flex items-center gap-2">
           {/* Theme orb */}
-          <ThemeOrb theme={theme} onClick={() => setShowTheme(true)}/>
+          <ThemeOrb theme={theme} onClick={() => setShowTheme(true)} />
 
           {/* Points badge */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
             style={{ background: t.brandBg, border: `1px solid ${t.brand}33` }}>
-            <IcStar size={11} color={t.brandLight} strokeWidth={2.5} style={{ fill: t.brandLight }}/>
+            <IcStar size={11} color={t.brandLight} strokeWidth={2.5} style={{ fill: t.brandLight }} />
             <span className="font-display font-bold" style={{ fontSize: '11px', color: t.brandLight }}>
               {user.points.toLocaleString()}
             </span>
@@ -82,14 +83,14 @@ export default function Header({ currentView, onNavigate }) {
             style={{ padding: '2px', background: `linear-gradient(135deg, ${t.brand}, ${t.accent})`, boxShadow: `0 0 12px ${t.brandGlow}` }}>
             <img src={user.avatarUrl} alt={user.name} width={34} height={34}
               className="rounded-full block object-cover" style={{ border: `2px solid ${t.bg}` }}
-              onError={e => { e.target.src = 'https://i.pravatar.cc/150?img=33' }}/>
+              onError={e => { e.target.src = 'https://i.pravatar.cc/150?img=33' }} />
           </button>
         </div>
       </header>
 
       {/* Theme switcher overlay */}
       <AnimatePresence>
-        {showTheme && <ThemeSwitcher onClose={() => setShowTheme(false)}/>}
+        {showTheme && <ThemeSwitcher onClose={() => setShowTheme(false)} />}
       </AnimatePresence>
     </>
   )
